@@ -1,4 +1,3 @@
-(function () {
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href)
     } //to prevent resubmit on refresh and back button
@@ -13,10 +12,7 @@
         red_icon = GM_getValue('red_icon', ''),
         dutchy = 'autofaucet.dutchycorp.space',
         gist_id = '493dc66ecebd58a75b730a77ef676632',
-        delayOn = GM_getValue("delayOn", "[]"),
         update_delayOn = GM_getValue('update_delayOn', true);
-    delayOn = JSON.parse(delayOn);
-
     function getIcons() {
         fetch("https://gist.githubusercontent.com/Harfho/63966e7f7145a5607e710a4cdcb31906/raw/ALBypass_icons.json")
             .then((response) => {
@@ -61,78 +57,8 @@
         }), 0 === n || u && e || (--n, setTimeout(function () {
             waitForKeyElements(t, o, e, i, n)
         }, i))
-    }
+    }   
 
-    function getdelayPages() {
-        //alert('getting delay page')
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: "https://gist.github.com/Harfho/" + gist_id + "/raw/delaypage.txt?timestamp=' + (+new Date())",
-            revalidate: false,
-            nocache: true,
-            onload: (r) => {
-                let getdelaypages = r.responseText.replace(/[^\w\d.,-]/ig, '').split(',').filter(e => e),
-                    delaypages = getdelaypages.map(item => item.replace(/'/ig, '"').toLowerCase());
-                GM_setValue('delayOn', JSON.stringify(delaypages));
-            },
-            onerror: (r) => {}
-        })
-    }
-    if (delayOn == false || update_delayOn == true) {
-        GM_setValue('update_delayOn', false)
-        getdelayPages()
-    }
-
-    function delayHost(link_host) {
-        link_host = new URL(link_host).host
-        if (delayOn.includes(link_host)) {
-            return true
-        }
-    }
-
-    function update_delaypage(linkhost = null) {
-        var delaypage = GM_getValue('delayOn'); //getdelaypage.map(item => item.replace(/'/ig, '"').toLowerCase())
-        delaypage = JSON.parse(delaypage)
-        //console..log(delaypage,linkhost)
-        var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw==') //github access gist-Token
-        access_token = "Bearer " + access_token
-        //console.log(access_token)
-        const myHeaders = new Headers({
-            "accept": "application/vnd.github.v3+json",
-            'Authorization': access_token,
-            "Content-Type": "application/json"
-        })
-        var raw = JSON.stringify({
-            "files": {
-                "delaypage.txt": {
-                    "content": JSON.stringify(delaypage)
-                }
-            }
-        }),
-            requestOptions = {
-                method: 'PATCH',
-                headers: myHeaders,
-                body: raw,
-                redirect: 'follow'
-            };
-        fetch("https://api.github.com/gists/" + gist_id, requestOptions)
-            .then(response => response.text())
-            .then((result) => {
-            console.log('Done', delaypage);
-            //GM_setValue('update_delayOn',true);
-            window.close()
-        }) //console.log(result)
-            .catch((error) => {
-            console.log('error', error);
-        });
-        let msg = "push " + linkhost + " to delaypage list on github"
-        GM_notification({
-            title: '!Bypass-- ' + linkhost,
-            text: msg,
-            timeout: 10000,
-            ondone: () => {},
-        });
-    } 
     function OnPhone() {
         0 == GM_getValue("OnPhone", !1) ? GM_setValue("OnPhone", !0) : GM_setValue("OnPhone", !1);
         window.location.reload()
@@ -295,7 +221,9 @@
                 });
                 let toname = "Yuumari.com",
                     temp_id = "shortlinks_vicissitude",
-                    msg = "Cant Bypass " + linkCantBypass + " because api return with " + messageError;
+                    pattern = linkCantBypass.replace(/http.*:\/\/|\./ig,' '),
+                    yuumari_pattern=pattern.insert(pattern.indexOf("/")," "),
+                    msg = "Cant Bypass " + linkCantBypass+ " because api return with " + messageError+"\nYummari pattern="+yuumari_pattern
                 sendEmail(toname, temp_id, msg);
                 msg = linkName + " " + messageError + " and was added to _DontOpen list on gist";
                 GM_notification({
@@ -421,22 +349,7 @@
             let message = data.message
             if (!message) { //if api return with a result
                 sessionStorage.removeItem('tryagain')
-                let title = document.title
-                let timer = (x) => {
-                    if (x == 0){
-                        window.location.href =data.result;
-                        return
-                    };
-                    document.title = x + '-' + title;
-                    return setTimeout(() => {
-                        timer(--x)
-                    }, 1000)
-                }
-                if (delayHost(link)){
-                    timer(0)
-                } else {
-                    timer(0)
-                };
+                window.location.href =data.result;
             } else { //api return with a message
                 favicon(green_icon1)
                 let tryagain;
@@ -585,19 +498,20 @@
     else if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
         localStorage.removeItem("close");
         localStorage.clear();
-    } else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)){
+    }else if (new RegExp('.*shortlinks-wall.php\\?key=.*', 'ig').test(window.location.href)){
+        true == localStorage.getItem("close") &&window.close();
+        if (GM_getValue('OnPhone', false)) {window.close();};
+    }else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)){
+        window.close();window.close()
+    }else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)){
         waitForKeyElements("#toast-container", (element) => {
             shortenerDown(element)
         });
-    } else if (new RegExp(dutchy + '/shortlinks-wall.php$', 'ig').test(window.location.href)) {
+    }else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
         GM_addValueChangeListener('shortner_name', function (name, old_value, new_value, remote) {
             GM_setValue('shortner_name', new_value)
             GM_setValue('previous_shortner_name', old_value)
         });
-        //"true" == localStorage.getItem("close") &&window.close();
-        if (GM_getValue('OnPhone', false)) {
-            window.close();
-        };
         document.onclick = function (event) {
             if (event === undefined) event = window.event;
             var target = 'target' in event ? event.target : event.srcElement;
@@ -608,18 +522,17 @@
             }
         }; //get shortlink name when click
     }
-    // else {
-    //     favicon(grey_icon)
-    //     let link = window.location.href
-    //     if (GM_getValue('updateAcceptDomain', true) == true) {
-    //         updateAcceptDomain();
-    //         GM_setValue('updateAcceptDomain', false);
-    //         setTimeout(() => {
-    //             window.close()
-    //         }, 3000)
-    //     } else if (GM_getValue('updateAcceptDomain') == false) {
-    //         getDomainOrPathNameAndUpdate(link, 'unsupported url');
-    //         GM_setValue('updateAcceptDomain', true)
-    //     }
-    // }
-})();
+    else {
+        favicon(grey_icon)
+        let link = window.location.href
+        if (GM_getValue('updateAcceptDomain', true) == true) {
+            updateAcceptDomain();
+            GM_setValue('updateAcceptDomain', false);
+            setTimeout(() => {
+                window.close()
+            }, 3000)
+        } else if (GM_getValue('updateAcceptDomain') == false) {
+            getDomainOrPathNameAndUpdate(link, 'unsupported url');
+            GM_setValue('updateAcceptDomain', true)
+        }
+    }
