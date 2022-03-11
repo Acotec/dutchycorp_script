@@ -522,7 +522,7 @@
                 console.log(linkName);
             }
         }; //get shortlink name when click
-    } else if(/autofaucet.dutchycorp.space.+(roll.php|coin_roll.php|ptc|offers.php)/ig.test(window.location.href)) {console.log("Bypass Can't Run on this Page")}
+    }else if(new RegExp(dutchy,'ig').test(window.location.href)) {console.log("Bypass Can't Run on this Page")}
     else {
         favicon(grey_icon)
         let link = window.location.href
