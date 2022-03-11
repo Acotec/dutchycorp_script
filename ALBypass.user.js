@@ -278,6 +278,7 @@
             }
             let found = urlsplice.some((r) => {
                 pathname = r;
+                return shortlinks_name.includes(r)
                 return shortlinks_name.includes(getSimilarWord(r.toLowerCase(), shortlinks_name,0.4))
             })
             if (found) {
