@@ -9,7 +9,7 @@
         if(email){
             element.querySelector('input').value=email
             GM_deleteValue('email')
-            document.querySelector("#addresses_form > div:nth-child(91) > center > button").click()
+            document.querySelector("#addresses_form button")
         }
         else{
             getEmail()
