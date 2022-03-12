@@ -1,4 +1,3 @@
-(function () {
     var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
         shortlinks_name = GM_getResourceText("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
         _open_link_fast = [].map(e => e.toLowerCase()),
@@ -138,8 +137,12 @@
         }
     } else {
         SpeedCtr()
+        var second_parag = document.createElement("p");
+        second_parag.setAttribute('class','title')
+        second_parag.innerText='Available Shortlinks:'+_views_ToVisit.length;
+        body.append(second_parag);
         body.appendChild(button);
-        button.innerHTML = "Script Not Running -- SHORTLINKS=" + _views_ToVisit.length;     
+        button.innerHTML = "Script Not Running -- SHORTLINKS=" + _views_ToVisit.length;
         button.addEventListener("click", function () {
             checkButton()
         });
@@ -302,10 +305,10 @@
                                 setTimeout(()=>{clickOnEle(img.getElementsByTagName('input')[0])},1000)
                                 setTimeout(()=>{clickOnEle(document.querySelector("#"+antibotid).querySelector('button'))},1000)
                                 GM_setValue("_alreadyRun", false);
-                                setTimeout(()=>{window.location.reload()},2000)
+                                setTimeout(()=>{window.location.reload(false)},2000)
                             }
                         })
-                    },2000)
+                    },1000)
                 };
             }catch(e){}
         }
@@ -367,13 +370,13 @@
                                         // clearInterval(inter)
                                         // appear() // re-run
                                     }
-                                     else{
+                                    else{
                                         console.log('linkName='+linkName,"no view left")
                                         clearInterval(inter)
                                         clearInterval(interval)
                                         appear() // re-run
-                                    //     //alert(duration)
-                                     }
+                                        //     //alert(duration)
+                                    }
                                 }, duration)
                             } else {
                                 console.log(linkName.toLowerCase(), 'Is not among shortlinks to open',limit)
@@ -408,8 +411,8 @@
                     button.innerHTML = 'Done opening-Click to Run Again'
                     clearInterval(interval)
                     GM_setValue("use_static", false)
-                    //Re_run()
-                    //window.close();//window.close()
+                    Re_run()
+                    window.close();//window.close()
                 }
             }, duration);
         }
@@ -434,4 +437,3 @@
             main()
         }
     }
-})();
