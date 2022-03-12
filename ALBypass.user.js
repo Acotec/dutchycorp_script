@@ -11,8 +11,7 @@
         grey_icon = GM_getValue('grey_icon', ''),
         red_icon = GM_getValue('red_icon', ''),
         dutchy = 'autofaucet.dutchycorp.space',
-        gist_id = '493dc66ecebd58a75b730a77ef676632',
-        update_delayOn = GM_getValue('update_delayOn', true);
+        gist_id = '493dc66ecebd58a75b730a77ef676632'
     function getIcons() {
         fetch("https://gist.githubusercontent.com/Harfho/63966e7f7145a5607e710a4cdcb31906/raw/ALBypass_icons.json")
             .then((response) => {
@@ -57,7 +56,7 @@
         }), 0 === n || u && e || (--n, setTimeout(function () {
             waitForKeyElements(t, o, e, i, n)
         }, i))
-    }   
+    }
 
     function OnPhone() {
         0 == GM_getValue("OnPhone", !1) ? GM_setValue("OnPhone", !0) : GM_setValue("OnPhone", !1);
@@ -278,11 +277,10 @@
             }
             let found = urlsplice.some((r) => {
                 pathname = r;
-                return shortlinks_name.includes(r)
                 return shortlinks_name.includes(getSimilarWord(r.toLowerCase(), shortlinks_name,0.4))
             })
             if (found) {
-                pathname = pathname.toLowerCase()
+                pathname = getSimilarWord(pathname.toLowerCase(),shortlinks_name)
                 if (/.*dontopen.*/ig.test(toupdate)) {
                     pathname = getSimilarWord(pathname, shortlinks_name)
                     update_DontOpen(pathname)
@@ -526,14 +524,6 @@
     else {
         favicon(grey_icon)
         let link = window.location.href
-        if (GM_getValue('updateAcceptDomain', true) == true) {
-            updateAcceptDomain();
-            GM_setValue('updateAcceptDomain', false);
-            setTimeout(() => {
-                window.close()
-            }, 3000)
-        } else if (GM_getValue('updateAcceptDomain') == false) {
-            getDomainOrPathNameAndUpdate(link, 'unsupported url');
-            GM_setValue('updateAcceptDomain', true)
-        }
+        getDomainOrPathNameAndUpdate(link, 'unsupported url');
+        updateAcceptDomain()
     }
