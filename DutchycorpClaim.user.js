@@ -7,6 +7,11 @@
         button = document.createElement("button"),
         body = document.getElementsByClassName('col s12 m12 l4 center-align')[0],// card col s8 m4
         gist_id = "493dc66ecebd58a75b730a77ef676632"
+    var linknames = [];
+    _views_ToVisit.forEach(e=>{
+        let n=e.getElementsByTagName("a")[1].parentElement.parentElement.innerText.replace(/\n.*/g,"").trim();
+        n=n.replace(/\s|\d$/ig,"").toLowerCase()
+        0==linknames.includes(n)&&linknames.push(n)});
     function AutoUpdateDontOpen() {
         var AutoUpdateB = document.createElement("button"),
             AutoUpdate = document.getElementsByClassName('col s12 center-align')[1]
@@ -139,10 +144,10 @@
         SpeedCtr()
         var second_parag = document.createElement("p");
         second_parag.setAttribute('class','title')
-        second_parag.innerText='Available Shortlinks:'+_views_ToVisit.length;
+        second_parag.innerText='Available Shortlinks:'+linknames.length;
         body.append(second_parag);
         body.appendChild(button);
-        button.innerHTML = "Script Not Running -- SHORTLINKS=" + _views_ToVisit.length;
+        button.innerHTML = "Script Not Running -- SHORTLINKS=" +linknames.length + ' ['+_views_ToVisit.length+']'
         button.addEventListener("click", function () {
             checkButton()
         });
@@ -162,12 +167,12 @@
             _DontOpen = _DontOpen.map(item => item.replace(/'/ig, '"').toLowerCase());
             shortlinks_name = shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());
         }
-        if (_views_ToVisit.length >= _DontOpen.length) {
-            var _totalLink = _views_ToVisit.length - _DontOpen.length;
-        } else if (_DontOpen.length >= _views_ToVisit.length) {
+        if (linknames.length >= _DontOpen.length) {
+            var _totalLink = linknames.length - _DontOpen.length;
+        } else if (_DontOpen.length >= linknames.length) {
             _totalLink = 'NO'
         } else {
-            _totalLink = _views_ToVisit.length;
+            _totalLink = linknames.length;
         }
         if (/404|400/ig.test(_DontOpen + shortlinks_name)) {
             window.location.reload();
@@ -186,7 +191,7 @@
                     button.innerHTML = "Script Run(Click to Run Again)";
                     localStorage.setItem("close", "true") //AutoFCB(Close)
                 } else {
-                    button.innerHTML = "Script Not Running -- SHORTLINKS=" + _views_ToVisit.length;
+                    button.innerHTML = "Script Not Running -- SHORTLINKS=" +linknames.length;
                 }
             }
         }
@@ -215,7 +220,7 @@
 
         function DontOpen_LinkByName(linkName) {
             let check = _DontOpen.some((link) => {
-                return new RegExp('^' + link.replace(/\s\d/,'') + '$', "ig").test(linkName.replace(/\s\d/,''))
+                return new RegExp('^' + link.replace(/\s|\d$/ig,'') + '$', "ig").test(linkName.replace(/\s|\d$/ig,''))
             }) //check if linkName is among _DontOpen
             if (check) {
                 //alert('Dontopen '+linkName)
@@ -412,7 +417,7 @@
                     clearInterval(interval)
                     GM_setValue("use_static", false)
                     Re_run()
-                    //window.close();//window.close()
+                    window.close();//window.close()
                 }
             }, duration);
         }
