@@ -215,7 +215,7 @@
 
         function DontOpen_LinkByName(linkName) {
             let check = _DontOpen.some((link) => {
-                return new RegExp('^' + link.replace(/\s/,'') + '$', "ig").test(linkName)
+                return new RegExp('^' + link.replace(/\s\d/,'') + '$', "ig").test(linkName.replace(/\s\d/,''))
             }) //check if linkName is among _DontOpen
             if (check) {
                 //alert('Dontopen '+linkName)
@@ -412,7 +412,7 @@
                     clearInterval(interval)
                     GM_setValue("use_static", false)
                     Re_run()
-                    window.close();//window.close()
+                    //window.close();//window.close()
                 }
             }, duration);
         }
