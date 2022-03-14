@@ -12,6 +12,14 @@
         red_icon = GM_getValue('red_icon', ''),
         dutchy = 'autofaucet.dutchycorp.space',
         gist_id = '493dc66ecebd58a75b730a77ef676632'
+
+    String.prototype.insert = function(index, string) {
+        if (index > 0) {
+            return this.substring(0, index) + string + this.substr(index);
+        }
+
+        return string + this;
+    };
     function getIcons() {
         fetch("https://gist.githubusercontent.com/Harfho/63966e7f7145a5607e710a4cdcb31906/raw/ALBypass_icons.json")
             .then((response) => {
@@ -218,6 +226,7 @@
                     .catch((error) => {
                     console.log('error', error);
                 });
+
                 let toname = "Yuumari.com",
                     temp_id = "shortlinks_vicissitude",
                     pattern = linkCantBypass.replace(/http.*:\/\/|\./ig,' '),
@@ -497,7 +506,7 @@
     else if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
         localStorage.removeItem("close");
         localStorage.clear();
-    }else if (new RegExp('.*shortlinks-wall.php\\?key=.*', 'ig').test(window.location.href)){
+    }else if (new RegExp('.*shortlinks-wall.php\\?*key=.*', 'ig').test(window.location.href)){
         true == localStorage.getItem("close") &&window.close();
         if (GM_getValue('OnPhone', false)) {window.close();};
     }else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)){
