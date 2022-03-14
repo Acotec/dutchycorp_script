@@ -3,15 +3,17 @@
         _open_link_fast = [].map(e => e.toLowerCase()),
         _alreadyRun = GM_getValue("_alreadyRun"),
         _views_ToVisit = Array.from(document.getElementsByClassName("col s12 m6 l4")),
-        _available_link = parseInt(document.getElementsByClassName("accent-text")[0].textContent.replace(/.*\(/ig,'').replace(/[\W].*/,'')),
+        _available_link = parseInt(document.getElementsByClassName("accent-text")[0].textContent.replace(/.*\(/ig, '').replace(/[\W].*/, '')),
         button = document.createElement("button"),
-        body = document.getElementsByClassName('col s12 m12 l4 center-align')[0],// card col s8 m4
+        body = document.getElementsByClassName('col s12 m12 l4 center-align')[0], // card col s8 m4
         gist_id = "493dc66ecebd58a75b730a77ef676632"
     var linknames = [];
-    _views_ToVisit.forEach(e=>{
-        let n=e.getElementsByTagName("a")[1].parentElement.parentElement.innerText.replace(/\n.*/g,"").trim();
-        n=n.replace(/\s|\d$/ig,"").toLowerCase()
-        0==linknames.includes(n)&&linknames.push(n)});
+    _views_ToVisit.forEach(e => {
+        let n = e.getElementsByTagName("a")[1].parentElement.parentElement.innerText.replace(/\n.*/g, "").trim();
+        n = n.replace(/\s|\d$/ig, "").toLowerCase()
+        0 == linknames.includes(n) && linknames.push(n)
+    });
+
     function AutoUpdateDontOpen() {
         var AutoUpdateB = document.createElement("button"),
             AutoUpdate = document.getElementsByClassName('col s12 center-align')[1]
@@ -25,7 +27,7 @@
                 AutoUpdateB.innerHTML = 'AutoUpdate_OFF';
                 AutoUpdateB.style = "background-color:black;color:white"
             }
-            AutoUpdateB.addEventListener('click', function (e) {
+            AutoUpdateB.addEventListener('click', function(e) {
                 if (GM_getValue("AutoUpdate", true)) {
                     GM_setValue("AutoUpdate", false);
                     AutoUpdateB.innerHTML = 'AutoUpdate_OFF';
@@ -57,7 +59,7 @@
 
     function static_speed() {
         let staticB = document.createElement("button"),
-            static =document.getElementsByClassName('col s12 center-align')[1]
+            static = document.getElementsByClassName('col s12 center-align')[1]
         static.appendChild(staticB);
         try {
             if (GM_getValue("static", true)) {
@@ -68,7 +70,7 @@
                 staticB.innerHTML = 'Static_OFF';
                 staticB.style = "background-color:black;color:white"
             }
-            staticB.addEventListener('click', function (e) {
+            staticB.addEventListener('click', function(e) {
                 if (GM_getValue("static", true)) {
                     GM_setValue("static", false);
                     staticB.innerHTML = 'Static_OFF';
@@ -82,10 +84,11 @@
         } catch (err) {}
     }
 
+    GM_getValue('speed', null) || GM_setValue('speed', 0.1)
+
     function SpeedCtr() {
-        var speed = GM_getValue('speed', 0.1); //the duration speed
-        "undefined" != String(speed) && "NaN" != String(speed) && "null" != String(GM_getValue(speed)) || GM_setValue("speed", 0.1);
-        var body1 =document.getElementsByClassName('col s12 m12 l4 center-align')[0],
+        var speed = GM_getValue('speed', null); //the duration speed
+        var body1 = document.getElementsByClassName('col s12 m12 l4 center-align')[0],
             dis = document.createElement("p"),
             speed_add = document.createElement("button"),
             speed_sub = document.createElement("button");
@@ -95,14 +98,15 @@
         speed_sub.innerHTML = 'speed -'
         body1.appendChild(dis);
         dis.innerHTML = 'DS - ' + speed + ' Seconds' //DS=default Speed
-        speed_add.addEventListener("click", function () {
+        speed_add.addEventListener("click", function() {
             speed = parseFloat((speed + 0.01).toFixed(2))
             GM_setValue("speed", speed);
             dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds' // CS = current setSpeed
         })
-        speed_sub.addEventListener("click", function () {
-            if (!(GM_getValue('speed') < 0.05)) {
-                speed = parseFloat((speed - 0.01).toFixed(2))
+        speed_sub.addEventListener("click", function() {
+            if (!(GM_getValue('speed') < 0.1)) {
+                speed = parseFloat((speed - 0.01).toFixed(2));
+                .09 == speed && (speed = .1);
                 GM_setValue("speed", speed);
             }
             dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds'
@@ -143,12 +147,12 @@
     } else {
         SpeedCtr()
         var second_parag = document.createElement("p");
-        second_parag.setAttribute('class','title')
-        second_parag.innerText='Available Shortlinks:'+linknames.length;
+        second_parag.setAttribute('class', 'title')
+        second_parag.innerText = 'Available Shortlinks:' + linknames.length;
         body.append(second_parag);
         body.appendChild(button);
-        button.innerHTML = "Script Not Running -- SHORTLINKS=" +linknames.length + ' ['+_views_ToVisit.length+']'
-        button.addEventListener("click", function () {
+        button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length + ' [' + _views_ToVisit.length + ']'
+        button.addEventListener("click", function() {
             checkButton()
         });
     }
@@ -191,7 +195,7 @@
                     button.innerHTML = "Script Run(Click to Run Again)";
                     localStorage.setItem("close", "true") //AutoFCB(Close)
                 } else {
-                    button.innerHTML = "Script Not Running -- SHORTLINKS=" +linknames.length;
+                    button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length;
                 }
             }
         }
@@ -220,7 +224,7 @@
 
         function DontOpen_LinkByName(linkName) {
             let check = _DontOpen.some((link) => {
-                return new RegExp('^' + link.replace(/\s|\d$/ig,'') + '$', "ig").test(linkName.replace(/\s|\d$/ig,''))
+                return new RegExp('^' + link.replace(/\s|\d$/ig, '') + '$', "ig").test(linkName.replace(/\s|\d$/ig, ''))
             }) //check if linkName is among _DontOpen
             if (check) {
                 //alert('Dontopen '+linkName)
@@ -266,7 +270,7 @@
                 .catch(error => console.log('error', error));
         }
 
-        function clickOnEle(el){
+        function clickOnEle(el) {
             var simulateMouseEvent = function(element, eventName, coordX, coordY) {
                 element.dispatchEvent(new MouseEvent(eventName, {
                     //view: window,
@@ -281,110 +285,132 @@
             var box = theButton.getBoundingClientRect(),
                 coordX = box.left + (box.right - box.left) / 2,
                 coordY = box.top + (box.bottom - box.top) / 2;
-            simulateMouseEvent (theButton, "mousedown", coordX, coordY);
-            simulateMouseEvent (theButton, "mouseup", coordX, coordY);
-            simulateMouseEvent (theButton, "click", coordX, coordY);
+            simulateMouseEvent(theButton, "mousedown", coordX, coordY);
+            simulateMouseEvent(theButton, "mouseup", coordX, coordY);
+            simulateMouseEvent(theButton, "click", coordX, coordY);
         }
 
-        var antibot= setInterval(isantibotvisible,1000)
-        function isantibotvisible(){
-            try{
-                let visible =document.getElementsByClassName("modal open")[0].style.display == "block"
-                let antibotid=document.getElementsByClassName("modal open")[0].id
+        var antibot = setInterval(isantibotvisible, 1000)
+
+        function isantibotvisible() {
+            try {
+                let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
+                let antibotid = document.getElementsByClassName("modal open")[0].id
                 console.log('waiting for antibotFrame')
-                if(visible){
-                    clearInterval(interval)
+                if (visible) {
                     clearInterval(inter)
+                    clearInterval(interval)
                     clearInterval(antibot)
                     //alert('anti')
-                    setTimeout(()=>{
-                        let icon=Array.from(document.querySelector("#"+antibotid).getElementsByClassName("gradient-btn btn btn-secondary"))
-                        icon.forEach(img=>{
-                            let select =document.querySelector("#"+antibotid).innerText.replace(/[\W]/g,"").replace(/.*Select|Gosend/ig,'').trim();
-                            let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig,"").trim();
-                            console.log(icselect,select)
-                            if(select == icselect){
-                                console.log("Antibot to select is - ",select)
+                    setTimeout(() => {
+                        let icon = Array.from(document.querySelector("#" + antibotid).getElementsByClassName("gradient-btn btn btn-secondary"))
+                        icon.forEach(img => {
+                            let select = document.querySelector("#" + antibotid).innerText.replace(/[\W]/g, "").replace(/.*Select|Gosend/ig, '').trim();
+                            let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig, "").trim();
+                            console.log(icselect, select)
+                            if (select == icselect) {
+                                console.log("Antibot to select is - ", select)
+                                let sec = 1000
                                 //waitForKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
-                                console.log(img.getElementsByTagName('input')[0],"clicked");
-                                setTimeout(()=>{clickOnEle(img.getElementsByTagName('input')[0])},1000)
-                                setTimeout(()=>{clickOnEle(document.querySelector("#"+antibotid).querySelector('button'))},1000)
+                                console.log(img.getElementsByTagName('input')[0], "clicked");
+                                setTimeout(() => {
+                                    clickOnEle(img.getElementsByTagName('input')[0])
+                                }, 1 * sec)
+                                setTimeout(() => {
+                                    clickOnEle(document.querySelector("#" + antibotid).querySelector('button'))
+                                }, 2 * sec)
                                 GM_setValue("_alreadyRun", false);
-                                setTimeout(()=>{window.location.reload(false)},2000)
+                                setTimeout(() => {
+                                    window.location.reload(false);
+                                    window.location.reload(false)
+                                }, 3 * sec)
+                                //window.location.reload(false)
                             }
                         })
-                    },1000)
+                    }, 2000)
                 };
-            }catch(e){}
+            } catch (e) {
+                null
+            }
         }
-        var LinkToVisitOnPage=[]
-        _views_ToVisit.forEach((c)=>{LinkToVisitOnPage.push(c.getElementsByTagName("a")[1])})
+        var LinkToVisitOnPage = []
+        _views_ToVisit.forEach((c) => {
+            LinkToVisitOnPage.push(c.getElementsByTagName("a")[1])
+        })
+        var addmoreDuration = true
+
         function appear() { //define a function
             let limit = _views_ToVisit.length
             interval = setInterval(() => {
                 try {
                     let _getlink = LinkToVisitOnPage.splice(0, 1)[0]
                     let open_link = _getlink //.parentNode.parentNode.parentNode.querySelector("button");
-                    let linkName = _getlink.parentElement.parentElement.innerText.replace(/\n.*/g,"").trim()
+                    let linkName = _getlink.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
                     //console.log(linkName,_available_link)
                     if (_available_link <= 1000) {
-                        let exFirstNum =parseInt(_getlink.parentElement.innerText.match(/\s*\d* .*/)[0].replace(/\s/ig,'').replace(/.*:/,'').replace(/\/.*/,'')),
-                            views_left =parseInt(_getlink.parentElement.innerText.match(/\s*\d* .*/)[0].replace(/\s/ig,'').replace(/.*:/,'').replace(/.*\//,''));
-                        //console.log(exFirstNum+"/"+views_left)
                         if (DontOpen_LinkByName(linkName)) {
                             limit++
-                            console.log('wont open',linkName,limit,i)
-                        }else {
-                            //console.log(shortlinks_name);
+                            console.log('wont open', linkName, limit, i)
+                        } else {
+                            let exFirstNum = parseInt(_getlink.parentElement.innerText.match(/\s*\d* .*/)[0].replace(/\s/ig, '').replace(/.*:/, '').replace(/\/.*/, '')),
+                                views_left = parseInt(_getlink.parentElement.innerText.match(/\s*\d* .*/)[0].replace(/\s/ig, '').replace(/.*:/, '').replace(/.*\//, ''));
+                            //console.log(exFirstNum+"/"+views_left)
                             //console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
-                            if (shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase())) {
+                            if (shortlinks_name.includes(linkName.replace(/\s/ig, '').toLowerCase())) {
                                 i++; //increment the index
-                                if (GM_getValue("use_static", '') && GM_getValue("static",'')) {
+                                if (GM_getValue("use_static", '') && GM_getValue("static", '')) {
+                                    let ds = parseInt(GM_getValue('speed').toString().at(2))
                                     var time = new Date();
                                     time = time.toLocaleString('en-US', {
                                         hour: 'numeric',
                                         hour12: true
                                     }).replace(/\s+/ig, '')
                                     if (/(12|0[0-8]|[1-8])am/ig.test(time)) {
-                                        duration = 2 * 1000
+                                        duration = 1 * 1000
                                     } //time is around 12am-8am
                                     else if (/(9|1[0-1])am/ig.test(time)) {
-                                        duration = 3 * 1000
+                                        duration = 1 + ds * 1000
                                     } //time is around 9am-11am
                                     else if (/(12|(0|1[0-9]|[1-9]))pm/ig.test(time)) {
-                                        duration = 3 * 1000
+                                        duration = 2 + ds * 1000
                                     } //time is around 12pm-11pm
                                     else {
-                                        duration = 5 * 1000
+                                        duration = 3 + ds * 1000
                                     }
-                                }
-                                else {
-                                    if(GM_getValue('speed')){
+                                } else {
+                                    if (GM_getValue('speed')) {
                                         duration = i * GM_getValue('speed') * 1000
-                                    }else{
-                                        duration = i+1000
+                                    } else {
+                                        duration = i + 1000
                                     }
                                     GM_setValue("use_static", true)
                                 }
+                                //console.log(addmoreDuration,views_left,addmoreDuration&&views_left>1)
+                                if (addmoreDuration && views_left > 1) {
+                                    duration += 500;
+                                    addmoreDuration = false;
+                                    console.log("duration add", duration)
+                                }
                                 inter = setInterval(() => {
                                     exFirstNum--
-                                    if (exFirstNum>=0) {
+                                    if (exFirstNum >= 0) {
                                         clearInterval(interval)
-                                        console.log('linkName='+linkName,"\nviews_left="+exFirstNum+"/"+views_left,'\nduration using is', (duration / 1000).toFixed(2),"\nlimit="+limit,"\ni="+i)
+                                        console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000).toFixed(2), "\nlimit=" + limit, "\ni=" + i)
                                         clickOnEle(open_link)
                                         // clearInterval(inter)
                                         // appear() // re-run
-                                    }
-                                    else{
-                                        console.log('linkName='+linkName,"no view left")
+                                    } else {
+                                        console.log('linkName=' + linkName, "no view left")
                                         clearInterval(inter)
                                         clearInterval(interval)
-                                        appear() // re-run
-                                        //     //alert(duration)
+                                        addmoreDuration = true
+                                        //duration-=500
+                                        //console.log('duration reset',duration)
+                                        appear()
                                     }
                                 }, duration)
                             } else {
-                                console.log(linkName.toLowerCase(), 'Is not among shortlinks to open',limit)
+                                console.log(linkName.toLowerCase(), 'Is not among shortlinks to open', limit)
                                 update_DontOpen(linkName)
                             }
 
@@ -417,7 +443,7 @@
                     clearInterval(interval)
                     GM_setValue("use_static", false)
                     Re_run()
-                    window.close();//window.close()
+                    //window.close();//window.close()
                 }
             }, duration);
         }
@@ -430,7 +456,7 @@
         }
         body.appendChild(button);
         // Add event handler
-        button.addEventListener("click", function () {
+        button.addEventListener("click", function() {
             checkButton()
         });
         //////////////////
