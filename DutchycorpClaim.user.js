@@ -272,8 +272,9 @@
 
         function clickOnEle(el) {
             var simulateMouseEvent = function(element, eventName, coordX, coordY) {
-                element.dispatchEvent(new MouseEvent(eventName, {
+                element.dispatchEvent(new MouseEvent(eventName,{
                     //view: window,
+                    ctrlKey: true,
                     bubbles: true,
                     cancelable: true,
                     clientX: coordX,
@@ -322,9 +323,7 @@
                                 GM_setValue("_alreadyRun", false);
                                 setTimeout(() => {
                                     window.location.reload(false);
-                                    window.location.reload(false)
-                                }, 3 * sec)
-                                //window.location.reload(false)
+                                }, 3 * sec)                                
                             }
                         })
                     }, 2000)
