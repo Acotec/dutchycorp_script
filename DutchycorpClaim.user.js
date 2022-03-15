@@ -17,7 +17,7 @@
     function OnPhone() {
         0 == GM_getValue("OnPhone", !1) ? GM_setValue("OnPhone", !0) : GM_setValue("OnPhone", !1);
         window.location.reload()
-    };
+    };GM_registerMenuCommand("OnPhone-" + GM_getValue('OnPhone', false), OnPhone, "OnPhone");
 
     function AutoUpdateDontOpen() {
         var AutoUpdateB = document.createElement("button"),
@@ -119,7 +119,6 @@
         });
         static_speed()
     }
-    GM_registerMenuCommand("OnPhone-" + GM_getValue('OnPhone', false), OnPhone, "OnPhone");
 
     AutoUpdateDontOpen() //run
     //function to get the shortlinks that should not be open
