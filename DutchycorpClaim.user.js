@@ -14,6 +14,11 @@
         0 == linknames.includes(n) && linknames.push(n)
     });
 
+    function OnPhone() {
+        0 == GM_getValue("OnPhone", !1) ? GM_setValue("OnPhone", !0) : GM_setValue("OnPhone", !1);
+        window.location.reload()
+    };
+
     function AutoUpdateDontOpen() {
         var AutoUpdateB = document.createElement("button"),
             AutoUpdate = document.getElementsByClassName('col s12 center-align')[1]
@@ -84,7 +89,7 @@
         } catch (err) {}
     }
 
-    GM_getValue('speed', null) || GM_setValue('speed', 0.1)
+    GM_getValue('speed', null) || GM_setValue('speed', 0)
 
     function SpeedCtr() {
         var speed = GM_getValue('speed', null); //the duration speed
@@ -99,20 +104,22 @@
         body1.appendChild(dis);
         dis.innerHTML = 'DS - ' + speed + ' Seconds' //DS=default Speed
         speed_add.addEventListener("click", function() {
-            speed = parseFloat((speed + 0.01).toFixed(2))
-            GM_setValue("speed", speed);
+            if (GM_getValue('speed') < 10) {
+                speed += 1
+                GM_setValue("speed", speed);
+            }
             dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds' // CS = current setSpeed
         })
         speed_sub.addEventListener("click", function() {
-            if (!(GM_getValue('speed') < 0.1)) {
-                speed = parseFloat((speed - 0.01).toFixed(2));
-                .09 == speed && (speed = .1);
+            if (GM_getValue('speed') >= 1) {
+                speed -= 1
                 GM_setValue("speed", speed);
             }
             dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds'
         });
         static_speed()
     }
+    GM_registerMenuCommand("OnPhone-" + GM_getValue('OnPhone', false), OnPhone, "OnPhone");
 
     AutoUpdateDontOpen() //run
     //function to get the shortlinks that should not be open
@@ -272,7 +279,7 @@
 
         function clickOnEle(el) {
             var simulateMouseEvent = function(element, eventName, coordX, coordY) {
-                element.dispatchEvent(new MouseEvent(eventName,{
+                element.dispatchEvent(new MouseEvent(eventName, {
                     //view: window,
                     ctrlKey: true,
                     bubbles: true,
@@ -291,13 +298,14 @@
             simulateMouseEvent(theButton, "click", coordX, coordY);
         }
 
+        var check = 0
         var antibot = setInterval(isantibotvisible, 1000)
 
         function isantibotvisible() {
             try {
                 let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
                 let antibotid = document.getElementsByClassName("modal open")[0].id
-                console.log('waiting for antibotFrame')
+                console.log('antibotFrame is now visible')
                 if (visible) {
                     clearInterval(inter)
                     clearInterval(interval)
@@ -316,27 +324,36 @@
                                 console.log(img.getElementsByTagName('input')[0], "clicked");
                                 setTimeout(() => {
                                     clickOnEle(img.getElementsByTagName('input')[0])
-                                }, 1 * sec)
+                                }, )
                                 setTimeout(() => {
                                     clickOnEle(document.querySelector("#" + antibotid).querySelector('button'))
-                                }, 2 * sec)
+                                }, 1 * sec)
                                 GM_setValue("_alreadyRun", false);
                                 setTimeout(() => {
-                                    window.location.reload(false);
-                                }, 3 * sec)                                
+                                    if (GM_getValue('OnPhone', false)) {
+                                        window.close()
+                                    } else {
+                                        window.location.reload(false)
+                                    }
+                                }, 2 * sec)
                             }
                         })
                     }, 2000)
                 };
             } catch (e) {
-                null
+                if (check > 10) {
+                    clearInterval(antibot)
+                    console.log('There is no antibotFrame')
+                } else {
+                    console.log('waiting for antibotFrame', check)
+                    check++
+                }
             }
         }
         var LinkToVisitOnPage = []
         _views_ToVisit.forEach((c) => {
             LinkToVisitOnPage.push(c.getElementsByTagName("a")[1])
         })
-        var addmoreDuration = true
 
         function appear() { //define a function
             let limit = _views_ToVisit.length
@@ -357,44 +374,42 @@
                             //console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
                             if (shortlinks_name.includes(linkName.replace(/\s/ig, '').toLowerCase())) {
                                 i++; //increment the index
-                                if (GM_getValue("use_static", '') && GM_getValue("static", '')) {
-                                    let ds = parseInt(GM_getValue('speed').toString().at(2))
-                                    var time = new Date();
-                                    time = time.toLocaleString('en-US', {
-                                        hour: 'numeric',
-                                        hour12: true
-                                    }).replace(/\s+/ig, '')
-                                    if (/(12|0[0-8]|[1-8])am/ig.test(time)) {
-                                        duration = 1 * 1000
-                                    } //time is around 12am-8am
-                                    else if (/(9|1[0-1])am/ig.test(time)) {
-                                        duration = 1 + ds * 1000
-                                    } //time is around 9am-11am
-                                    else if (/(12|(0|1[0-9]|[1-9]))pm/ig.test(time)) {
-                                        duration = 2 + ds * 1000
-                                    } //time is around 12pm-11pm
-                                    else {
-                                        duration = 3 + ds * 1000
+                                if (GM_getValue("static", null)) {
+                                    let ds = GM_getValue('speed')
+                                    if (ds != 0) {
+                                        var time = new Date();
+                                        time = time.toLocaleString('en-US', {
+                                            hour: 'numeric',
+                                            hour12: true
+                                        }).replace(/\s+/ig, '')
+                                        if (/(12|0[0-8]|[1-8])am/ig.test(time)) {
+                                            duration = 1 * 1000
+                                        } //time is around 12am-8am
+                                        else if (/(9|1[0-1])am/ig.test(time)) {
+                                            duration = (1 + ds) * 1000
+                                        } //time is around 9am-11am
+                                        else if (/(12|(0|1[0-9]|[1-9]))pm/ig.test(time)) {
+                                            duration = (2 + ds) * 1000
+                                        } //time is around 12pm-11pm
+                                        else {
+                                            duration = (3 + ds) * 1000
+                                        }
+                                    } else {
+                                        duration = (ds + 1) * 1000
                                     }
+
                                 } else {
                                     if (GM_getValue('speed')) {
                                         duration = i * GM_getValue('speed') * 1000
                                     } else {
                                         duration = i + 1000
                                     }
-                                    GM_setValue("use_static", true)
-                                }
-                                //console.log(addmoreDuration,views_left,addmoreDuration&&views_left>1)
-                                if (addmoreDuration && views_left > 1) {
-                                    duration += 500;
-                                    addmoreDuration = false;
-                                    console.log("duration add", duration)
                                 }
                                 inter = setInterval(() => {
                                     exFirstNum--
                                     if (exFirstNum >= 0) {
                                         clearInterval(interval)
-                                        console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000).toFixed(2), "\nlimit=" + limit, "\ni=" + i)
+                                        console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i)
                                         clickOnEle(open_link)
                                         // clearInterval(inter)
                                         // appear() // re-run
@@ -402,9 +417,6 @@
                                         console.log('linkName=' + linkName, "no view left")
                                         clearInterval(inter)
                                         clearInterval(interval)
-                                        addmoreDuration = true
-                                        //duration-=500
-                                        //console.log('duration reset',duration)
                                         appear()
                                     }
                                 }, duration)
@@ -430,9 +442,8 @@
                 } catch (err) {
                     null
                 }
-                clearInterval(interval); //clear
                 //console.log(limit);
-                //console.log('duration using is', (duration / 1000).toFixed(2))
+                //console.log('duration using is', (duration / 1000))
                 if (limit != 0) {
                     appear(); //re-run
                 } else {
@@ -440,7 +451,6 @@
                     console.log('Done opening')
                     button.innerHTML = 'Done opening-Click to Run Again'
                     clearInterval(interval)
-                    GM_setValue("use_static", false)
                     Re_run()
                     //window.close();//window.close()
                 }
