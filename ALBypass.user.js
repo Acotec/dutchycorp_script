@@ -453,6 +453,7 @@
                 favicon(red_icon)
                 document.title = error + ":" + new URL(link).host
                 sessionStorage.removeItem('recheck')
+                window.location.close()
 
             }
         });
@@ -506,15 +507,15 @@
     else if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
         localStorage.removeItem("close");
         localStorage.clear();
-    }else if (new RegExp('.*shortlinks-wall.php.*', 'ig').test(window.location.href)){
-        true == localStorage.getItem("close") &&window.close();
-        if (GM_getValue('OnPhone', false)) {window.close();};
     }else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)){
         window.close();window.close()
     }else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)){
         waitForKeyElements("#toast-container", (element) => {
             shortenerDown(element)
         });
+    }else if (new RegExp('.*shortlinks-wall.php.*key.*', 'ig').test(window.location.href)){
+        if (GM_getValue('OnPhone', false)) {window.close();};
+        true == localStorage.getItem("close") &&window.close()
     }else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
         GM_addValueChangeListener('shortner_name', function (name, old_value, new_value, remote) {
             GM_setValue('shortner_name', new_value)
