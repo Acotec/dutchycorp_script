@@ -513,9 +513,6 @@
         waitForKeyElements("#toast-container", (element) => {
             shortenerDown(element)
         });
-    }else if (new RegExp('.*shortlinks-wall.php.*key.*', 'ig').test(window.location.href)){
-        if (GM_getValue('OnPhone', false)) {window.close();};
-        true == localStorage.getItem("close") &&window.close()
     }else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
         GM_addValueChangeListener('shortner_name', function (name, old_value, new_value, remote) {
             GM_setValue('shortner_name', new_value)
@@ -529,6 +526,8 @@
                 GM_setValue('shortner_name', linkName);
                 console.log(linkName);
             }
+            if (GM_getValue('OnPhone', false)) {window.close();};
+            true == localStorage.getItem("close") &&window.close()
         }; //get shortlink name when click
     }else if(new RegExp(dutchy,'ig').test(window.location.href)) {console.log("Bypass Can't Run on this Page")}
     else {
