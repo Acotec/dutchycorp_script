@@ -506,7 +506,7 @@
     else if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
         localStorage.removeItem("close");
         localStorage.clear();
-    }else if (new RegExp('.*shortlinks-wall.php\\?*key=.*', 'ig').test(window.location.href)){
+    }else if (new RegExp('.*shortlinks-wall.php.*', 'ig').test(window.location.href)){
         true == localStorage.getItem("close") &&window.close();
         if (GM_getValue('OnPhone', false)) {window.close();};
     }else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)){
