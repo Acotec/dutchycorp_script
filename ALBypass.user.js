@@ -1,4 +1,4 @@
-    if (window.history.replaceState) {
+ if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href)
     } //to prevent resubmit on refresh and back button
     //---------------------------------------------------------//
@@ -526,8 +526,8 @@
                 GM_setValue('shortner_name', linkName);
                 console.log(linkName);
             }
-            if (GM_getValue('OnPhone', false)) {window.close();};
             true == localStorage.getItem("close") &&window.close()
+            //if (GM_getValue('OnPhone', false)){window.close()}
         }; //get shortlink name when click
     }else if(new RegExp(dutchy,'ig').test(window.location.href)) {console.log("Bypass Can't Run on this Page")}
     else {
