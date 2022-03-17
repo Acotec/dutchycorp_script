@@ -1,4 +1,6 @@
-let coin_code = 'USDT'
+(function(){
+    'use strict';
+    let coin_code = 'USDT'
     var i=0
     var limit=10
     var check = setInterval(()=>{
@@ -17,3 +19,4 @@ let coin_code = 'USDT'
             clearInterval(check)
         }
     },1000)
+    })();
