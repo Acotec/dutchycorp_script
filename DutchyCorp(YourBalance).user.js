@@ -8,7 +8,7 @@
         var element
         console.log("waiting for",coin_code,"withdraw button to be available within",limit-i,"seconds")
         try{
-            element =document.querySelector('#status_text_USDT'+coin_code)
+            element =document.querySelector('#status_text_'+coin_code)
             if(element){
                 element.scrollIntoView();
                 //element.click()
