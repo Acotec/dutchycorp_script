@@ -13,7 +13,7 @@
         n = n.replace(/\s|\d$/ig, "").toLowerCase()
         0 == linknames.includes(n) && linknames.push(n)
     });
-
+    try{document.querySelector("#properties p:nth-child(2) i").scrollIntoView()}catch(err){document.querySelector("#properties p:nth-child(2) i").scrollIntoView()}
     function OnPhone() {
         0 == GM_getValue("OnPhone", !1) ? GM_setValue("OnPhone", !0) : GM_setValue("OnPhone", !1);
         window.location.reload()
