@@ -1,4 +1,4 @@
-    var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
+var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
         shortlinks_name = GM_getResourceText("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
         _open_link_fast = [].map(e => e.toLowerCase()),
         _alreadyRun = GM_getValue("_alreadyRun"),
@@ -289,17 +289,12 @@
                 }));
             };
             var theButton = el;
-            var theButttonHref= theButton.getAttribute('onmousedown').replace(/.*\/|[\(\)';]/ig,'')
             var box = theButton.getBoundingClientRect(),
                 coordX = box.left + (box.right - box.left) / 2,
                 coordY = box.top + (box.bottom - box.top) / 2;
-            if(/extend_claim_count_wall/ig.test(theButttonHref)){
-                GM_openInTab("https://autofaucet.dutchycorp.space/"+theButttonHref)
-            }
-            else{
-                simulateMouseEvent(theButton, "mousedown", coordX, coordY);
-                simulateMouseEvent(theButton, "mouseup", coordX, coordY);
-                simulateMouseEvent(theButton, "click", coordX, coordY);}
+            simulateMouseEvent(theButton, "mousedown", coordX, coordY);
+            simulateMouseEvent(theButton, "mouseup", coordX, coordY);
+            simulateMouseEvent(theButton, "click", coordX, coordY);
         }
 
         var check = 0
@@ -328,7 +323,7 @@
                                 console.log(img.getElementsByTagName('input')[0], "clicked");
                                 setTimeout(() => {
                                     clickOnEle(img.getElementsByTagName('input')[0])
-                                },5000)
+                                }, )
                                 setTimeout(() => {
                                     clickOnEle(document.querySelector("#" + antibotid).querySelector('button'))
                                 }, 1 * sec)
@@ -414,7 +409,6 @@
                                     if (exFirstNum >= 0) {
                                         clearInterval(interval)
                                         console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i)
-                                        //console.log(open_link.getAttribute('onmousedown').replace(/.*\/|[\(\)';]/ig,''))
                                         clickOnEle(open_link)
                                         // clearInterval(inter)
                                         // appear() // re-run
