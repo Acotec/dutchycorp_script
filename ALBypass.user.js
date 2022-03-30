@@ -506,9 +506,7 @@
                 timer(--x)
             }, 1000)
         }
-        let randInt=(min,max)=>{return Math.floor(Math.random() * (max - min + 1) ) + min;}
-        let duration= randInt(0)
-        timer(duration)
+        timer(0)
     }
     //main
     GM_registerMenuCommand("OnPhone-" + GM_getValue('OnPhone', false), OnPhone, "OnPhone");
