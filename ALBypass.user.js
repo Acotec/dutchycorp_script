@@ -143,6 +143,9 @@ function updateAcceptDomain() {
             }
             //console.log(elements);
             GM_setValue('domains', JSON.stringify(elements))
+            setTimeout(() => {
+                window.close()
+            }, 2000)
         }).catch((error) => {
             //alert(error)
             //console.error(error);
@@ -181,6 +184,15 @@ function sendEmail(toname, temp_id, msg) {
         .then(response => response.text())
         .then((result) => {
             console.log(result);
+            GM_notification({
+                title: '!Bypass-- ' + linkCantBypass,
+                text: msg,
+                timeout: 10000,
+                ondone: () => {},
+            });
+            setTimeout(() => {
+                window.close()
+            }, 1000)
         })
         .catch(error => console.log('error', error));
 }
@@ -230,17 +242,8 @@ function update_DontOpen(linkName) {
                         pattern = linkCantBypass.replace(/http.*:\/\/|\./ig, ' '),
                         yuumari_pattern = pattern.insert(pattern.indexOf("/"), " "),
                         msg = "Cant Bypass " + linkCantBypass + " because api return with " + messageError + "\nYummari pattern=" + yuumari_pattern
-                    sendEmail(toname, temp_id, msg);
                     msg = linkName + " " + messageError + " and was added to _DontOpen list on gist";
-                    GM_notification({
-                        title: '!Bypass-- ' + linkCantBypass,
-                        text: msg,
-                        timeout: 10000,
-                        ondone: () => {},
-                    });
-                    setTimeout(() => {
-                        window.close()
-                    }, 1000)
+                    sendEmail(toname, temp_id, msg);
                 }) //console.log(result)
                 .catch((error) => {
                     console.log('error', error);
@@ -256,9 +259,6 @@ function update_DontOpen(linkName) {
             });
             //console.log('Already added to _DontOpen')console.log('Updating shortlinks Lists')
             updateAcceptDomain()
-            setTimeout(() => {
-                window.close()
-            }, 5000)
         }
     }
 }
@@ -377,6 +377,7 @@ function bypass(link) {
         if (!message) { //if api return with a result
             sessionStorage.removeItem('tryagain')
             window.open(new URL(data.result), "_self");
+            return
         } else { //api return with a message
             favicon(green_icon1)
             let tryagain;
