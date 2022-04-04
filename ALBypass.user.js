@@ -200,7 +200,7 @@ function sendEmail(toname, temp_id, msg) {
 function update_DontOpen(linkName) {
     GM_xmlhttpRequest({
         method: 'GET',
-        url: "https://gist.github.com/Harfho/" + gist_id + "/raw/_DontOpen.txt?timestamp=' + (+new Date())",
+        url: "https://gist.github.com/Harfho/" + gist_id + "/raw/_DontOpen.txt?timestamp=" + (+new Date()),
         revalidate: false,
         nocache: true,
         onload: getDontOpen
@@ -209,7 +209,7 @@ function update_DontOpen(linkName) {
     function getDontOpen(response) {
         let getDontOpen = response.responseText.replace(/'|"|\[|\]/ig, '').split(',').filter(e => e);
         var _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
-        console.log(_DontOpen, linkName)
+        //console.log(_DontOpen, linkName)
         var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw==') //github access gist-Token
         access_token = "Bearer " + access_token
         //console.log(access_token)
@@ -266,7 +266,7 @@ function update_DontOpen(linkName) {
 function getDomainOrPathNameAndUpdate(link, toupdate) { //toupdate=(dontopen,delaypage,unsupported url)
     GM_xmlhttpRequest({
         method: 'GET',
-        url: "https://gist.github.com/Harfho/" + gist_id + "/raw/shortlinks_name.txt?timestamp=' + (+new Date())",
+        url: "https://gist.github.com/Harfho/" + gist_id + "/raw/shortlinks_name.txt?timestamp=" + (+new Date()),
         revalidate: false,
         nocache: true,
         onload: get_Shortlinks
@@ -283,10 +283,8 @@ function getDomainOrPathNameAndUpdate(link, toupdate) { //toupdate=(dontopen,del
             shortner_name = GM_getValue('shortner_name').replace(/\s/g, ''),
             previous_shortner_name = GM_getValue('previous_shortner_name'),
             similardomain = getSimilarWord(urlsplice[0], shortlinks_name);
-        if (document.referrer && !(/.*auto.*/ig.test(document.referrer))) {
+        if (document.referrer && !/autofaucet.dutchycorp.space/ig.test(document.referrer)) {
             ref = new URL(document.referrer).host
-        }
-        if (ref) {
             ex_link = [ref, urlsplice[0], urlsplice[1], page_title, hostname, shortner_name, similardomain, similardomain, previous_shortner_name, ]
         } else {
             ex_link = [urlsplice[0], urlsplice[1], page_title, hostname, , shortner_name, similardomain, previous_shortner_name, ]
@@ -376,7 +374,7 @@ function bypass(link) {
         let message = data.message
         if (!message) { //if api return with a result
             sessionStorage.removeItem('tryagain')
-            window.open(new URL(data.result), "_self");
+            window.location.href = new URL(data.result)
             return
         } else { //api return with a message
             favicon(green_icon1)
@@ -499,7 +497,7 @@ function quick_bypass(link) {
     let title = new URL(link).host
     let timer = (x) => {
         if (x == 0) {
-            window.location.href = link;
+            window.location.href = new URL(link);
             return
         };
         document.title = x + '--' + title;
@@ -543,37 +541,39 @@ if (!listOfAcceptDomains) {
         bypass(link)
     }
 } //autofaucet.dutcycorp.space
-else if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
-    localStorage.removeItem("close");
-    localStorage.clear();
-} else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)) {
-    window.close();
-    window.close()
-} else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
-    waitForKeyElements("#toast-container", (element) => {
-        shortenerDown(element)
-    });
-} else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
-    GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
-        GM_setValue('shortner_name', new_value)
-        GM_setValue('previous_shortner_name', old_value)
-    });
-    document.onclick = function(event) {
-        if (event === undefined) event = window.event;
-        var target = 'target' in event ? event.target : event.srcElement;
-        if (/claim/ig.test(target.textContent)) {
-            let linkName = target.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
-            GM_setValue('shortner_name', linkName);
-            console.log(linkName);
-        }
-        true == localStorage.getItem("close") && window.close()
-        //if (GM_getValue('OnPhone', false)){window.close()}
-    }; //get shortlink name when click
-} else if (new RegExp(dutchy, 'ig').test(window.location.href)) {
-    if (/Attention Required/ig.test(document.title)) {
+else if (new RegExp(dutchy, 'ig').test(window.location.href)) {
+    if (/Attention Required|A timeout occurred/ig.test(document.title)) {
         window.location.reload()
     }
-    console.log("Bypass Can't Run on this Page")
+    if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
+        localStorage.removeItem("close");
+        localStorage.clear();
+    } else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)) {
+        window.close();
+        window.close()
+    } else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
+        waitForKeyElements("#toast-container", (element) => {
+            shortenerDown(element)
+        });
+    } else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
+        GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
+            GM_setValue('shortner_name', new_value)
+            GM_setValue('previous_shortner_name', old_value)
+        });
+        document.onclick = function(event) {
+            if (event === undefined) event = window.event;
+            var target = 'target' in event ? event.target : event.srcElement;
+            if (/claim/ig.test(target.textContent)) {
+                let linkName = target.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
+                GM_setValue('shortner_name', linkName);
+                console.log(linkName);
+            }
+            true == localStorage.getItem("close") && window.close()
+            //if (GM_getValue('OnPhone', false)){window.close()}
+        }; //get shortlink name when click
+    } else {
+        console.log("Bypass Can't Run on this Page")
+    }
 } else {
     favicon(grey_icon)
     let link = window.location.href
