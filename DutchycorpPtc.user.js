@@ -1,4 +1,5 @@
 var element;
+
 function waitForKeyElements(t, o, e, i, n) {
     void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
     var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -9,6 +10,35 @@ function waitForKeyElements(t, o, e, i, n) {
     }), 0 === n || u && e || (--n, setTimeout(function() {
         waitForKeyElements(t, o, e, i, n)
     }, i))
+}
+GM_getValue('speed', null) || GM_setValue('speed', 5)
+
+function SpeedCtr(pos) {
+    var speed = GM_getValue('speed', null); //the duration speed
+    var body1 = pos,
+        dis = document.createElement("p"),
+        speed_add = document.createElement("button"),
+        speed_sub = document.createElement("button");
+    body1.appendChild(speed_add);
+    speed_add.innerHTML = 'speed +'
+    body1.appendChild(speed_sub);
+    speed_sub.innerHTML = 'speed -'
+    body1.appendChild(dis);
+    dis.innerHTML = 'DS - ' + speed + ' Seconds' //DS=default Speed
+    speed_add.addEventListener("click", function() {
+        if (GM_getValue('speed') < 20) {
+            speed += 1
+            GM_setValue("speed", speed);
+        }
+        dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds' // CS = current setSpeed
+    })
+    speed_sub.addEventListener("click", function() {
+        if (GM_getValue('speed') > 5) {
+            speed -= 1
+            GM_setValue("speed", speed);
+        }
+        dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds'
+    });
 }
 waitForKeyElements('[class*="toast green darken-4"]', (element) => {
     window.close()
@@ -21,6 +51,7 @@ try {
 if (element) {
     window.close()
 } else {
+    SpeedCtr(document.querySelector("center:nth-child(7) > p"))
     var button = document.createElement("button"),
         _ptc_ToVisit = Array.from(document.getElementsByClassName("btn-small waves-effect")),
         _ptc_ToClaim = _ptc_ToVisit.filter((e) => {
@@ -40,7 +71,6 @@ if (element) {
     body.append(second_parag);
     body.appendChild(button);
     button.innerHTML = "Script Not Running"
-
     button.addEventListener("click", function() {
         button.innerHTML = "Script Run"
         console.log("Script Run")
@@ -93,17 +123,14 @@ if (element) {
     }
 
     function visitPtc() {
+        var timerId1;
         let delay = 0;
         let timerId = setTimeout(function request() {
             let visit = _ptc_ToClaim.splice(0, 1)[0];
             if (visit) {
                 console.log(visit.parentElement.parentElement.parentElement.getElementsByTagName('p')[0].textContent)
                 clickOnEle(visit)
-                if (delay >= 20000) {
-                    delay -= 1000
-                } else {
-                    delay += 2000
-                }
+                delay = GM_getValue('speed', 5) * 1000
             } else {
                 clearTimeout(timerId)
                 clearTimeout(timerId1)
@@ -111,7 +138,7 @@ if (element) {
                 console.log("Done Running Script")
             }
             console.log(delay)
-            var timerId1 = setTimeout(request, delay);
+            timerId1 = setTimeout(request, delay);
 
         }, delay);
     }
