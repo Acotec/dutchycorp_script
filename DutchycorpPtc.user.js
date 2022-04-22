@@ -48,7 +48,7 @@ try {
 } catch (e) {
     element = null
 }
-if (element) {
+if (element || GM_getValue("canclose", false)) {
     window.close()
 } else {
     SpeedCtr(document.querySelector("center:nth-child(7) > p"))
@@ -72,6 +72,7 @@ if (element) {
     body.appendChild(button);
     button.innerHTML = "Script Not Running"
     button.addEventListener("click", function() {
+        GM_setValue("canclose", true);
         button.innerHTML = "Script Run"
         console.log("Script Run")
         visitPtc()
@@ -132,6 +133,7 @@ if (element) {
                 clickOnEle(visit)
                 delay = GM_getValue('speed', 5) * 1000
             } else {
+                GM_setValue("canclose", false);
                 clearTimeout(timerId)
                 clearTimeout(timerId1)
                 button.innerHTML = "Done Running Script"
