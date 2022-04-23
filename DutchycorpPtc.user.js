@@ -7,9 +7,19 @@ const pageAccessedByReload = (
     .includes('reload')
 );
 
-if (pageAccessedByReload) {
-    console.log("This page is reloaded");
-    GM_getValue("canclose", false)
+function ForceCloseTab() {
+    0 == GM_getValue("ForceCloseTab", !1) ? GM_setValue("ForceCloseTab", !0) : GM_setValue("ForceCloseTab", !1);
+    window.location.reload()
+};
+GM_registerMenuCommand("ForceCloseTab-" + GM_getValue('ForceCloseTab', false), ForceCloseTab, "ForceCloseTab");
+if (GM_getValue('ForceCloseTab', false)) {
+    if (pageAccessedByReload) {
+        console.log("This page is reloaded");
+        GM_getValue("canclose", false)
+    }
+    if (GM_getValue("canclose")) {
+        window.close()
+    }
 }
 GM_getValue('speed', null) || GM_setValue('speed', 10)
 
@@ -45,7 +55,7 @@ try {
 } catch (e) {
     element = null
 }
-if (element || GM_getValue("canclose", false)) {
+if (element) {
     window.close()
 } else {
     SpeedCtr(document.querySelector("center:nth-child(7) > p"))
