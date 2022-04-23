@@ -1,17 +1,9 @@
 var element;
-
-function waitForKeyElements(t, o, e, i, n) {
-    void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
-    var r = "function" == typeof t ? t() : document.querySelectorAll(t),
-        u = r && 0 < r.length;
-    u && r.forEach(function(t) {
-        var e = "data-userscript-alreadyFound";
-        t.getAttribute(e) || !1 || (o(t) ? u = !1 : t.setAttribute(e, !0))
-    }), 0 === n || u && e || (--n, setTimeout(function() {
-        waitForKeyElements(t, o, e, i, n)
-    }, i))
+if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+    console.log("This page is reloaded");
+    GM_getValue("canclose", false)
 }
-GM_getValue('speed', null) || GM_setValue('speed', 5)
+GM_getValue('speed', null) || GM_setValue('speed', 10)
 
 function SpeedCtr(pos) {
     var speed = GM_getValue('speed', null); //the duration speed
@@ -40,9 +32,6 @@ function SpeedCtr(pos) {
         dis.innerHTML = 'CS - ' + GM_getValue('speed') + ' Seconds'
     });
 }
-waitForKeyElements('[class*="toast green darken-4"]', (element) => {
-    window.close()
-});
 try {
     element = document.querySelector('[class*="toast green darken-4"]')
 } catch (e) {
