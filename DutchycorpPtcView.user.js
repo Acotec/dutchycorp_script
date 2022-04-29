@@ -8,7 +8,7 @@
         try{style = document.querySelector("div.progress").getAttribute('style')}catch(e){style=null}
         if(/display: none/ig.test(style)){
             clearInterval(progress)
-            document.querySelector("#ptc-submit-btn").click()
+            try{document.querySelector("#ptc-submit-btn").click()}catch(e){document.getElementsByTagName('button')[0].click()}
         }
         if(i>=61){clearInterval(progress)}
 
