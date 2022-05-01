@@ -1,3 +1,4 @@
+try{document.querySelector("#methods > p").scrollIntoView()}catch(e){document.querySelector("#methods > p").scrollIntoViewIfNeeded()}
 var element;
 const pageAccessedByReload = (
     (window.performance.navigation && window.performance.navigation.type === 1) ||
