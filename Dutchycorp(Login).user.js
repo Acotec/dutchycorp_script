@@ -8,8 +8,8 @@
             clearInterval(check)
         }
     }, 1000)
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log(document.readyState, 'document was not ready, place code here');
+    window.addEventListener('load', function() {
+        console.log(document.readyState);
         let form = Array.from(document.querySelectorAll(".form-group"))
         let ps = "",
             d = [];
