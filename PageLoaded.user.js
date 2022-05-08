@@ -8,11 +8,11 @@ function show() {
         document.title = title
         return setTimeout(() => {
             timer(--x)
-        }, 200)
+        },100)
     }
     setTimeout(() => {
         if (/.*:.*roll.*/ig.test(document.title)) {
-            timer(300)
+            timer(500)
         } else {
             document.title = title
         }
