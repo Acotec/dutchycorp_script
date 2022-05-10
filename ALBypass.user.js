@@ -267,7 +267,7 @@ function update_DontOpen(linkName) {
     }
 }
 
-function getDomainOrPathNameAndUpdate(link, toupdate) { //toupdate=(dontopen,delaypage,unsupported url)
+function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsupported url') { //toupdate=(dontopen,delaypage,unsupported url)
     GM_xmlhttpRequest({
         method: 'GET',
         url: "https://gist.github.com/Harfho/" + gist_id + "/raw/shortlinks_name.txt?timestamp=" + (+new Date()),
@@ -277,12 +277,16 @@ function getDomainOrPathNameAndUpdate(link, toupdate) { //toupdate=(dontopen,del
     }, )
 
     function get_Shortlinks(response) {
-        let pathname, ref, ex_link;
+        let pathname, ref, ex_link, hostname;
         let get_shortlinks_name = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         let shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase()).sort();
+        try {
+            hostname = new URL(link).host
+        } catch (e) {
+            hostname = document.title
+        }; //get hostname
         let url = window.location.href.toLowerCase(),
             page_title = document.title.toLowerCase().replace(/\(page.*|\s/g, '').trim(),
-            hostname = new URL(link).host, //get hostname
             urlsplice = url.split('/').splice(2, 2),
             shortner_name = GM_getValue('shortner_name').replace(/\s/g, ''),
             previous_shortner_name = GM_getValue('previous_shortner_name'),
@@ -318,7 +322,7 @@ function getDomainOrPathNameAndUpdate(link, toupdate) { //toupdate=(dontopen,del
         })
         if (getfound) {
             pathname = getfound
-            if (/.*dontopen.*/ig.test(toupdate)) {
+            if (/.*dontopen.*|.*down.*/ig.test(toupdate)) {
                 pathname = getSimilarWord(pathname, shortlinks_name)
                 update_DontOpen(pathname)
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(pathname)) {
@@ -328,7 +332,7 @@ function getDomainOrPathNameAndUpdate(link, toupdate) { //toupdate=(dontopen,del
             }
         } else {
             hostname = hostname.toLowerCase()
-            if (/dontopen/ig.test(toupdate)) {
+            if (/dontopen|.*down.*/ig.test(toupdate)) {
                 hostname = getSimilarWord(hostname, shortlinks_name, 0.4)
                 update_DontOpen(hostname)
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(hostname)) {
@@ -489,20 +493,6 @@ function bypass(link) {
 }
 
 //autofaucet.dutcycorp.space
-function shortenerDown(element) {
-    let shortner_down = /.*This shortener is down right now.*/ig.test(element.textContent.toLowerCase())
-    //alert(shortner_down)
-    if (shortner_down) {
-        messageError = 'This shortener is down right now'
-        if (document.referrer) {
-            update_DontOpen(document.referrer)
-        } else {
-            update_DontOpen(GM_getValue("shortner_name"))
-        }
-    } else {
-        window.close();
-    }
-}
 
 function quick_bypass(link) {
     document.title = GM_getValue('shortner_name')
@@ -562,9 +552,8 @@ else if (new RegExp(dutchy, 'ig').test(window.location.href)) {
         window.close();
         window.close()
     } else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
-        waitForKeyElements("#toast-container", (element) => {
-            shortenerDown(element)
-        });
+        document.title = GM_getValue('shortner_name')
+        getDomainOrPathNameAndUpdate(document.title, 'shortenerdown');
     } else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
         GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
             GM_setValue('shortner_name', new_value)
