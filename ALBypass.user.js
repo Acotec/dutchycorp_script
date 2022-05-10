@@ -198,66 +198,71 @@ function sendEmail(toname, temp_id, msg) {
 }
 
 function update_DontOpen(linkName) {
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: "https://gist.github.com/Harfho/" + gist_id + "/raw/_DontOpen.txt?timestamp=" + (+new Date()),
-        revalidate: false,
-        nocache: true,
-        onload: getDontOpen
-    })
-
-    function getDontOpen(response) {
-        let getDontOpen = response.responseText.replace(/'|"|\[|\]/ig, '').split(',').filter(e => e);
-        var _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
-        //console.log(_DontOpen, linkName)
-        var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw==') //github access gist-Token
-        access_token = "Bearer " + access_token
-        //console.log(access_token)
-        const myHeaders = new Headers({
-            "accept": "application/vnd.github.v3+json",
-            'Authorization': access_token,
-            "Content-Type": "application/json"
+    if (/autofaucet.dutchycorp.space/ig.test(linkName)) {
+        console.log("can't add link to dontopen")
+        window.close()
+    } else {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: "https://gist.github.com/Harfho/" + gist_id + "/raw/_DontOpen.txt?timestamp=" + (+new Date()),
+            revalidate: false,
+            nocache: true,
+            onload: getDontOpen
         })
-        if (linkName && !(new RegExp(linkName, 'ig').test(_DontOpen))) { //if the shortlink is not among _DontOpen before
-            _DontOpen.push(linkName.toLowerCase())
-            var raw = JSON.stringify({
-                    "files": {
-                        "_DontOpen.txt": {
-                            "content": JSON.stringify(_DontOpen)
+
+        function getDontOpen(response) {
+            let getDontOpen = response.responseText.replace(/'|"|\[|\]/ig, '').split(',').filter(e => e);
+            var _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
+            //console.log(_DontOpen, linkName)
+            var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw==') //github access gist-Token
+            access_token = "Bearer " + access_token
+            //console.log(access_token)
+            const myHeaders = new Headers({
+                "accept": "application/vnd.github.v3+json",
+                'Authorization': access_token,
+                "Content-Type": "application/json"
+            })
+            if (linkName && !(new RegExp(linkName, 'ig').test(_DontOpen))) { //if the shortlink is not among _DontOpen before
+                _DontOpen.push(linkName.toLowerCase())
+                var raw = JSON.stringify({
+                        "files": {
+                            "_DontOpen.txt": {
+                                "content": JSON.stringify(_DontOpen)
+                            }
                         }
-                    }
-                }),
-                requestOptions = {
-                    method: 'PATCH',
-                    headers: myHeaders,
-                    body: raw,
-                    redirect: 'follow'
-                };
-            fetch("https://api.github.com/gists/" + gist_id, requestOptions)
-                .then(response => response.text())
-                .then((result) => {
-                    console.log('Done', _DontOpen)
-                    let toname = "Yuumari.com",
-                        temp_id = "shortlinks_vicissitude",
-                        pattern = linkCantBypass.replace(/http.*:\/\/|\./ig, ' '),
-                        yuumari_pattern = pattern.insert(pattern.indexOf("/"), " "),
-                        msg = "Cant Bypass \nURL-" + linkCantBypass + "\nSNAME-" + linkName + "\nbecause api return with " + messageError + "\nYummari pattern=" + yuumari_pattern;
-                    sendEmail(toname, temp_id, msg);
-                }) //console.log(result)
-                .catch((error) => {
-                    console.log('error', error);
-                    window.close()
+                    }),
+                    requestOptions = {
+                        method: 'PATCH',
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: 'follow'
+                    };
+                fetch("https://api.github.com/gists/" + gist_id, requestOptions)
+                    .then(response => response.text())
+                    .then((result) => {
+                        console.log('Done', _DontOpen)
+                        let toname = "Yuumari.com",
+                            temp_id = "shortlinks_vicissitude",
+                            pattern = linkCantBypass.replace(/http.*:\/\/|\./ig, ' '),
+                            yuumari_pattern = pattern.insert(pattern.indexOf("/"), " "),
+                            msg = "Cant Bypass \nURL-" + linkCantBypass + "\nSNAME-" + linkName + "\nbecause api return with " + messageError + "\nYummari pattern=" + yuumari_pattern;
+                        sendEmail(toname, temp_id, msg);
+                    }) //console.log(result)
+                    .catch((error) => {
+                        console.log('error', error);
+                        window.close()
+                    });
+            } else {
+                let msg = "SNAME-" + linkName + "\nURL-" + linkCantBypass + "\nis Already added to _DontOpen because api return with " + messageError;
+                GM_notification({
+                    title: '!Bypass-- ' + linkCantBypass,
+                    text: msg,
+                    timeout: 10000,
+                    ondone: () => {},
                 });
-        } else {
-            let msg = "SNAME-" + linkName + "\nURL-" + linkCantBypass + "\nis Already added to _DontOpen because api return with " + messageError;
-            GM_notification({
-                title: '!Bypass-- ' + linkCantBypass,
-                text: msg,
-                timeout: 10000,
-                ondone: () => {},
-            });
-            //console.log('Already added to _DontOpen')console.log('Updating shortlinks Lists')
-            updateAcceptDomain()
+                //console.log('Already added to _DontOpen')console.log('Updating shortlinks Lists')
+                updateAcceptDomain()
+            }
         }
     }
 }
