@@ -1,4 +1,5 @@
 (function() {
+    'use strict';
     function waitForKeyElements(t,o,e,i,n){void 0===e&&(e=!0),void 0===i&&(i=300),void 0===n&&(n=-1);var r="function"==typeof t?t():document.querySelectorAll(t),u=r&&0<r.length;u&&r.forEach(function(t){var e="data-userscript-alreadyFound";t.getAttribute(e)||!1||(o(t)?u=!1:t.setAttribute(e,!0))}),0===n||u&&e||(--n,setTimeout(function(){waitForKeyElements(t,o,e,i,n)},i))}
     function getEmail(){
         window.location.href="https://autofaucet.dutchycorp.space/account.php"
@@ -8,6 +9,7 @@
         if(email){
             element.querySelector('input').value=email
             GM_deleteValue('email')
+            GM_deleteValue('updateFpAddress')
             document.querySelector("#addresses_form button").click()
         }
         else{
@@ -22,6 +24,7 @@
             let email = document.querySelector("#addresses_form > div:nth-child(3)").querySelector('input').value
             if(email){
                 GM_deleteValue('email')
+                GM_deleteValue('updateFpAddress')
                 console.log('FaucetPay Email already added')
                 clearInterval(check)
             }else{
@@ -38,7 +41,7 @@
     if(/account.php.*/ig.test(window.location)){
         let email=document.querySelector("#methods > form > font > form:nth-child(10) > div:nth-child(1) > input").value
         GM_setValue('email',email)
-        if(GM_getValue('updateFpAddress')){window.location.href="https://autofaucet.dutchycorp.space/addresses_update.php"}        
+        if(GM_getValue('updateFpAddress')){window.location.href="https://autofaucet.dutchycorp.space/addresses_update.php"}
         // else{
         //     var captcha='recaptcha'
         //     document.querySelector("#methods > form > font > center:nth-child(12) > h3").scrollIntoView(true)
@@ -51,5 +54,5 @@
         //         }
         //     })
         // }
-    }    
+    }
 })();
