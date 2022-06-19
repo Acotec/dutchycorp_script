@@ -7,9 +7,13 @@ var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').sp
     button = document.createElement("button"),
     body = document.getElementsByClassName('col s12 m12 l4 center-align')[0], // card col s8 m4
     gist_id = "493dc66ecebd58a75b730a77ef676632"
-var linknames = [];
+var linknames = [],
+    totalReward = 0,
+    totalReward1 = 0;
 _views_ToVisit.forEach(e => {
     let n = e.getElementsByTagName("a")[1].parentElement.parentElement.innerText.replace(/\n.*/g, "").trim();
+    let d = e.getElementsByTagName('b')
+    totalReward += parseInt(d[1].textContent.replace(/.*\/|\s/ig, '')) * parseInt(d[2].textContent)
     // n = n.replace(/\s|\d$/ig, "").toLowerCase()
     0 == linknames.includes(n) && linknames.push(n)
 });
@@ -178,7 +182,7 @@ if (GM_getValue("_alreadyRun") != true) {
     second_parag.innerText = 'Available Shortlinks:' + linknames.length;
     body.append(second_parag);
     body.appendChild(button);
-    button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length + ' [' + _views_ToVisit.length + ']'
+    button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length + ' [' + totalReward + ']'
     button.addEventListener("click", function() {
         checkButton()
     });
@@ -424,7 +428,9 @@ function Runcode(response = null) {
                     } else {
                         let views = _getlink.parentElement.innerText.match(/\s*\d* .*/)[0],
                             exFirstNum = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/\/.*/, '')),
-                            views_left = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/.*\//, ''));
+                            views_left = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/.*\//, '')),
+                            reward = parseInt(String(_getlink.parentElement.innerText).replace(/\s/ig, '').replace(/claim.*|.*reward:/ig, ''));
+                        totalReward1 += reward * views_left
                         //console.log(exFirstNum+"/"+views_left)
                         //console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
                         if (shortlinks_name.includes(linkName.replace(/\s/ig, '').toLowerCase())) {
@@ -440,7 +446,7 @@ function Runcode(response = null) {
                                 exFirstNum--
                                 if (exFirstNum >= 0) {
                                     clearInterval(interval)
-                                    console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i)
+                                    console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i, "\nTotalreward=" + totalReward1)
                                     clickOnEle(open_link)
                                     duration += addtoduration
                                     timerId = setTimeout(call, duration);
@@ -485,9 +491,9 @@ function Runcode(response = null) {
                 clearInterval(interval);
                 i = 0; //reset
                 console.log('Done opening')
-                button.innerHTML = 'Done opening-Click to Run Again'
+                button.innerHTML = "Done opening-Click to Run Again=[" + totalReward1 + '] out of ' + totalReward
                 clearInterval(interval)
-                clearInterval(inter)
+                //clearInterval(inter)
                 //Re_run()
                 //window.close();//window.close()
             }
