@@ -27,7 +27,7 @@ let view = setInterval(() => {
         count++
         let value = $('.g-recaptcha')[0].name.replace(/.*btn-/ig, '');
         $('#submit_captcha').show();
-        $('#submit-btn')[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />'`;
+        $('#submit-btn')[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`;
         $('.progress').hide();
         $('#sec').hide();
         $('.g-recaptcha').click()
