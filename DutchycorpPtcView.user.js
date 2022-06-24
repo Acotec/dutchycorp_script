@@ -31,12 +31,8 @@ let view = setInterval(() => {
         $('.progress').hide();
         $('#sec').hide();
         $('.g-recaptcha').click()
-        if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
-            clearInterval(view)
-        } else if (count >= 10) {
-            clearInterval(view)
-            window.location.reload(true)
-        }
-        //clearInterval(view)
+       if($('#rc-imageselect').length>=1||$('.rc-audiochallenge-tabloop-begin').length>=1) {clearInterval(view)}
+       else if (count >= 10) {clearInterval(view);window.location.reload(true)}
+       //clearInterval(view)
     }
 }, 1000)
