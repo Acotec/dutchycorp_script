@@ -1,7 +1,8 @@
+'use strict'
 var i = 0
 var watched;
-let count = 0
-let value;
+var count = 0
+var value;
 
 function manual() {
     var progress = setInterval(() => {
@@ -51,7 +52,8 @@ function auto() {
             $('#sec') && $('#sec').hide();
             $('.g-recaptcha') && $('.g-recaptcha').click()
             if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
-                clearInterval(view)
+                clearInterval(view);
+                throw new Error("!! Stop JS")
             } else if (count >= 20) {
                 clearInterval(view);
                 window.location.reload(true)
@@ -85,8 +87,9 @@ function autotimer() {
             $('#sec') && $('#sec').hide();
             $('.g-recaptcha') && $('.g-recaptcha').click()
             if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
+                console.log('recaptcha need to be solve');
                 clearInterval(timer);
-                console.log('recaptcha need to be solve')
+                throw new Error("!! Stop JS")
             }
             //else if (count >= 10) {clearInterval(timer);window.location.reload(true)}
             //clearInterval(timer)
