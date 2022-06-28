@@ -324,6 +324,7 @@ function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsuppo
             pathname = getfound
             if (/.*dontopen.*|.*down.*/ig.test(toupdate)) {
                 pathname = getSimilarWord(pathname, shortlinks_name)
+                messageError = toupdate
                 update_DontOpen(pathname)
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(pathname)) {
                 messageError = toupdate + "\nor\nshortlink url was changed";
