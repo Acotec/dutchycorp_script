@@ -1,4 +1,3 @@
-'use strict'
 var i = 0
 var watched;
 var count = 0
@@ -45,22 +44,23 @@ function auto() {
             window.close()
         } else {
             count++
-            $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
-            $("#submit_captcha") && $("#submit_captcha").show();
-            $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
-            $('.progress') && $('.progress').hide();
-            $('#sec') && $('#sec').hide();
-            $('.g-recaptcha') && $('.g-recaptcha').click()
             if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
                 clearInterval(view);
                 throw new Error("!! Stop JS")
-            } else if (count >= 20) {
+            } else if (count >= 10) {
                 clearInterval(view);
                 window.location.reload(true)
+            } else {
+                $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
+                $("#submit_captcha") && $("#submit_captcha").show();
+                $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
+                $('.progress') && $('.progress').hide();
+                $('#sec') && $('#sec').hide();
+                $('.g-recaptcha') && $('.g-recaptcha').click()
+                //clearInterval(view)
             }
-            //clearInterval(view)
         }
-    }, 1000)
+    }, 2000)
 }
 
 function autotimer() {
@@ -79,26 +79,26 @@ function autotimer() {
             clearInterval(view);
             window.close()
         } else {
-            count++
-            $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
-            $("#submit_captcha") && $("#submit_captcha").show();
-            $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
-            $('.progress') && $('.progress').hide();
-            $('#sec') && $('#sec').hide();
-            $('.g-recaptcha') && $('.g-recaptcha').click()
             if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
                 console.log('recaptcha need to be solve');
                 clearInterval(timer);
-                throw new Error("!! Stop JS")
+                throw new Error("!!Stop JS")
+            } else {
+                $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
+                $("#submit_captcha") && $("#submit_captcha").show();
+                $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
+                $('.progress') && $('.progress').hide();
+                $('#sec') && $('#sec').hide();
+                $('.g-recaptcha') && $('.g-recaptcha').click()
+                //else if (count >= 10) {clearInterval(timer);window.location.reload(true)}
+                //clearInterval(timer)
             }
-            //else if (count >= 10) {clearInterval(timer);window.location.reload(true)}
-            //clearInterval(timer)
             return setTimeout(() => {
                 timer(--x)
-            }, 1000)
+            }, 2000)
         }
     }
-    timer(20)
+    timer(10)
 }
 
 //manual()
