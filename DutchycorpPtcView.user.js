@@ -57,12 +57,12 @@ function auto() {
                 $('.g-recaptcha') && $('.g-recaptcha').click()
                 if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
                     clearInterval(view);
-                    throw new Error("!! Stop JS")
+                    //throw new Error("!! Stop JS")
                     //clearInterval(view)
                 }
             }
         }
-    }, 2000)
+    }, 3000)
 }
 
 function autotimer() {
@@ -97,11 +97,11 @@ function autotimer() {
         }
         return setTimeout(() => {
             timer(--x)
-        }, 2000)
+        }, 3000)
     }
     timer(10)
 }
 
 //manual()
-//auto()
-autotimer()
+auto()
+//autotimer()
