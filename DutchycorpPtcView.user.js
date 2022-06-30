@@ -1,3 +1,4 @@
+'use strict'
 var i = 0
 var watched;
 var count = 0
@@ -44,10 +45,7 @@ function auto() {
             window.close()
         } else {
             count++
-            if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
-                clearInterval(view);
-                throw new Error("!! Stop JS")
-            } else if (count >= 10) {
+            if (count >= 10) {
                 clearInterval(view);
                 window.location.reload(true)
             } else {
@@ -57,7 +55,11 @@ function auto() {
                 $('.progress') && $('.progress').hide();
                 $('#sec') && $('#sec').hide();
                 $('.g-recaptcha') && $('.g-recaptcha').click()
-                //clearInterval(view)
+                if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
+                    clearInterval(view);
+                    throw new Error("!! Stop JS")
+                    //clearInterval(view)
+                }
             }
         }
     }, 2000)
@@ -76,27 +78,26 @@ function autotimer() {
             watched = document.querySelector("body div.column h4")
         } catch (e) {}
         if (watched && /.*All.+Ads.*/ig.test(watched.textContent)) {
-            clearInterval(view);
+            clearInterval(timer);
             window.close()
         } else {
+            $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
+            $("#submit_captcha") && $("#submit_captcha").show();
+            $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
+            $('.progress') && $('.progress').hide();
+            $('#sec') && $('#sec').hide();
+            $('.g-recaptcha') && $('.g-recaptcha').click()
             if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
                 console.log('recaptcha need to be solve');
                 clearInterval(timer);
                 throw new Error("!!Stop JS")
-            } else {
-                $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
-                $("#submit_captcha") && $("#submit_captcha").show();
-                $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
-                $('.progress') && $('.progress').hide();
-                $('#sec') && $('#sec').hide();
-                $('.g-recaptcha') && $('.g-recaptcha').click()
-                //else if (count >= 10) {clearInterval(timer);window.location.reload(true)}
-                //clearInterval(timer)
             }
-            return setTimeout(() => {
-                timer(--x)
-            }, 2000)
+            //else if (count >= 10) {clearInterval(timer);window.location.reload(true)}
+            //clearInterval(timer)
         }
+        return setTimeout(() => {
+            timer(--x)
+        }, 2000)
     }
     timer(10)
 }
