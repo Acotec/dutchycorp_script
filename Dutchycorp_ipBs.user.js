@@ -1,5 +1,5 @@
 'use strict';
-const scriptTag= `<script async>const adBlockDetected_2=()=>{}</script><script defer>const adBlockDetected_2=()=>{}</script>`;
+const scriptTag =`<script defer async>const adBlockDetected_2=()=>{}</script>`;
 const scriptTagappend = document.createRange().createContextualFragment(scriptTag);
 document.querySelector("html").prepend(scriptTagappend);
 document.addEventListener("DOMContentLoaded", function(event) {
