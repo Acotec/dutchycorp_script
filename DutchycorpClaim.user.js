@@ -24,17 +24,20 @@ try {
 }
 
 function caldutchbal() {
-    let dutchbalb = document.querySelectorAll("#methods")[1]
-    let dutchbalp = document.createElement("p")
-    let dutchbal = dutchbalb.innerText.replace(/\D|\s/ig, '')
-    let dutch_usdt_rate = parseFloat(0.00000284)
-    let calusdt = dutch_usdt_rate * dutchbal
-    let calperc = ((5 / 100) * calusdt).toFixed(8)
-    dutchbal = calusdt - calperc
-    dutchbalp.setAttribute('class', 'title')
-    dutchbalp.innerText = "Your DUTCHY(USDT): \n" + dutchbal.toFixed(8)
-    dutchbalb.append(dutchbalp);
-}
+        let dutchbalb = document.querySelectorAll("#methods")[1]
+        let dutchbalp = document.createElement("p")
+        let dutchbal = dutchbalb.innerText.replace(/\D|\s|\+.*/ig, '')
+        let dutch_usdt_rate = parseFloat(0.000002845)
+        let calusdt = dutch_usdt_rate * dutchbal
+        let calperc = ((5 / 100) * calusdt).toFixed(8)
+        dutchbal = calusdt - calperc
+        dutchbalp.setAttribute('class', 'title')
+        dutchbalp.innerText = `Your DUTCHYBalance(USDT)
+                                     ${calusdt}
+                               DUTCHYBalance(USDT)-5%(${calperc})
+                                     ${dutchbal.toFixed(8)}`
+        dutchbalb.append(dutchbalp);
+    }
 caldutchbal()
 
 function OnPhone() {
