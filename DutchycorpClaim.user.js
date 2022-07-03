@@ -26,7 +26,7 @@ try {
 function caldutchbal() {
         let dutchbalb = document.querySelectorAll("#methods")[1]
         let dutchbalp = document.createElement("p")
-        let dutchbal = dutchbalb.innerText.replace(/\D|\s|\+.*/ig, '')
+        let dutchbal = dutchbalb.innerText.replace(/\+.*|\D|\s/ig, '')
         let dutch_usdt_rate = parseFloat(0.000002845)
         let calusdt = dutch_usdt_rate * dutchbal
         let calperc = ((5 / 100) * calusdt).toFixed(8)
