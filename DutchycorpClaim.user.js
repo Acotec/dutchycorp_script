@@ -33,7 +33,7 @@ function caldutchbal() {
         dutchbal = calusdt - calperc
         dutchbalp.setAttribute('class', 'title')
         dutchbalp.innerText = `Your DUTCHYBalance(USDT)
-                                     ${calusdt}
+                                     ${calusdt.toFixed(8)}
                                DUTCHYBalance(USDT)-5%(${calperc})
                                      ${dutchbal.toFixed(8)}`
         dutchbalb.append(dutchbalp);
