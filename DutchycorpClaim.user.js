@@ -441,7 +441,7 @@ function Runcode(response = null) {
                             duration = getduration(i)
                             var addtoduration;
                             if (GM_getValue('OnPhone', false)) {
-                                addtoduration = 500
+                                addtoduration=1<GM_getValue("speed")?500:0;
                             } else {
                                 addtoduration = 0
                             }
