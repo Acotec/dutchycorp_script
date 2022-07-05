@@ -29,6 +29,7 @@
                 clearInterval(check)
             }else{
                 GM_setValue('updateFpAddress',true)
+                GM_setValue('captcha_changed',false)
                 updateFpAddress( document.querySelector("#addresses_form > div:nth-child(3)"))
                 clearInterval(check)
             }
