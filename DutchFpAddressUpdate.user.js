@@ -40,9 +40,8 @@
         },1000)
         }
     if(/account.php.*/ig.test(window.location)){
-        let email=document.querySelector("#methods > form > font > form:nth-child(10) > div:nth-child(1) > input").value
-        GM_setValue('email',email)
-        if(GM_getValue('updateFpAddress')){window.location.href="https://autofaucet.dutchycorp.space/addresses_update.php"}
+        let email=document.querySelector("#methods > form > font > form:nth-child(10) > div:nth-child(1) > input").value        
+        if(GM_getValue('updateFpAddress')){GM_setValue('email',email);window.location.href="https://autofaucet.dutchycorp.space/addresses_update.php"}
         // else{
         //     var captcha='recaptcha'
         //     document.querySelector("#methods > form > font > center:nth-child(12) > h3").scrollIntoView(true)
