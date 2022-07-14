@@ -62,4 +62,8 @@
     } else {
         alert("CHANGE YOUR IP")
     }
+    document.querySelector('input[name*="username"]').addEventListener("change", (e) => {
+        let ps = generatepass(e.target.value)
+        document.querySelector('input[name*="password"]').value=ps
+    });
 })();
