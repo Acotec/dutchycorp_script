@@ -324,10 +324,10 @@ function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsuppo
             pathname = getfound
             if (/.*dontopen.*|.*down.*/ig.test(toupdate)) {
                 pathname = getSimilarWord(pathname, shortlinks_name)
-                messageError = toupdate
+                messageError = `${messageError}-(${toupdate})`
                 update_DontOpen(pathname)
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(pathname)) {
-                messageError = toupdate + "\nor\nshortlink url was changed";
+                messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`
                 linkCantBypass = link
                 update_DontOpen(pathname)
             }
@@ -335,9 +335,10 @@ function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsuppo
             hostname = hostname.toLowerCase()
             if (/dontopen|.*down.*/ig.test(toupdate)) {
                 hostname = getSimilarWord(hostname, shortlinks_name, 0.4)
+                messageError = `${messageError}-(${toupdate})`
                 update_DontOpen(hostname)
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(hostname)) {
-                messageError = toupdate + "\nor\nshortlink url was changed";
+                messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`
                 linkCantBypass = link
                 update_DontOpen(hostname)
             }
@@ -464,6 +465,7 @@ function bypass(link) {
                     GM_setClipboard(link, {
                         type: 'text/plain'
                     })
+                    console.log(message)
                     window.close()
                 }
             }
