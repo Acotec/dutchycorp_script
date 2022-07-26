@@ -4,6 +4,15 @@ var watched;
 var count = 0
 var value;
 
+function skip_waiting_time() {
+    $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
+    $("#submit_captcha") && $("#submit_captcha").show();
+    $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
+    $('.progress') && $('.progress').hide();
+    $('#sec') && $('#sec').hide();
+    $('.g-recaptcha') && $('.g-recaptcha').click()
+}
+
 function manual() {
     var progress = setInterval(() => {
         i++;
@@ -35,7 +44,7 @@ function manual() {
     }, 1000)
 }
 
-function auto() {
+function autotimer(seconds = 3) {
     let view = setInterval(() => {
         try {
             watched = document.querySelector("body div.column h4")
@@ -49,11 +58,7 @@ function auto() {
                 clearInterval(view);
                 window.location.reload(true)
             } else {
-                $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
-                $("#submit_captcha") && $("#submit_captcha").show();
-                $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
-                $('.progress') && $('.progress').hide();
-                $('#sec') && $('#sec').hide();
+                skip_waiting_time()
                 $('.g-recaptcha') && $('.g-recaptcha').click()
                 if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
                     clearInterval(view);
@@ -62,10 +67,10 @@ function auto() {
                 }
             }
         }
-    }, 3000)
+    }, seconds * 1000)
 }
 
-function autotimer() {
+function auto(seconds = 2, timing = 10) {
     var title = document.title
     let timer = (x) => {
         if (x < 0) {
@@ -81,12 +86,7 @@ function autotimer() {
             clearInterval(timer);
             window.close()
         } else {
-            $(".g-recaptcha") && (value = $(".g-recaptcha")[0].name.replace(/.*btn-/ig, ""));
-            $("#submit_captcha") && $("#submit_captcha").show();
-            $("#submit-btn") && ($("#submit-btn")[0].innerHTML = `<input required type="hidden" name="hash" value="${value}" />`);
-            $('.progress') && $('.progress').hide();
-            $('#sec') && $('#sec').hide();
-            $('.g-recaptcha') && $('.g-recaptcha').click()
+            skip_waiting_time()
             if ($('#rc-imageselect') || $('.rc-audiochallenge-tabloop-begin')) {
                 console.log('recaptcha need to be solve');
                 clearInterval(timer);
@@ -97,11 +97,11 @@ function autotimer() {
         }
         return setTimeout(() => {
             timer(--x)
-        }, 3000)
+        }, seconds * 1000)
     }
-    timer(10)
+    timer(timing)
 }
 
 //manual()
-auto()
-//autotimer()
+//autotimer(3)
+auto(3, 10)
