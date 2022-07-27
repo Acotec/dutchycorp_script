@@ -1,14 +1,3 @@
-var check = setInterval(() => {
-    let sidevar = document.querySelector("#mobile-demo")
-    let dutch_pri_info = document.querySelector("#DUTCHY-price-informations")
-    let coupon = document.querySelector("#coupon")
-    if (sidevar && dutch_pri_info && coupon) {
-        sidevar.remove();
-        dutch_pri_info.remove();
-        coupon.remove();
-        clearInterval(check);
-    } else(null)
-}, 1000)
 var _ptc_ToVisit = Array.from(document.getElementsByClassName("btn-small waves-effect")),
     _ptc_ToClaim = _ptc_ToVisit.filter((e) => {
         if (e.name) {
@@ -61,10 +50,19 @@ function visitPtc() {
         console.log(visit.parentElement.parentElement.parentElement.getElementsByTagName('p')[0].textContent)
         clickOnEle(visit)
     } else {
+        var check = setInterval(() => {
+            let sidevar = document.querySelector("#mobile-demo")
+            let dutch_pri_info = document.querySelector("#DUTCHY-price-informations")
+            let coupon = document.querySelector("#coupon")
+            if (sidevar && dutch_pri_info && coupon) {
+                sidevar.remove();
+                dutch_pri_info.remove();
+                coupon.remove();
+                clearInterval(check);
+            } else(null)
+        }, 1000);
         button.innerHTML = "Done Running Script All Available Ads Watched"
         console.log("Done Running Script")
     }
-
-
 }
 visitPtc()
