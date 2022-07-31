@@ -1,3 +1,5 @@
+$('#DUTCHY-price-informations,#coupon').remove();
+document.querySelector("#mobile-demo").innerHTML = document.querySelector("#mobile-demo > p:nth-child(6) > b").innerText;
 var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     shortlinks_name = GM_getResourceText("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     _open_link_fast = [].map(e => e.toLowerCase()),
@@ -24,20 +26,20 @@ try {
 }
 
 function caldutchbal() {
-        let dutchbalb = document.querySelectorAll("#methods")[1]
-        let dutchbalp = document.createElement("p")
-        let dutchbal = dutchbalb.innerText.replace(/\+.*|\D|\s/ig, '')
-        let dutch_usdt_rate = parseFloat(0.000002845)
-        let calusdt = dutch_usdt_rate * dutchbal
-        let calperc = ((5 / 100) * calusdt).toFixed(8)
-        dutchbal = calusdt - calperc
-        dutchbalp.setAttribute('class', 'title')
-        dutchbalp.innerText = `Your DUTCHYBalance(USDT)
+    let dutchbalb = document.querySelectorAll("#methods")[1]
+    let dutchbalp = document.createElement("p")
+    let dutchbal = dutchbalb.innerText.replace(/\+.*|\D|\s/ig, '')
+    let dutch_usdt_rate = parseFloat(0.000002845)
+    let calusdt = dutch_usdt_rate * dutchbal
+    let calperc = ((5 / 100) * calusdt).toFixed(8)
+    dutchbal = calusdt - calperc
+    dutchbalp.setAttribute('class', 'title')
+    dutchbalp.innerText = `Your DUTCHYBalance(USDT)
                                      ${calusdt.toFixed(8)}
                                DUTCHYBalance(USDT)-5%(${calperc})
                                      ${dutchbal.toFixed(8)}`
-        dutchbalb.append(dutchbalp);
-    }
+    dutchbalb.append(dutchbalp);
+}
 caldutchbal()
 
 function OnPhone() {
@@ -441,7 +443,7 @@ function Runcode(response = null) {
                             duration = getduration(i)
                             var addtoduration;
                             if (GM_getValue('OnPhone', false)) {
-                                addtoduration=1<GM_getValue("speed")?500:0;
+                                addtoduration = 0 < GM_getValue("speed") ? 500 : 0;
                             } else {
                                 addtoduration = 0
                             }
