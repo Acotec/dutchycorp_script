@@ -315,6 +315,7 @@ function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsuppo
             Array.prototype.sample = function() {
                 return this[Math.floor(Math.random() * this.length)];
             }
+            i=i.replace(/\..*/,'').toLowerCase();
             let f = getSimilarWord(i.toLowerCase(), shortlinks_name, [.3, .4].sample())
             getfound = f
             console.log('final = ' + f)
@@ -323,24 +324,24 @@ function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsuppo
         if (getfound) {
             pathname = getfound
             if (/.*dontopen.*|.*down.*/ig.test(toupdate)) {
-                pathname = getSimilarWord(pathname, shortlinks_name)
-                messageError = `${messageError}-(${toupdate})`
-                update_DontOpen(pathname)
+                pathname = getSimilarWord(pathname, shortlinks_name);
+                messageError = `${messageError}-(${toupdate})`;
+                update_DontOpen(pathname);
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(pathname)) {
-                messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`
-                linkCantBypass = link
-                update_DontOpen(pathname)
+                messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`;
+                linkCantBypass = link;
+                update_DontOpen(pathname);
             }
         } else {
             hostname = hostname.toLowerCase()
             if (/dontopen|.*down.*/ig.test(toupdate)) {
-                hostname = getSimilarWord(hostname, shortlinks_name, 0.4)
-                messageError = `${messageError}-(${toupdate})`
-                update_DontOpen(hostname)
+                hostname = getSimilarWord(hostname, shortlinks_name, 0.4);
+                messageError = `${messageError}-(${toupdate})`;
+                update_DontOpen(hostname);
             } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(hostname)) {
-                messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`
-                linkCantBypass = link
-                update_DontOpen(hostname)
+                messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`;
+                linkCantBypass = link;
+                update_DontOpen(hostname);
             }
         }
     }
