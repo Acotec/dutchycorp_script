@@ -103,5 +103,5 @@ function auto(seconds = 2, timing = 10) {
 }
 
 //manual()
-//autotimer(3)
-auto(3, 10)
+autotimer(3)
+//auto(3, 10)
