@@ -49,7 +49,10 @@ function autotimer(seconds = 3) {
         try {
             watched = document.querySelector("body div.column h4")
         } catch (e) {}
-        if (watched && /.*All.+Ads.*/ig.test(watched.textContent)) {
+        if (watched && /.*All Availables Ads Viewed*/ig.test(watched.textContent)) {
+            clearInterval(view);
+            window.location = 'https://autofaucet.dutchycorp.space/ptc/wall.php'
+        } else if (watched && /.*All Available Ads Watched*/ig.test(watched.textContent)) {
             clearInterval(view);
             window.close()
         } else {
@@ -104,4 +107,4 @@ function auto(seconds = 2, timing = 10) {
 
 //manual()
 autotimer(3)
-//auto(3, 10)
+//auto(3,10)
