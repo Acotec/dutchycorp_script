@@ -1,5 +1,5 @@
 $('#DUTCHY-price-informations,#coupon').remove();
-document.querySelector("#mobile-demo").innerHTML = document.querySelector("#mobile-demo > p:nth-child(6) > b").innerText;
+document.querySelector("#mobile-demo").innerHTML = document.querySelector("#mobile-demo p b").innerText;
 var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     shortlinks_name = GM_getResourceText("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     _open_link_fast = [].map(e => e.toLowerCase()),
@@ -127,6 +127,7 @@ function SpeedCtr() {
         dis = document.createElement("p"),
         speed_add = document.createElement("button"),
         speed_sub = document.createElement("button");
+    dis.classList.add('speed');
     body1.appendChild(speed_add);
     speed_add.innerHTML = 'speed +'
     body1.appendChild(speed_sub);
@@ -329,7 +330,6 @@ function Runcode(response = null) {
 
     var check = 0
     var antibot = setInterval(isantibotvisible, 1000)
-
     function isantibotvisible() {
         try {
             let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
@@ -379,7 +379,6 @@ function Runcode(response = null) {
             }
         }
     }
-
     function getduration(i) {
         if (GM_getValue("static", null)) {
             var ds = GM_getValue('speed')
@@ -410,6 +409,8 @@ function Runcode(response = null) {
                 duration = i + 1000
             }
         }
+        let speedclass = document.querySelector("p.speed")
+        speedclass.innerText=`${speedclass.innerText.replace(/\(duration.*/,'')} (duration=${duration/1000} seconds)`
         return duration
     }
     var LinkToVisitOnPage = []
