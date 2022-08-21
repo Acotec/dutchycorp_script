@@ -51,7 +51,7 @@ function autotimer(seconds = 3) {
         } catch (e) {}
         if (watched && /.*All Availables Ads Viewed*/ig.test(watched.textContent)) {
             clearInterval(view);
-            window.location = 'https://autofaucet.dutchycorp.space/ptc/wall.php'
+            //window.location = 'https://autofaucet.dutchycorp.space/ptc/wall.php'
         } else if (watched && /.*All Available Ads Watched*/ig.test(watched.textContent)) {
             clearInterval(view);
             window.close()
