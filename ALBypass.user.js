@@ -246,7 +246,10 @@
                             temp_id = "shortlinks_vicissitude",
                             pattern = linkCantBypass.replace(/http.*:\/\/|\./ig, ' '),
                             yuumari_pattern = pattern.insert(pattern.indexOf("/"), " "),
-                            msg = "Cant Bypass \nURL-" + linkCantBypass + "\n SNAME-" + linkName + "\n because api return with " + messageError + "\n Yummari pattern=" + yuumari_pattern;
+                            msg = `Cant Bypass URL ${linkCantBypass}
+                                  SNAME- ${linkName}
+                                  because api return with ${messageError}
+                                  Yummari pattern="${yuumari_pattern}`
                         sendEmail(toname, temp_id, msg);
                     }) //console.log(result)
                         .catch((error) => {
@@ -268,13 +271,16 @@
         }
     }
 
-    function getDomainOrPathNameAndUpdate(link = document.title, toupdate = 'unsupported url') { //toupdate=(dontopen,delaypage,unsupported url)
+    function getDomainOrPathNameAndUpdate(link =sessionStorage.getItem('shortner_name'), toupdate = 'unsupported url') { //toupdate=(dontopen,delaypage,unsupported url)
         GM_xmlhttpRequest({
             method: 'GET',
             url: "https://gist.github.com/Harfho/" + gist_id + "/raw/shortlinks_name.txt?timestamp=" + (+new Date()),
             revalidate: false,
             nocache: true,
-            onload: get_Shortlinks
+            onload: get_Shortlinks,
+            onerror:(r)=>{messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`;
+                          update_DontOpen(link)
+                         }
         }, )
 
         function get_Shortlinks(response) {
@@ -294,9 +300,9 @@
                 similardomain = getSimilarWord(urlsplice[0], shortlinks_name);
             if (document.referrer && /.*dutchycorp.*/ig.test(document.referrer) == false) {
                 ref = new URL(document.referrer).host
-                ex_link = [ref, page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name, ]
+                ex_link = [ref,sessionStorage.getItem('shortner_name'), page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name, ]
             } else {
-                ex_link = [page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name, ]
+                ex_link = [sessionStorage.getItem('shortner_name'),page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name, ]
             }
             //console.log(shortlinks_name)
             //console.log(ex_link)
@@ -369,6 +375,7 @@
     //bypass the link
     function bypass(link) {
         favicon(green_icon)
+        sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
         let urlhost = new URL(link).host
         document.title = GM_getValue('shortner_name')
         GM_setValue('previousHost', urlhost)
@@ -434,18 +441,18 @@
                         let after24h = new Date(new Date().getTime() + (24 * 60 * 60 * 1000)).toLocaleString()
                         GM_setValue('after24h', after24h)
                         GM_setValue('Bypass', false)
-                        //alert(message + "You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour for API key to continue working")
+                        //alert(message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`)
                         if (GM_getValue('AllowToSendEmail', false)) {
                             let toname = "Harfho",
                                 temp_id = "api_issue",
-                                msg = message + "You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour '(" + after24h + ")' for API key to continue working";
+                                msg = message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`;
                             if (GM_getValue('already_sent', false) == false) {
                                 sendEmail(toname, temp_id, msg);
                                 GM_setValue('already_sent', true)
                             };
                         } else {
                             GM_setValue('already_sent', false)
-                            console.log(message + "You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour '(" + after24h + ")' for API key to continue working")
+                            console.log(message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`)
                             window.close()
                         }
                     } else if (/leeched max count/ig.test(message)) {
@@ -537,7 +544,7 @@
     } else if (/\/===$/.test(window.location.href)) {
         if (/megaurl.in\/delay=/.test(window.location.href)) {
             let link = window.location.pathname.replace(/.*delay=/, '').replace(/\/===/ig, ''); //get the exact link to quick_bypass
-            quick_bypass(link)
+           quick_bypass(link)
         } else if (/megaurl.in\/bypass=/.test(window.location.href)) {
             let link = window.location.pathname.replace(/.*bypass=/, '').replace(/\/===/ig, ''); //get the exact link to pass to bypasser
             bypass(link)
@@ -549,16 +556,13 @@
     else if (new RegExp(dutchy, 'ig').test(window.location.href)) {
         if (/Attention Required|A timeout occurred/ig.test(document.title)) {
             window.location.reload()
-        }
-        if (new RegExp(dutchy + '/dashboard.php.*', 'ig').test(window.location.href)) {
-            localStorage.removeItem("close");
-            localStorage.clear();
         } else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)) {
             window.close();
             window.close()
         } else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
-            document.title = GM_getValue('shortner_name')
-            getDomainOrPathNameAndUpdate(document.title, 'shortenerdown');
+            //alert('down')
+            sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
+            getDomainOrPathNameAndUpdate( sessionStorage.getItem('shortner_name'), 'shortenerdown');
         } else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
             GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
                 GM_setValue('shortner_name', new_value)
@@ -572,17 +576,17 @@
                     GM_setValue('shortner_name', linkName);
                     console.log(linkName);
                 }
-                //true == localStorage.getItem("close") && window.close()
                 //if (GM_getValue('OnPhone', false)){window.close()}
             }; //get shortlink name when click
         } else {
             console.log("Bypass Can't Run on this Page")
         }
     } else {
+        sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
         document.title = GM_getValue('shortner_name')
         favicon(grey_icon)
         let link = window.location.href
-        getDomainOrPathNameAndUpdate(link, 'unsupported url');
+        getDomainOrPathNameAndUpdate(sessionStorage.getItem('shortner_name'), 'unsupported url');
         updateAcceptDomain()
     }
 })();
