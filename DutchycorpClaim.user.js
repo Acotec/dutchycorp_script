@@ -80,14 +80,11 @@ function checkButton() {
     if (GM_getValue("_alreadyRun") == true) {
         GM_setValue("_alreadyRun", false);
         button.innerHTML = "Script Run";
-        localStorage.removeItem("close")
         location.reload()
-        localStorage.removeItem("close")
         //console.log("GM_value set to-" + GM_getValue("_alreadyRun"))
     } else {
         GM_setValue("_alreadyRun", true);
         button.innerHTML = "Script Stop";
-        localStorage.removeItem("close")
         location.reload()
     }
 }
@@ -200,7 +197,6 @@ function Runcode(response = null) {
         interval, //for setInterval
         timerId,
         duration; //for setInterval duration
-    localStorage.setItem("close", "true")
     if (GM_getValue('AutoUpdate')) {
         let getDontOpen = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
@@ -215,6 +211,10 @@ function Runcode(response = null) {
     } else {
         _totalLink = linknames.length;
     }
+
+    console.log(_DontOpen)
+    console.log(shortlinks_name)
+    //throw new Error("!! Stop JS")
     if (/404|400/ig.test(_DontOpen + shortlinks_name)) {
         window.location.reload();
         throw new Error("!! Stop JS")
@@ -230,7 +230,6 @@ function Runcode(response = null) {
             sessionStorage.removeItem("reloading");
             if (_alreadyRun == false) {
                 button.innerHTML = "Script Run(Click to Run Again)";
-                localStorage.setItem("close", "true") //AutoFCB(Close)
             } else {
                 button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length;
             }
@@ -248,13 +247,11 @@ function Runcode(response = null) {
         let time = 2
         if (reRun < time) {
             GM_setValue("_alreadyRun", false);
-            GM_setValue("Re_run", reRun + 1); //
-            //localStorage.setItem("close", "true")
+            GM_setValue("Re_run", reRun + 1);
             window.location.reload()
         } else {
             GM_setValue("Re_run", 0); //
             GM_setValue("_alreadyRun", true);
-            localStorage.removeItem("close")
             //window.close()
         }
     }
@@ -262,7 +259,7 @@ function Runcode(response = null) {
     function DontOpen_LinkByName(linkName) {
         let check = _DontOpen.some((link) => {
             //return new RegExp('^' + link.replace(/\s|\d$/ig, '') + '$', "ig").test(linkName.replace(/\s|\d$/ig, ''))
-            return new RegExp('^' + link.replace(/\s/, '') + '$', "ig").test(linkName)
+            return new RegExp('^' + link.replace(/\s/, '') + '$', "ig").test(linkName.replace(/\s/, ''))
         }) //check if linkName is among _DontOpen
         if (check) {
             //alert('Dontopen '+linkName)
@@ -521,8 +518,7 @@ function Runcode(response = null) {
     pageR()
     reloadP()
     if (!_alreadyRun) {
-        button.innerHTML = "Script Run [" + _totalLink + "] Links will Open";
-        localStorage.setItem("close", "true") //AutoFCB(Close) 'Allow tab to close if codes rerun without pressing - var(button)'
+        button.innerHTML = "Script Run [" + _totalLink + "] Links will Open";       
         main()
     }
 }
