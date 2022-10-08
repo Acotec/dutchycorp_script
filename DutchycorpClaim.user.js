@@ -24,21 +24,38 @@ try {
 } catch (err) {
     document.querySelector("#properties p:nth-child(2) i").scrollIntoView()
 }
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() *
+                                               charactersLength));
+    }
+    return result;
+}
 
-function caldutchbal() {
+var reloadedid = makeid(5)
+
+function caldutchbal(bal) {
     let dutchbalb = document.querySelectorAll("#methods")[1]
     let dutchbalp = document.createElement("p")
-    let dutchbal = dutchbalb.innerText.replace(/\+.*|\D|\s/ig, '')
+    let dutchbal;
+    if(bal){ dutchbal=bal}else{dutchbal=dutchbalb.innerText.replace(/\+.*|\D|\s/ig, '')}
     let dutch_usdt_rate = parseFloat(0.000002845)
     let calusdt = dutch_usdt_rate * dutchbal
     let calperc = ((5 / 100) * calusdt).toFixed(8)
     dutchbal = calusdt - calperc
-    dutchbalp.setAttribute('class', 'title')
-    dutchbalp.innerText = `Your DUTCHYBalance(USDT)
+    if(bal){
+        return dutchbal.toFixed(8)
+    }else{
+        dutchbalp.setAttribute('class', 'title');
+        dutchbalp.innerText = `Your DUTCHYBalance(USDT)
                                      ${calusdt.toFixed(8)}
                                DUTCHYBalance(USDT)-5%(${calperc})
-                                     ${dutchbal.toFixed(8)}`
-    dutchbalb.append(dutchbalp);
+                                     ${dutchbal.toFixed(8)}`;
+        dutchbalb.append(dutchbalp);
+    }
 }
 caldutchbal()
 
@@ -185,7 +202,7 @@ if (GM_getValue("_alreadyRun") != true) {
     second_parag.innerText = 'Available Shortlinks:' + linknames.length;
     body.append(second_parag);
     body.appendChild(button);
-    button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length + ' [' + totalReward + ']'
+    button.innerHTML = "Script Not Running -- SHORTLINKS=" + linknames.length + ' [' + caldutchbal(totalReward) + ']'
     button.addEventListener("click", function() {
         checkButton()
     });
@@ -225,9 +242,9 @@ function Runcode(response = null) {
     //function to check when the page is reloaded
     function pageR() {
         //reload
-        var reloading = sessionStorage.getItem("reloading");
+        var reloading = sessionStorage.getItem(reloadedid);
         if (reloading) {
-            sessionStorage.removeItem("reloading");
+            sessionStorage.removeItem(reloadedid);
             if (_alreadyRun == false) {
                 button.innerHTML = "Script Run(Click to Run Again)";
             } else {
@@ -238,7 +255,7 @@ function Runcode(response = null) {
 
     //function to reload the page
     function reloadP() {
-        sessionStorage.setItem("reloading", "true");
+        sessionStorage.setItem(reloadedid, makeid(5));
     }
 
     //function to re-run the script
@@ -464,7 +481,7 @@ function Runcode(response = null) {
                             }, duration);
                         } else {
                             console.log(linkName.toLowerCase(), 'Is not among shortlinks to open', limit)
-                            update_DontOpen(linkName)
+                            update_DontOpen(linkName.toLowerCase())
                         }
 
                     }
@@ -518,7 +535,7 @@ function Runcode(response = null) {
     pageR()
     reloadP()
     if (!_alreadyRun) {
-        button.innerHTML = "Script Run [" + _totalLink + "] Links will Open";       
+        button.innerHTML = "Script Run [" + _totalLink + "] Links will Open";
         main()
     }
 }
