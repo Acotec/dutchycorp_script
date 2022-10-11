@@ -511,7 +511,7 @@ function Runcode(response = null) {
                 clearInterval(interval);
                 i = 0; //reset
                 console.log('Done opening')
-                button.innerHTML = "Done opening-Click to Run Again=[" + totalReward1 + '] out of ' + totalReward
+                button.innerHTML = "Done opening-Click to Run Again=[" + caldutchbal(totalReward1) + '] out of ' + caldutchbal(totalReward)
                 clearInterval(interval)
                 //clearInterval(inter)
                 //Re_run()
