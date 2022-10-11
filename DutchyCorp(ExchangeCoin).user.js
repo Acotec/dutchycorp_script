@@ -13,7 +13,7 @@ function waitForKeyElements(t, o, e, i, n) {
     }, i))
 }
 waitForKeyElements('.select-wrapper', (element) => {
-    selectFromDropDown(tocoin)
+    select(tocoin)
     fill_in_and_exchange()
 });
 waitForKeyElements('#toast-container', (element) => {
@@ -24,31 +24,34 @@ waitForKeyElements('#toast-container', (element) => {
     WithButton.parentNode.insertBefore(addButton, WithButton.nextSibling);
 }, false)
 
-function selectFromDropDown(coin = 'usdt', exc = null) {
-    var selectFrom, SelectCoin;
-    if (exc) {
-        console.log("Exchanging", exc)
-        exc = exc
-        selectFrom = document.querySelectorAll(".select-wrapper")[0]
-        SelectCoin = Array.from(selectFrom.querySelector('.dropdown-content').querySelectorAll('li'))
-        SelectCoin.filter((list) => {
-            if (new RegExp(exc, 'ig').test(list.textContent)) {
-                list.click()
+function selectFromDropDown(elem,choose=null){
+    if(choose&&elem){
+        let SelectCoin = Array.from(elem.querySelector('.dropdown-content').querySelectorAll('li'))
+        SelectCoin.filter((coin) => {
+            if (new RegExp(choose, 'ig').test(coin.textContent)) {
+                console.log(`pick ${coin.textContent.toUpperCase()}`)
+                coin.click()
             };
-            list.dispatchEvent(new Event('change'));
+            elem.dispatchEvent(new Event('change'));
         })
     }
+    else{
+        let say = `Element to choose from:${elem} and what to pick: ${choose}`
+        console.log(say)
+    }
+}
+function select(coin = 'usdt', exc =null) {
+    if (exc) {
+        //console.log("Exchanging", exc)
+        exc = exc
+        let elem= document.querySelectorAll(".select-wrapper")[0]
+        selectFromDropDown(elem,exc)
+    }
     if (coin) {
-        console.log("To ", coin)
+        //console.log("To ", coin)
         coin = coin
-        selectFrom = document.querySelectorAll(".select-wrapper")[1]
-        SelectCoin = Array.from(selectFrom.querySelector('.dropdown-content').querySelectorAll('li'))
-        SelectCoin.filter((list) => {
-            if (new RegExp(coin, 'ig').test(list.textContent)) {
-                list.click()
-            };
-            list.dispatchEvent(new Event('change'));
-        })
+        let elem = document.querySelectorAll(".select-wrapper")[1]
+        selectFromDropDown(elem,coin)
     } else {
         console.log('No currency claim yet ')
     }
