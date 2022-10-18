@@ -290,10 +290,10 @@
             try {
                 hostname = new URL(link).host
             } catch (e) {
-                hostname = document.title
+                hostname = document.title.toLowerCase().replace(/\d{1,}.|\(page.*|\s/ig, '').trim()
             }; //get hostname
             let url = window.location.href.toLowerCase(),
-                page_title = document.title.toLowerCase().replace(/\(page.*|\s/g, '').trim(),
+                page_title = document.title.toLowerCase().replace(/\d{1,}.|\(page.*|\s/ig, '').trim(),
                 urlsplice = url.split('/').splice(2, 2),
                 shortner_name = GM_getValue('shortner_name').replace(/\s/g, ''),
                 previous_shortner_name = GM_getValue('previous_shortner_name'),
@@ -322,7 +322,7 @@
                 Array.prototype.sample = function() {
                     return this[Math.floor(Math.random() * this.length)];
                 }
-                i=i.replace(/\..*/,'').toLowerCase();
+                i=i.replace(/\./ig,'').toLowerCase();
                 let f = getSimilarWord(i.toLowerCase(), shortlinks_name, [.3, .4].sample())
                 getfound = f
                 console.log('final = ' + f)
@@ -544,7 +544,7 @@
     } else if (/\/===$/.test(window.location.href)) {
         if (/megaurl.in\/delay=/.test(window.location.href)) {
             let link = window.location.pathname.replace(/.*delay=/, '').replace(/\/===/ig, ''); //get the exact link to quick_bypass
-           quick_bypass(link)
+            quick_bypass(link)
         } else if (/megaurl.in\/bypass=/.test(window.location.href)) {
             let link = window.location.pathname.replace(/.*bypass=/, '').replace(/\/===/ig, ''); //get the exact link to pass to bypasser
             bypass(link)
