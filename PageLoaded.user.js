@@ -18,4 +18,5 @@ function show() {
         }
     }, 1500)
 };
+if(/.*dutchycorp.space\/defi.*/ig.test(window.location.href)){window.close()}
 window.addEventListener('load', show, false);
