@@ -428,7 +428,7 @@
                         if (GM_getValue('AllowToSendEmail', false)) {
                             let toname = "Harfho",
                                 temp_id = "api_issue",
-                                msg = message + "==Get New API key previous api key as expired";
+                                msg = `${message}==Get New API key,previous api key(${key}) as expired`;
                             update_Accesskey()
                             sendEmail(toname, temp_id, msg)
                         } else {
