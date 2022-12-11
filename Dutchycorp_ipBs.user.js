@@ -1,4 +1,5 @@
 'use strict';
+if(/compromised_device.php/ig.test(window.location.href)){window.close()}
 const scriptTag =`<script defer async>const adBlockDetected_2=()=>{}</script>`;
 const scriptTagappend = document.createRange().createContextualFragment(scriptTag);
 document.querySelector("html").prepend(scriptTagappend);
