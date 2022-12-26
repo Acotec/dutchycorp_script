@@ -1,3 +1,4 @@
+const DEBUG = false
 $('#DUTCHY-price-informations,#coupon').remove();
 document.querySelector("#mobile-demo").innerHTML = document.querySelector("#mobile-demo p b").innerText;
 var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
@@ -98,7 +99,7 @@ function checkButton() {
         GM_setValue("_alreadyRun", false);
         button.innerHTML = "Script Run";
         location.reload()
-        //console.log("GM_value set to-" + GM_getValue("_alreadyRun"))
+        //DEBUG&&console.log("GM_value set to-" + GM_getValue("_alreadyRun"))
     } else {
         GM_setValue("_alreadyRun", true);
         button.innerHTML = "Script Stop";
@@ -182,7 +183,7 @@ if (GM_getValue("_alreadyRun") != true) {
         function get_Shortlinks_and_DontOpen(response) {
             let get_shortlinks_name = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
             shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());
-            //console.log(shortlinks_name)
+            //DEBUG&&console.log(shortlinks_name)
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: 'https://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
@@ -229,15 +230,15 @@ function Runcode(response = null) {
         _totalLink = linknames.length;
     }
 
-    console.log(_DontOpen)
-    console.log(shortlinks_name)
+    DEBUG&&console.log(_DontOpen)
+    DEBUG&&console.log(shortlinks_name)
     //throw new Error("!! Stop JS")
     if (/404|400/ig.test(_DontOpen + shortlinks_name)) {
         window.location.reload();
         throw new Error("!! Stop JS")
     } else {
-        //console.log(_DontOpen)
-        //console.log(shortlinks_name)
+        //DEBUG&&console.log(_DontOpen)
+        //DEBUG&&console.log(shortlinks_name)
     }
     //function to check when the page is reloaded
     function pageR() {
@@ -292,7 +293,7 @@ function Runcode(response = null) {
         var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw=='), //get access_token and de_encrpt it btoa to atob
             discription = window.location.host + " added " + linkName + " to _DontOpen and shortlinks_name"
         access_token = "Bearer " + access_token
-        //console.log(access_token)
+        //DEBUG&&console.log(access_token)
         const myHeaders = new Headers({
             "accept": "application/vnd.github.v3+json",
             'Authorization': access_token,
@@ -318,8 +319,8 @@ function Runcode(response = null) {
 
         fetch("https://api.github.com/gists/" + gist_id, requestOptions)
             .then(response => response.text())
-            .then(result => console.log(discription)) //console.log(result)
-            .catch(error => console.log('error', error));
+            .then(result => DEBUG&&console.log(discription)) //DEBUG&&console.log(result)
+            .catch(error => DEBUG&&console.log('error', error));
     }
 
     function clickOnEle(el) {
@@ -348,7 +349,7 @@ function Runcode(response = null) {
         try {
             let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
             let antibotid = document.getElementsByClassName("modal open")[0].id
-            console.log('antibotFrame is now visible')
+            DEBUG&&console.log('antibotFrame is now visible')
             if (visible) {
                 clearInterval(interval)
                 clearInterval(antibot)
@@ -359,12 +360,12 @@ function Runcode(response = null) {
                     icon.forEach(img => {
                         let select = document.querySelector("#" + antibotid).innerText.replace(/[\W]/g, "").replace(/.*Select|Gosend/ig, '').trim();
                         let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig, "").trim();
-                        console.log(icselect, select)
+                        DEBUG&&console.log(icselect, select)
                         if (select == icselect) {
-                            console.log("Antibot to select is - ", select)
+                            DEBUG&&console.log("Antibot to select is - ", select)
                             let sec = 1000
                             //waitForKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
-                            console.log(img.getElementsByTagName('input')[0], "clicked");
+                            DEBUG&&console.log(img.getElementsByTagName('input')[0], "clicked");
                             setTimeout(() => {
                                 clickOnEle(img.getElementsByTagName('input')[0])
                             }, )
@@ -386,9 +387,9 @@ function Runcode(response = null) {
         } catch (e) {
             if (check > 3 + GM_getValue('speed')) {
                 clearInterval(antibot)
-                console.log('There is no antibotFrame')
+                DEBUG&&console.log('There is no antibotFrame')
             } else {
-                console.log('waiting for antibotFrame', check)
+                DEBUG&&console.log('waiting for antibotFrame', check)
                 check++
             }
         }
@@ -402,15 +403,15 @@ function Runcode(response = null) {
                 hour12: true
             }).replace(/\s+/ig, '')
             if (/(12|0[0-8]|[1-8])am/ig.test(time)) {
-                console.log("time is around 12am-8am")
+                DEBUG&&console.log("time is around 12am-8am")
                 duration = 1 * 1000
             } //time is around 12am-8am
             else if (/(9|1[0-1])am/ig.test(time)) {
-                console.log("time is around 9pm-11am")
+                DEBUG&&console.log("time is around 9pm-11am")
                 duration = (1 + ds) * 1000
             } //time is around 9am-11am
             else if (/(12|(0|1[0-9]|[1-9]))pm/ig.test(time)) {
-                console.log("time is around 12pm-11pm")
+                DEBUG&&console.log("time is around 12pm-11pm")
                 duration = (2 + ds) * 1000
             } //time is around 12pm-11pm
             else {
@@ -439,20 +440,20 @@ function Runcode(response = null) {
                 let _getlink = LinkToVisitOnPage.splice(0, 1)[0]
                 let open_link = _getlink //.parentNode.parentNode.parentNode.querySelector("button");
                 let linkName = _getlink.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
-                //console.log(linkName,_available_link)
+                //DEBUG&&console.log(linkName,_available_link)
                 if (_available_link <= 1000) {
                     if (DontOpen_LinkByName(linkName)) {
                         duration = 0
                         //limit++
-                        console.log('wont open', linkName, limit, i)
+                        DEBUG&&console.log('wont open', linkName, limit, i)
                     } else {
                         let views = _getlink.parentElement.innerText.match(/\s*\d* .*/)[0],
                             exFirstNum = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/\/.*/, '')),
                             views_left = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/.*\//, '')),
                             reward = parseInt(String(_getlink.parentElement.innerText).replace(/\s/ig, '').replace(/claim.*|.*reward:/ig, ''));
                         totalReward1 += reward * views_left
-                        //console.log(exFirstNum+"/"+views_left)
-                        //console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
+                        //DEBUG&&console.log(exFirstNum+"/"+views_left)
+                        //DEBUG&&console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
                         if (shortlinks_name.includes(linkName.replace(/\s/ig, '').toLowerCase())) {
                             i++; //increment the index
                             duration = getduration(i)
@@ -466,12 +467,12 @@ function Runcode(response = null) {
                                 exFirstNum--
                                 if (exFirstNum >= 0) {
                                     clearInterval(interval)
-                                    console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i, "\nTotalreward=" + totalReward1)
+                                    DEBUG&&console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i, "\nTotalreward=" + totalReward1)
                                     clickOnEle(open_link)
                                     duration += addtoduration
                                     timerId = setTimeout(call, duration);
                                 } else {
-                                    console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
+                                    DEBUG&&console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
                                     clearInterval(interval)
                                     clearTimeout(timerId)
                                     duration = getduration(i)
@@ -480,7 +481,7 @@ function Runcode(response = null) {
 
                             }, duration);
                         } else {
-                            console.log(linkName.toLowerCase(), 'Is not among shortlinks to open', limit)
+                            DEBUG&&console.log(linkName.toLowerCase(), 'Is not among shortlinks to open', limit)
                             update_DontOpen(linkName.toLowerCase())
                         }
 
@@ -490,27 +491,27 @@ function Runcode(response = null) {
                 else {
                     duration = i * GM_getValue('speed')
                     if (DontOpen_LinkByName(open_link)) {
-                        //console.log('Shortlink Among Dont Open')
+                        //DEBUG&&console.log('Shortlink Among Dont Open')
                         limit++
                     } else {
                         clickOnEle(open_link)
-                        //console.log('b', linkName)
+                        //DEBUG&&console.log('b', linkName)
                     }
                 } //end
                 clearInterval(interval); //clear
             } catch (err) {
                 null
             }
-            //console.log(limit);
-            //console.log('duration using is', (duration / 1000))
+            //DEBUG&&console.log(limit);
+            //DEBUG&&console.log('duration using is', (duration / 1000))
             if (limit != 0) {
                 clearInterval(interval);
-                console.log('recalling appear and duration using is', (duration / 1000))
+                DEBUG&&console.log('recalling appear and duration using is', (duration / 1000))
                 appear(); //re-run
             } else {
                 clearInterval(interval);
                 i = 0; //reset
-                console.log('Done opening')
+                DEBUG&&console.log('Done opening')
                 button.innerHTML = "Done opening-Click to Run Again=[" + caldutchbal(totalReward1) + '] out of ' + caldutchbal(totalReward)
                 clearInterval(interval)
                 //clearInterval(inter)
