@@ -6,7 +6,7 @@ var _ptc_ToVisit = Array.from(document.getElementsByClassName("btn-small waves-e
     }),
     rewards = Array.from(document.querySelectorAll("b:nth-child(5)")),
     sum = 0,
-    body = document.querySelector("center:nth-child(7) > p");
+    body = $( "p:contains('for completing one View')" )[0]
 rewards.forEach((reward) => {
     sum += parseInt(reward.textContent)
 });
