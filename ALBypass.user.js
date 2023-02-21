@@ -333,22 +333,22 @@
                 if (/.*dontopen.*|.*down.*/ig.test(toupdate)) {
                     pathname = getSimilarWord(pathname, shortlinks_name);
                     messageError = `${messageError}-(${toupdate})`;
-                    //update_DontOpen(pathname);
+                    update_DontOpen(pathname);
                 } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(pathname)) {
                     messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`;
                     linkCantBypass = link;
-                    //update_DontOpen(pathname);
+                    update_DontOpen(pathname);
                 }
             } else {
                 hostname = hostname.toLowerCase()
                 if (/dontopen|.*down.*/ig.test(toupdate)) {
                     hostname = getSimilarWord(hostname, shortlinks_name, 0.4);
                     messageError = `${messageError}-(${toupdate})`;
-                    //update_DontOpen(hostname);
+                    update_DontOpen(hostname);
                 } else if (/.*unsupported url.*/ig.test(toupdate) && shortlinks_name.includes(hostname)) {
                     messageError = `${messageError}-(${toupdate})  \nor\nshortlink url was changed;`;
                     linkCantBypass = link;
-                    //update_DontOpen(hostname);
+                    update_DontOpen(hostname);
                 }
             }
         }
@@ -561,7 +561,7 @@
             window.close();
             window.close()
         } else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
-            //alert('down')
+            messageError = 'Shortner Down'
             sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
             getDomainOrPathNameAndUpdate( sessionStorage.getItem('shortner_name'), 'shortenerdown');
         } else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
