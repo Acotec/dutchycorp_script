@@ -6,7 +6,7 @@
         GM_setValue('shortner_name', new_value)
         GM_setValue('previous_shortner_name', old_value)
     })
-    //---------------------------------------------------------//
+    //---------------------------------------------------------=//
     var messageError, linkCantBypass,
         //var location = window.location
         listOfAcceptDomains = GM_getValue('domains', ''),
