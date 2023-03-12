@@ -2,15 +2,16 @@
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href)
     } //to prevent resubmit on refresh and back button
+    //---------------------------------------------------------//
     GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
-        GM_setValue('shortner_name', new_value)
-        GM_setValue('previous_shortner_name', old_value)
+        GM_setValue('shortner_name', new_value);
+        GM_setValue('previous_shortner_name', old_value);
     })
-    //---------------------------------------------------------=//
-    var messageError, linkCantBypass,
+    var messageError, linkCantBypass,invalid,
         //var location = window.location
         listOfAcceptDomains = GM_getValue('domains', ''),
-        retry = 3,
+        retry1 = 3,
+        retry2 = 5,
         green_icon = GM_getValue('green_icon', ''),
         green_icon1 = GM_getValue('green_icon1', ''),
         grey_icon = GM_getValue('grey_icon', ''),
@@ -47,7 +48,7 @@
             //alert(error)
             //console.error(error);
             console.log("can't get Icons because of ", error)
-            window.location.reload(true)
+            window.location=window.location.href
         });
     }
     0 != green_icon && 0 != green_icon1 && 0 != grey_icon && 0 != red_icon || getIcons();
@@ -74,18 +75,18 @@
 
     function OnPhone() {
         0 == GM_getValue("OnPhone", !1) ? GM_setValue("OnPhone", !0) : GM_setValue("OnPhone", !1);
-        window.location.reload()
+        window.location=window.location.href
     };
 
     function AllowToSendEmail() {
         0 == GM_getValue("AllowToSendEmail", !1) ? GM_setValue("AllowToSendEmail", !0) : GM_setValue("AllowToSendEmail", !1);
-        window.location.reload()
+        window.location=window.location.href
     };
 
     function Bypass() {
         0 == GM_getValue("Bypass", !1) ? GM_setValue("Bypass", !0) : GM_setValue("Bypass", !1);
         GM_setValue("already_sent", !1);
-        window.location.reload()
+        window.location=window.location.href
     }
 
     function getSimilarWord(word, knownWords, _threshold = 0.3) {
@@ -191,9 +192,12 @@
                 timeout: 10000,
                 ondone: () => {},
             });
-            setTimeout(() => {
+            if(invalid){
+                updateAcceptDomain()
+            }
+            else{setTimeout(() => {
                 window.close()
-            }, 1000)
+            }, 1000)}
         })
             .catch(error => console.log('error', error));
     }
@@ -202,7 +206,8 @@
         if (/autofaucet.dutchycorp.space/ig.test(linkName)) {
             console.log("can't add link to dontopen")
             window.close()
-        } else {
+        }
+        else {
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: "https://gist.github.com/Harfho/" + gist_id + "/raw/_DontOpen.txt?timestamp=" + (+new Date()),
@@ -210,7 +215,6 @@
                 nocache: true,
                 onload: getDontOpen
             })
-
             function getDontOpen(response) {
                 let getDontOpen = response.responseText.replace(/'|"|\[|\]/ig, '').split(',').filter(e => e);
                 var _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
@@ -256,8 +260,9 @@
                         console.log('error', error);
                         window.close()
                     });
-                } else {
-                    let msg = "SNAME-" + linkName + "\n URL-" + linkCantBypass + "\n is Already added to _DontOpen because api return with " + messageError;
+                }
+                else {
+                    let msg = "SNAME-" + linkName + "\n URL-" + linkCantBypass + "\n is Already added to _DontOpen";
                     GM_notification({
                         title: '!Bypass-- ' + linkCantBypass,
                         text: msg,
@@ -300,7 +305,7 @@
                 similardomain = getSimilarWord(urlsplice[0], shortlinks_name);
             if (document.referrer && /.*dutchycorp.*/ig.test(document.referrer) == false) {
                 ref = new URL(document.referrer).host
-                ex_link = [ref,sessionStorage.getItem('shortner_name'), page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name, ]
+                ex_link = [sessionStorage.getItem('shortner_name'), page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name,ref]
             } else {
                 ex_link = [sessionStorage.getItem('shortner_name'),page_title, urlsplice[0], urlsplice[1], hostname, shortner_name, similardomain, previous_shortner_name, ]
             }
@@ -372,13 +377,38 @@
         update_Accesskey()
     }
 
+    function title(link=window.location.href){
+        if (window.performance) {
+            console.info("window.performance works fine on this browser");
+        }
+        console.info(performance.navigation.type);
+        if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+            console.info( "This page is reloaded" );
+            sessionStorage.getItem('shortner_name')
+        }
+        else {
+            console.info( "This page is not reloaded");
+            sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
+        }
+        let host = new URL(link).host;
+        let links=[sessionStorage.getItem('shortner_name').toLowerCase(),GM_getValue('shortner_name').toLowerCase()];
+        let closestlink = getSimilarWord(host, links,0.3);
+        if(host===closestlink ){
+            let uselink = sessionStorage.getItem('shortner_name')||GM_getValue('shortner_name');
+            document.title = uselink
+            return uselink
+        }else{
+            document.title =closestlink
+            return closestlink
+        }
+    }
+
     //bypass the link
     function bypass(link) {
         link=link.replace(/.+:/,'https:');
         favicon(green_icon)
-        sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
         let urlhost = new URL(link).host
-        document.title = GM_getValue('shortner_name')
+        title(link)
         GM_setValue('previousHost', urlhost)
         const key = atob(GM_getValue('accesskey').match(/\w*/gi).filter(e => "" != e)[0]),
               baseUrl = 'https://api.yuumari.com/alpha-bypass/',
@@ -397,119 +427,156 @@
                 throw new Error("Network response was not OK - HTTP status " + response.status);
             }
             return response.json()
-        }).then((data) => {
+        })
+            .then((data) => {
             let message = data.message
             if (!message) { //if api return with a result
                 sessionStorage.removeItem('tryagain')
                 window.location.href = new URL(data.result)
                 return
             } else { //api return with a message
-                favicon(green_icon1)
                 let tryagain;
+                let check;
                 tryagain = sessionStorage.getItem('tryagain')
-                if (sessionStorage.getItem('tryagain') == null) {
-                    sessionStorage.setItem('tryagain', 1);
-                    tryagain = sessionStorage.getItem('tryagain')
+                check = "pattern changed|unsupported domain|invalid domain"
+                if (new RegExp(check, 'ig').test(message)) {
+                    messageError = message;
+                    linkCantBypass = link
+                    getDomainOrPathNameAndUpdate(link,) //getDomain Or PathName And Update _DontoOpen with it
                 }
-                if (parseInt(tryagain) <= retry) {
-                    sessionStorage.setItem('tryagain', parseInt(tryagain) + 1);
-                    setTimeout(() => {
-                        window.location.reload(true)
-                    }, 2000)
-                } else { //can't bypass the link after retrying
-                    let urlhost = new URL(l).host
-                    sessionStorage.removeItem('tryagain')
-                    console.log(data.message)
-                    let check = "pattern changed|unsupported domain|not found|invalid path|invalid domain|failed to get document"
-                    if (new RegExp(check, 'ig').test(message)) {
-                        messageError = message;
-                        linkCantBypass = link
-                        getDomainOrPathNameAndUpdate(link, 'dontopen') //getDomain Or PathName And Update _DontoOpen with it
-                    } else if (/ticket.*expired/ig.test(message)) { // if api key is expired
-                        if (GM_getValue('AllowToSendEmail', false)) {
-                            let toname = "Harfho",
-                                temp_id = "api_issue",
-                                msg = `${message}==Get New API key,previous api key(${key}) as expired`;
-                            update_Accesskey()
-                            sendEmail(toname, temp_id, msg)
-                        } else {
-                            update_Accesskey()
-                            setTimeout(() => {
-                                window.close()
-                            }, 5000)
-                        }
-                    } else if (/ticket.*locked/ig.test(message)) {
-                        let after24h = new Date(new Date().getTime() + (24 * 60 * 60 * 1000)).toLocaleString()
-                        GM_setValue('after24h', after24h)
-                        GM_setValue('Bypass', false)
-                        //alert(message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`)
-                        if (GM_getValue('AllowToSendEmail', false)) {
-                            let toname = "Harfho",
-                                temp_id = "api_issue",
-                                msg = message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`;
-                            if (GM_getValue('already_sent', false) == false) {
-                                sendEmail(toname, temp_id, msg);
-                                GM_setValue('already_sent', true)
-                            };
-                        } else {
-                            GM_setValue('already_sent', false)
-                            console.log(message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`)
-                            window.close()
-                        }
-                    } else if (/leeched max count/ig.test(message)) {
-                        let msg = message + "The limit on the number of requests has exceeded 2 queries per 1sec."
-                        console.log(msg)
+                if (/ticket.*expired/ig.test(message)) { // if api key is expired
+                    if (GM_getValue('AllowToSendEmail', false)) {
+                        let toname = "Harfho",
+                            temp_id = "api_issue",
+                            msg = `${message}==Get New API key,previous api key(${key}) as expired`;
+                        update_Accesskey()
+                        sendEmail(toname, temp_id, msg)
+                    }
+                    else {
+                        update_Accesskey()
                         setTimeout(() => {
-                            window.location.reload(true)
-                        }, 1000)
-                    } else {
-                        let msg = message + "--" + link
+                            window.close()
+                        }, 5000)
+                    }
+                }
+                else if (/ticket.*locked/ig.test(message)) {
+                    let after24h = GM_getValue('after24h',false)||new Date(new Date().getTime() + (24 * 60 * 60 * 1000)).toLocaleString();
+                    GM_setValue('after24h', after24h);
+                    GM_setValue('Bypass', false);
+                    if (GM_getValue('AllowToSendEmail', false)) {
+                        let toname = "Harfho",
+                            temp_id = "api_issue",
+                            msg = message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`;
+                        if (GM_getValue('already_sent', false) == false) {
+                            GM_setValue('already_sent', true)
+                            sendEmail(toname, temp_id, msg);
+                        }
+                        else {
+                            let msgs = message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`;
+                            console.log(msgs)
+                            GM_notification({
+                                title: '!Bypass-- ' + linkCantBypass,
+                                text: msgs,
+                                timeout: 5000,
+                                ondone: () => {window.close()
+                                              },
+                            });
+                        }
+                    }
+                    else {
+                        GM_setValue('already_sent', false)
+                        let msgs = message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`;
+                        console.log(msgs)
                         GM_notification({
-                            title: '!Bypass-- ' + urlhost,
-                            text: msg,
-                            timeout: 10 * 1000,
-                            ondone: () => {
-                                window.close()
-                            },
+                            title: '!Bypass-- ' + linkCantBypass,
+                            text: msgs,
+                            timeout: 5000,
+                            ondone: () => {window.close()},
                         });
-                        GM_setClipboard(link, {
-                            type: 'text/plain'
-                        })
-                        console.log(message)
                         window.close()
                     }
                 }
+                else if (/exceeded/ig.test(message)) {
+                    let msg = message + "The limit on the number of requests has exceeded 2 queries per 1sec."
+                    console.log(msg)
+                    setTimeout(() => {
+                        window.location.reload(true)
+                    }, 3000)
+                }
+                else {
+                    let urlhost = new URL(l).host
+                    if (sessionStorage.getItem('tryagain') == null) {
+                        sessionStorage.setItem('tryagain', 1);
+                        tryagain = sessionStorage.getItem('tryagain')
+                    }
+                    if (parseInt(tryagain) <= retry1) {
+                        sessionStorage.setItem('tryagain', parseInt(tryagain) + 1);
+                        setTimeout(() => {
+                            window.location.reload(true)
+                        }, 3000)
+                    }
+                    //can't bypass the link after retrying
+                    check = "not found|failed to get document|invalid path"
+                    if (new RegExp(check, 'ig').test(message)) {
+                        messageError = message;
+                        linkCantBypass = link
+                        console.log(messageError)
+                        //getDomainOrPathNameAndUpdate(link, 'dontopen') //getDomain Or PathName And Update _DontoOpen with it
+                        //window.close()
+                    }
+                    else{sessionStorage.removeItem('tryagain')
+                         console.log(data.message)
+                         let msg = message + "--" + link
+                         GM_notification({
+                             title: '!Bypass-- ' + urlhost,
+                             text: msg,
+                             timeout: 10 * 1000,
+                             ondone: () => {
+                                 window.close()
+                             },
+                         });
+                         GM_setClipboard(link, {
+                             type: 'text/plain'
+                         })
+                         console.log(message)
+                         window.close()
+                        }
+                }
             }
-        }).catch((error) => {
-            favicon(red_icon)
-            console.error(error);
-            let urlhost = new URL(link).host
-            console.log("can't bypass " + urlhost + " because of", error)
-            //alert(error)
-            let recheck;
-            recheck = sessionStorage.getItem('recheck')
-            if (sessionStorage.getItem('recheck') == null) {
-                sessionStorage.setItem('recheck', 1);
-                recheck = sessionStorage.getItem('recheck')
-            }
-            if (parseInt(recheck) <= retry) {
-                sessionStorage.setItem('recheck', parseInt(recheck) + 1);
-                setTimeout(window.location.reload(true), 5000)
-            } else {
+        })
+            .catch((error) => {
+            if(/Failed to fetch/ig.test(error)){
                 favicon(red_icon)
-                document.title = error + ":" + new URL(link).host
-                sessionStorage.removeItem('recheck')
-                window.close()
+                console.error(error);
+                let urlhost = new URL(link).host
+                console.log("can't bypass " + urlhost + " because of", error)
+                let recheck;
+                recheck = sessionStorage.getItem('recheck')
+                if (sessionStorage.getItem('recheck') == null) {
+                    sessionStorage.setItem('recheck', 1);
+                    recheck = sessionStorage.getItem('recheck')
+                }
+                if (parseInt(recheck) <= retry2) {
+                    favicon(red_icon)
+                    sessionStorage.setItem('recheck', parseInt(recheck) + 1);
+                    setTimeout(window.location.reload(true), 5000)
+                }
+                else {
+                    favicon(red_icon)
+                    document.title = error + ":" +title(link)
+                    sessionStorage.removeItem('recheck')
+                    window.location.reload(true)
+                    //window.close()
 
+                }
             }
+            else{console.log(error)}
         });
     }
 
-    //autofaucet.dutcycorp.space
-
     function quick_bypass(link) {
-        document.title = GM_getValue('shortner_name')
-        let title = new URL(link).host
+        title(link)
+        let title = title(link)
         let timer = (x) => {
             if (x == 0) {
                 window.location.href = new URL(link);
@@ -526,7 +593,23 @@
     GM_registerMenuCommand("OnPhone-" + GM_getValue('OnPhone', false), OnPhone, "OnPhone");
     GM_registerMenuCommand("AllowToSendEmail-" + GM_getValue('AllowToSendEmail', false), AllowToSendEmail, "AllowToSendEmail");
     GM_registerMenuCommand("Bypass-" + GM_getValue('Bypass', true), Bypass, "Bypass");
-    //alert(GM_getValue("after24h"))
+    //autofaucet.dutcycorp.space
+    if (/.+shortlinks-wall.php(?:\?r=s)?$/ig.test(window.location.href)) {
+        // GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
+        //     GM_setValue('shortner_name', new_value)
+        //     GM_setValue('previous_shortner_name', old_value)
+        // });
+        document.onclick = function(event) {
+            if (event === undefined) event = window.event;
+            var target = 'target' in event ? event.target : event.srcElement;
+            if (/claim/ig.test(target.textContent)) {
+                let linkName = target.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
+                GM_setValue('shortner_name', linkName);
+                console.log(linkName);
+            }
+            //if (GM_getValue('OnPhone', false)){window.close()}
+        }; //get shortlink name when click
+    }
     let t = new Date(Date.parse((new Date).toLocaleString())),
         to_day = parseInt([t.getMonth(), t.getDate(), t.getHours(), t.getMinutes(), t.getSeconds()].join("")),
         pr = new Date(Date.parse(GM_getValue("after24h"))),
@@ -534,15 +617,19 @@
         to_greaterthan_pre = to_day >= pre_day;
     //alert(to_day+'>='+pre_day+" "+to_greaterthan_pre)
     GM_getValue("after24h") != (new Date).toLocaleString() && !to_greaterthan_pre || (GM_setValue("after24h", ""), GM_setValue("Bypass", !0), GM_setValue("already_sent", !1));
-    if (0 == GM_getValue("Bypass", !0)) throw new Error("!! Stop JS, You have use more than 2 IPs to access Yuumari.com !!");
+    if (0 == GM_getValue("Bypass", !0)){
+        title(window.location.href);
+        throw new Error("!! Stop JS, You have use more than 2 IPs to access Yuumari.com !!");}
     GM_setValue("Bypass", !0)
     if (!listOfAcceptDomains) {
         updateAcceptDomain()
-    } else if (listOfAcceptDomains.includes(window.location.host) && !(/\/===$/.test(window.location.href))) {
+    }
+    else if (listOfAcceptDomains.includes(window.location.host) && !(/\/===$/.test(window.location.href))) {
         //alert(window.location.host)
         let link = window.location.href
         bypass(link)
-    } else if (/\/===$/.test(window.location.href)) {
+    }
+    else if (/\/===$/.test(window.location.href)) {
         if (/megaurl.in\/delay=/.test(window.location.href)) {
             let link = window.location.pathname.replace(/.*delay=/, '').replace(/\/===/ig, ''); //get the exact link to quick_bypass
             quick_bypass(link)
@@ -553,41 +640,30 @@
             let link = window.location.href.replace(/\/===/ig, '');
             bypass(link)
         }
-    } //autofaucet.dutcycorp.space
+    }
+    //autofaucet.dutcycorp.space
     else if (new RegExp(dutchy, 'ig').test(window.location.href)) {
         if (/Attention Required|A timeout occurred/ig.test(document.title)) {
-            window.location.reload()
-        } else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)) {
+            window.location.reload(true)
+        }
+        else if (new RegExp('.*shortlinks-wall.php\\?antibot_failed.*', 'ig').test(window.location.href)) {
             window.close();
             window.close()
-        } else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
+        }
+        else if (new RegExp('.*shortlinks-wall.php\\?down=.*', 'ig').test(window.location.href)) {
             messageError = 'Shortner Down'
-            sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
+            sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'));
             getDomainOrPathNameAndUpdate( sessionStorage.getItem('shortner_name'), 'shortenerdown');
-        } else if (new RegExp(dutchy + '/shortlinks-wall.php', 'ig').test(window.location.href)) {
-            GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
-                GM_setValue('shortner_name', new_value)
-                GM_setValue('previous_shortner_name', old_value)
-            });
-            document.onclick = function(event) {
-                if (event === undefined) event = window.event;
-                var target = 'target' in event ? event.target : event.srcElement;
-                if (/claim/ig.test(target.textContent)) {
-                    let linkName = target.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
-                    GM_setValue('shortner_name', linkName);
-                    console.log(linkName);
-                }
-                //if (GM_getValue('OnPhone', false)){window.close()}
-            }; //get shortlink name when click
-        } else {
+        }
+        else {
             console.log("Bypass Can't Run on this Page")
         }
-    } else {
-        sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
-        document.title = GM_getValue('shortner_name')
+    }
+    else {
+        invalid=true
         favicon(grey_icon)
         let link = window.location.href
-        getDomainOrPathNameAndUpdate(sessionStorage.getItem('shortner_name'), 'unsupported url');
-        updateAcceptDomain()
+        title(link)
+        getDomainOrPathNameAndUpdate(title(link), 'unsupported url');
     }
 })();
