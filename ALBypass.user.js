@@ -384,14 +384,16 @@
         console.info(performance.navigation.type);
         if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
             console.info( "This page is reloaded" );
-            sessionStorage.getItem('shortner_name')
+            console.log(sessionStorage.getItem('shortner_name'))
         }
         else {
             console.info( "This page is not reloaded");
             sessionStorage.setItem('shortner_name',GM_getValue('shortner_name'))
         }
         let host = new URL(link).host;
-        let links=[sessionStorage.getItem('shortner_name').toLowerCase(),GM_getValue('shortner_name').toLowerCase()];
+        let links=[String(sessionStorage.getItem('shortner_name')).toLowerCase(),
+                   GM_getValue('shortner_name').toLowerCase(),
+                   GM_getValue('previous_shortner_name').toLowerCase()];
         let closestlink = getSimilarWord(host, links,0.3);
         if(host===closestlink ){
             let uselink = sessionStorage.getItem('shortner_name')||GM_getValue('shortner_name');
