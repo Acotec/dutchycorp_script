@@ -343,57 +343,58 @@ function Runcode(response = null) {
         simulateMouseEvent(theButton, "click", coordX, coordY);
     }
 
-    var check = 0
-    var antibot = setInterval(isantibotvisible, 1000)
-    function isantibotvisible() {
-        try {
-            let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
-            let antibotid = document.getElementsByClassName("modal open")[0].id
-            DEBUG&&console.log('antibotFrame is now visible')
-            if (visible) {
-                clearInterval(interval)
-                clearInterval(antibot)
-                clearTimeout(timerId)
-                //alert('anti')
-                setTimeout(() => {
-                    let icon = Array.from(document.querySelector("#" + antibotid).getElementsByClassName("gradient-btn btn btn-secondary"))
-                    icon.forEach(img => {
-                        let select = document.querySelector("#" + antibotid).innerText.replace(/[\W]/g, "").replace(/.*Select|Gosend/ig, '').trim();
-                        let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig, "").trim();
-                        DEBUG&&console.log(icselect, select)
-                        if (select == icselect) {
-                            DEBUG&&console.log("Antibot to select is - ", select)
-                            let sec = 1000
-                            //waitForKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
-                            DEBUG&&console.log(img.getElementsByTagName('input')[0], "clicked");
-                            setTimeout(() => {
-                                clickOnEle(img.getElementsByTagName('input')[0])
-                            }, )
-                            setTimeout(() => {
-                                clickOnEle(document.querySelector("#" + antibotid).querySelector('button'))
-                            }, 1 * sec)
-                            GM_setValue("_alreadyRun", false);
-                            setTimeout(() => {
-                                if (GM_getValue('OnPhone', false)) {
-                                    window.close()
-                                } else {
-                                    window.location.reload(false)
-                                }
-                            }, 2 * sec)
-                        }
-                    })
-                }, 2000)
-            };
-        } catch (e) {
-            if (check > 3 + GM_getValue('speed')) {
-                clearInterval(antibot)
-                DEBUG&&console.log('There is no antibotFrame')
-            } else {
-                DEBUG&&console.log('waiting for antibotFrame', check)
-                check++
-            }
-        }
-    }
+    // var check = 0
+    // var antibot = setInterval(isantibotvisible, 1000)
+    // function isantibotvisible() {
+    //     try {
+    //         let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
+    //         let antibotid = document.getElementsByClassName("modal open")[0].id
+    //         DEBUG&&console.log('antibotFrame is now visible')
+    //         if (visible) {
+    //             clearInterval(interval)
+    //             clearInterval(antibot)
+    //             clearTimeout(timerId)
+    //             //alert('anti')
+    //             setTimeout(() => {
+    //                 let icon = Array.from(document.querySelector("#" + antibotid).getElementsByClassName("gradient-btn btn btn-secondary"))
+    //                 icon.forEach(img => {
+    //                     let select = document.querySelector("#" + antibotid).innerText.replace(/[\W]/g, "").replace(/.*Select|Gosend/ig, '').trim();
+    //                     let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig, "").trim();
+    //                     DEBUG&&console.log(icselect, select)
+    //                     if (select == icselect) {
+    //                         DEBUG&&console.log("Antibot to select is - ", select)
+    //                         let sec = 1000
+    //                         //waitForKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
+    //                         DEBUG&&console.log(img.getElementsByTagName('input')[0], "clicked");
+    //                         setTimeout(() => {
+    //                             clickOnEle(img.getElementsByTagName('input')[0])
+    //                         }, )
+    //                         setTimeout(() => {
+    //                             clickOnEle(document.querySelector("#" + antibotid).querySelector('button'))
+    //                         }, 1 * sec)
+    //                         GM_setValue("_alreadyRun", false);
+    //                         setTimeout(() => {
+    //                             if (GM_getValue('OnPhone', false)) {
+    //                                 window.close()
+    //                             } else {
+    //                                 window.location.reload(false)
+    //                             }
+    //                         }, 2 * sec)
+    //                     }
+    //                 })
+    //             }, 2000)
+    //         };
+    //     } catch (e) {
+    //         if (check > 3 + GM_getValue('speed')) {
+    //             clearInterval(antibot)
+    //             DEBUG&&console.log('There is no antibotFrame')
+    //         } else {
+    //             DEBUG&&console.log('waiting for antibotFrame', check)
+    //             check++
+    //         }
+    //     }
+    // }
+
     function getduration(i) {
         if (GM_getValue("static", null)) {
             var ds = GM_getValue('speed')
