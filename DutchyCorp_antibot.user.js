@@ -11,6 +11,22 @@
             waitForKeyElements(t, o, e, i, n)
         }, i))
     }
+    let shortlinkBtn = document.querySelectorAll("#properties .s12 .card a.gradient-btn.btn");
+    let username = document.querySelector("ul li .user_avatar + b").innerText.trim()
+    function checkLinks() {
+        Array.from(shortlinkBtn).forEach((btn, i) => {
+            const onclick = btn.getAttribute('onclick');
+            const match = onclick.match(/ad_display\('square',\s*(\d+)\)/);
+            if (match) {
+                const id = match[1];
+                btn.setAttribute('target', '_blank');
+                btn.setAttribute('href', `/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`);
+                btn.removeAttribute('onclick');
+                btn.removeAttribute('onmousedown');
+                //console.log(btn);
+            }
+        });
+    }
     var evt = new MouseEvent("click", {
         view: window,
         bubbles: true,
@@ -65,5 +81,6 @@
             };
         }catch(e){}
     }
+    checkLinks();
 
 })();
