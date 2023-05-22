@@ -15,7 +15,7 @@ function show() {
         if (/.*:.*roll.*/ig.test(document.title)) {
             timer(500)
         } else {
-            setTimeout(()=>{document.title = document.title.replace(addedtitle,'')},10000)
+            setTimeout(()=>{document.title = document.title.replace(addedtitle,'')},8500)
         }
     }, 1500)
 };
