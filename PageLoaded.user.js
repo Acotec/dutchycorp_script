@@ -1,5 +1,6 @@
 function show() {
-    let title = document.title + " (Page Loaded)"
+    let addedtitle=" (Page Loaded)"
+    let title = document.title +addedtitle
     document.title = title
     let timer = (x) => {
         if (x == 0) {
@@ -14,9 +15,9 @@ function show() {
         if (/.*:.*roll.*/ig.test(document.title)) {
             timer(500)
         } else {
-            document.title = title
+            document.title = document.title.replace(addedtitle,'')
         }
-    }, 1500)
+    }, 5000)
 };
 if(/.*dutchycorp.space\/defi.*/ig.test(window.location.href)){window.close()}
 //window.addEventListener('load', show, false);
