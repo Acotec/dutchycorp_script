@@ -15,9 +15,9 @@ function show() {
         if (/.*:.*roll.*/ig.test(document.title)) {
             timer(500)
         } else {
-            document.title = document.title.replace(addedtitle,'')
+            setTimeout(()=>{document.title = document.title.replace(addedtitle,'')},5000)
         }
-    }, 5000)
+    }, 1500)
 };
 if(/.*dutchycorp.space\/defi.*/ig.test(window.location.href)){window.close()}
 //window.addEventListener('load', show, false);
