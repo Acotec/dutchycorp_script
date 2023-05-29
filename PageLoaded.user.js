@@ -1,5 +1,14 @@
+let addedtitle=" (Page Loaded)"
+let remove=()=>{
+    /dutchycorp/.test(window.location.href)&&
+        window.addEventListener('keydown', function check(event) {
+        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'p') {
+            document.title = document.title.replace(addedtitle,'');
+            this.removeEventListener('keydown',check,false);
+        }
+    });
+};
 function show() {
-    let addedtitle=" (Page Loaded)"
     let title = document.title +addedtitle
     document.title = title
     let timer = (x) => {
@@ -13,9 +22,11 @@ function show() {
     }
     setTimeout(() => {
         if (/.*:.*roll.*/ig.test(document.title)) {
+            remove()
             timer(500)
         } else {
-            setTimeout(()=>{document.title = document.title.replace(addedtitle,'')},8500)
+            remove();           
+
         }
     }, 1500)
 };
