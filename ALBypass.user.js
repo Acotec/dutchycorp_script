@@ -633,10 +633,10 @@
     }
     else if (/\/===$/.test(window.location.href)) {
         if (/megaurl.in\/delay=/.test(window.location.href)) {
-            let link = window.location.pathname.replace(/.*delay=/, '').replace(/\/===/ig, ''); //get the exact link to quick_bypass
+            let link = window.location.pathname.replace(/.*delay=|\/===/ig, ''); //get the exact link to quick_bypass
             quick_bypass(link)
         } else if (/megaurl.in\/bypass=/.test(window.location.href)) {
-            let link = window.location.pathname.replace(/.*bypass=/, '').replace(/\/===/ig, ''); //get the exact link to pass to bypasser
+            let link = window.location.pathname.replace(/.*bypass=|\/===/ig, ''); //get the exact link to pass to bypasser
             bypass(link)
         } else {
             let link = window.location.href.replace(/\/===/ig, '');
