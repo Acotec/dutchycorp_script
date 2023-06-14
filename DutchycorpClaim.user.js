@@ -1,4 +1,4 @@
-const DEBUG = false
+const DEBUG = false;
 $('#DUTCHY-price-informations,#coupon').remove();
 document.querySelector("#mobile-demo").innerHTML = document.querySelector("#mobile-demo p b").innerText;
 var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
@@ -99,7 +99,7 @@ function checkButton() {
         GM_setValue("_alreadyRun", false);
         button.innerHTML = "Script Run";
         location.reload()
-        //DEBUG&&console.log("GM_value set to-" + GM_getValue("_alreadyRun"))
+        DEBUG&&console.log("GM_value set to-" + GM_getValue("_alreadyRun"))
     } else {
         GM_setValue("_alreadyRun", true);
         button.innerHTML = "Script Stop";
@@ -183,7 +183,7 @@ if (GM_getValue("_alreadyRun") != true) {
         function get_Shortlinks_and_DontOpen(response) {
             let get_shortlinks_name = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
             shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());
-            //DEBUG&&console.log(shortlinks_name)
+            DEBUG&&console.log(shortlinks_name)
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: 'https://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
@@ -237,8 +237,8 @@ function Runcode(response = null) {
         window.location.reload();
         throw new Error("!! Stop JS")
     } else {
-        //DEBUG&&console.log(_DontOpen)
-        //DEBUG&&console.log(shortlinks_name)
+        DEBUG&&console.log(_DontOpen)
+        DEBUG&&console.log(shortlinks_name)
     }
     //function to check when the page is reloaded
     function pageR() {
@@ -293,7 +293,7 @@ function Runcode(response = null) {
         var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw=='), //get access_token and de_encrpt it btoa to atob
             discription = window.location.host + " added " + linkName + " to _DontOpen and shortlinks_name"
         access_token = "Bearer " + access_token
-        //DEBUG&&console.log(access_token)
+        DEBUG&&console.log(access_token)
         const myHeaders = new Headers({
             "accept": "application/vnd.github.v3+json",
             'Authorization': access_token,
@@ -319,7 +319,7 @@ function Runcode(response = null) {
 
         fetch("https://api.github.com/gists/" + gist_id, requestOptions)
             .then(response => response.text())
-            .then(result => DEBUG&&console.log(discription)) //DEBUG&&console.log(result)
+            .then(result => DEBUG&&console.log(discription))//console.log(result);
             .catch(error => DEBUG&&console.log('error', error));
     }
 
@@ -395,7 +395,7 @@ function Runcode(response = null) {
     //     }
     // }
 
-    function getduration(i) {
+    function getduration(i,phone=false) {
         if (GM_getValue("static", null)) {
             var ds = GM_getValue('speed')
             var time = new Date();
@@ -418,8 +418,11 @@ function Runcode(response = null) {
             else {
                 duration = (3 + ds) * 1000
             }
-        } else {
-            if (GM_getValue('speed')) {
+        }
+        else {
+            if(phone){
+                duration = i + 1000}
+            else if (GM_getValue('speed')) {
                 duration = GM_getValue('speed') * 1000
             } else {
                 duration = i + 1000
@@ -441,7 +444,7 @@ function Runcode(response = null) {
                 let _getlink = LinkToVisitOnPage.splice(0, 1)[0]
                 let open_link = _getlink //.parentNode.parentNode.parentNode.querySelector("button");
                 let linkName = _getlink.parentElement.parentElement.innerText.replace(/\n.*/g, "").trim()
-                //DEBUG&&console.log(linkName,_available_link)
+                DEBUG&&console.log(linkName,_available_link)
                 if (_available_link <= 1000) {
                     if (DontOpen_LinkByName(linkName)) {
                         duration = 0
@@ -453,14 +456,14 @@ function Runcode(response = null) {
                             views_left = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/.*\//, '')),
                             reward = parseInt(String(_getlink.parentElement.innerText).replace(/\s/ig, '').replace(/claim.*|.*reward:/ig, ''));
                         totalReward1 += reward * views_left
-                        //DEBUG&&console.log(exFirstNum+"/"+views_left)
-                        //DEBUG&&console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
+                        DEBUG&&console.log(exFirstNum+"/"+views_left)
+                        DEBUG&&console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
                         if (shortlinks_name.includes(linkName.replace(/\s/ig, '').toLowerCase())) {
                             i++; //increment the index
                             duration = getduration(i)
                             var addtoduration;
                             if (GM_getValue('OnPhone', false)) {
-                                addtoduration = 0 < GM_getValue("speed") ? 500 : 0;
+                                addtoduration = 0 < GM_getValue("speed") ? getduration(i,GM_getValue('OnPhone',true)) : 0;
                             } else {
                                 addtoduration = 0
                             }
@@ -492,19 +495,19 @@ function Runcode(response = null) {
                 else {
                     duration = i * GM_getValue('speed')
                     if (DontOpen_LinkByName(open_link)) {
-                        //DEBUG&&console.log('Shortlink Among Dont Open')
+                        DEBUG&&console.log('Shortlink Among Dont Open')
                         limit++
                     } else {
                         clickOnEle(open_link)
-                        //DEBUG&&console.log('b', linkName)
+                        DEBUG&&console.log('b', linkName)
                     }
                 } //end
                 clearInterval(interval); //clear
             } catch (err) {
                 null
             }
-            //DEBUG&&console.log(limit);
-            //DEBUG&&console.log('duration using is', (duration / 1000))
+            DEBUG&&console.log(limit);
+            DEBUG&&console.log('duration using is', (duration / 1000))
             if (limit != 0) {
                 clearInterval(interval);
                 DEBUG&&console.log('recalling appear and duration using is', (duration / 1000))
