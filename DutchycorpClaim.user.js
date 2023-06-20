@@ -15,8 +15,10 @@ var linknames = [],
     totalReward1 = 0;
 _views_ToVisit.forEach(e => {
     let n = e.getElementsByTagName("a")[1].parentElement.parentElement.innerText.replace(/\n.*/g, "").trim();
-    let d = e.getElementsByTagName('b')
-    totalReward += parseInt(d[1].textContent.replace(/.*\/|\s/ig, '')) * parseInt(d[2].textContent)
+    let d = e.querySelector("#methods div div")
+    let views = parseInt(d.innerText.replace(/Views:.*\/|Reward:.*|\s/ig,''))
+    let rewards = parseInt(d.innerText.replace(/Views:.*|Reward*:|\s/ig,''));
+    totalReward += views*rewards
     // n = n.replace(/\s|\d$/ig, "").toLowerCase()
     0 == linknames.includes(n) && linknames.push(n)
 });
@@ -42,13 +44,13 @@ function caldutchbal(bal) {
     let dutchbalb = document.querySelectorAll("#methods")[1]
     let dutchbalp = document.createElement("p")
     let dutchbal;
-    if(bal){ dutchbal=bal}else{dutchbal=dutchbalb.innerText.replace(/\+.*|\D|\s/ig, '')}
+    if(bal){ dutchbal=bal}else{dutchbal=dutchbalb.querySelector('p').innerText.replace(/.*\n|\s|,/ig,'')}
     let dutch_usdt_rate = parseFloat(0.000002845)
     let calusdt = dutch_usdt_rate * dutchbal
     let calperc = ((5 / 100) * calusdt).toFixed(8)
     dutchbal = calusdt - calperc
     if(bal){
-        return dutchbal.toFixed(8)
+        return calusdt.toFixed(8)
     }else{
         dutchbalp.setAttribute('class', 'title');
         dutchbalp.innerText = `Your DUTCHYBalance(USDT)
@@ -56,6 +58,7 @@ function caldutchbal(bal) {
                                DUTCHYBalance(USDT)-5%(${calperc})
                                      ${dutchbal.toFixed(8)}`;
         dutchbalb.append(dutchbalp);
+        //return 0
     }
 }
 caldutchbal()
@@ -421,14 +424,14 @@ function Runcode(response = null) {
         }
         else {
             if(phone){
-                duration = i + 1000}
+                duration = i * 1000}
             else if (GM_getValue('speed')) {
                 duration = GM_getValue('speed') * 1000
             } else {
                 duration = i + 1000
             }
         }
-        let speedclass = document.querySelector("p.speed")
+        var speedclass = document.querySelector("p.speed")
         speedclass.innerText=`${speedclass.innerText.replace(/\(duration.*/,'')} (duration=${duration/1000} seconds)`
         return duration
     }
@@ -447,14 +450,14 @@ function Runcode(response = null) {
                 DEBUG&&console.log(linkName,_available_link)
                 if (_available_link <= 1000) {
                     if (DontOpen_LinkByName(linkName)) {
-                        duration = 0
+                        duration = 1
                         //limit++
                         DEBUG&&console.log('wont open', linkName, limit, i)
                     } else {
-                        let views = _getlink.parentElement.innerText.match(/\s*\d* .*/)[0],
-                            exFirstNum = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/\/.*/, '')),
-                            views_left = parseInt(views.replace(/\s/ig, '').replace(/.*:/, '').replace(/.*\//, '')),
-                            reward = parseInt(String(_getlink.parentElement.innerText).replace(/\s/ig, '').replace(/claim.*|.*reward:/ig, ''));
+                        let views = _getlink.parentElement.querySelector("#methods div div"),
+                            exFirstNum = parseInt(views.innerText.replace(/Views:|Reward:.*|\s|\/.*/ig,'')),
+                            views_left = parseInt(views.innerText.replace(/Views:.*\/|Reward:.*|\s/ig,'')),
+                            reward = parseInt(views.innerText.replace(/Views:.*|Reward*:|\s/ig,''));
                         totalReward1 += reward * views_left
                         DEBUG&&console.log(exFirstNum+"/"+views_left)
                         DEBUG&&console.log(linkName,shortlinks_name.includes(linkName.replace(/\s/ig,'').toLowerCase()));
@@ -463,11 +466,13 @@ function Runcode(response = null) {
                             duration = getduration(i)
                             var addtoduration;
                             if (GM_getValue('OnPhone', false)) {
-                                addtoduration = 0 < GM_getValue("speed") ? getduration(i,GM_getValue('OnPhone',true)) : 0;
+                                addtoduration = 0 < GM_getValue("speed") ? getduration(1,GM_getValue('OnPhone',true)) : 0;
                             } else {
                                 addtoduration = 0
                             }
                             timerId = setTimeout(function call() {
+                                var speedclass = document.querySelector("p.speed");
+                                speedclass.innerText=`${speedclass.innerText.replace(/\(duration.*/,'')} (duration=${duration/1000} seconds)`
                                 exFirstNum--
                                 if (exFirstNum >= 0) {
                                     clearInterval(interval)
@@ -516,6 +521,7 @@ function Runcode(response = null) {
                 clearInterval(interval);
                 i = 0; //reset
                 DEBUG&&console.log('Done opening')
+                console.log( caldutchbal(totalReward1))
                 button.innerHTML = "Done opening-Click to Run Again=[" + caldutchbal(totalReward1) + '] out of ' + caldutchbal(totalReward)
                 clearInterval(interval)
                 //clearInterval(inter)
