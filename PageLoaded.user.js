@@ -1,35 +1,64 @@
+//Press P on the keybboard to remove the added title
+
 let addedtitle=" (Page Loaded)"
+const title = ()=>{
+    if(new RegExp('autofaucet.dutchycorp|faucetpay','ig').test(window.location.href)){remove();document.title=document.title.replace(/\|.*|-.*/,addedtitle)}
+    else{
+        clearInterval(checkPageLoadInterval);
+    }
+}
 let remove=()=>{
-    /dutchycorp/.test(window.location.href)&&
-        window.addEventListener('keydown', function check(event) {
-        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'p') {
+    window.addEventListener('keydown', function check(event) {
+        if (event.key.toLowerCase() === 'p') {
+            clearInterval(checkPageLoadInterval);
             document.title = document.title.replace(addedtitle,'');
             this.removeEventListener('keydown',check,false);
         }
     });
 };
-function show() {
-    let title = document.title +addedtitle
-    document.title = title
-    let timer = (x) => {
-        if (x == 0) {
-            return
-        };
-        document.title = title
-        return setTimeout(() => {
-            timer(--x)
-        },100)
-    }
-    setTimeout(() => {
-        if (/.*:.*roll.*/ig.test(document.title)) {
-            remove()
-            timer(500)
-        } else {
-            remove();           
-
-        }
-    }, 1500)
-};
 if(/.*dutchycorp.space\/defi.*/ig.test(window.location.href)){window.close()}
 //window.addEventListener('load', show, false);
-window.onload = () => {show()};
+var checkPageLoadInterval;
+function checkPageLoad() {
+    // Check if the text has already been added to the title
+    if (document.title.endsWith(" (Page Loaded)")) {
+        //clearInterval(checkPageLoadInterval);
+        return;
+    }
+
+    // Check if the page has finished loading
+    if (document.readyState === 'complete') {
+        // Add text to page title
+        title();
+
+        // Stop checking for page load
+        clearInterval(checkPageLoadInterval);
+    }
+}
+
+// Wait for the page to fully load
+window.onload =()=>{
+    // Check if the text has already been added to the title
+    if (!(new RegExp(addedtitle,'ig').test(document.title))) {
+        // Add text to page title
+        title();
+    }
+
+    // Check for page load every 500 milliseconds
+    checkPageLoadInterval = setInterval(checkPageLoad, 500);
+
+    // Listen for URL changes
+    window.addEventListener('urlchange', function() {
+        // Reset the interval check
+        clearInterval(checkPageLoadInterval);
+
+        // Check if the text has already been added to the title
+        if (!(new RegExp(addedtitle,'ig').test(document.title))){
+            // Add text to page title
+            title();
+        }
+
+        // Check for page load every 500 milliseconds
+        checkPageLoadInterval = setInterval(checkPageLoad, 500);
+    });
+};
