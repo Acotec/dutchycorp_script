@@ -1,9 +1,8 @@
 //Press P on the keybboard to remove the added title
-
 let addedtitle=" (Page Loaded)"
 const title = ()=>{
-    if(new RegExp('faucetpay','ig').test(window.location.href)){remove();document.title=document.title.replace(/\|.*/,addedtitle)}
-    else if(new RegExp('autofaucet.dutchycorp','ig').test(window.location.href)){remove();document.title=document.title.replace(/-.*/,addedtitle)}
+    if(new RegExp('faucetpay.io','ig').test(window.location.href)){remove();document.title=document.title.replace(/\|.*/,addedtitle)}
+    else if(new RegExp('autofaucet.dutchycorp','ig').test(window.location.href)){remove();document.title=document.title+addedtitle}
     else{
         clearInterval(checkPageLoadInterval);
     }
