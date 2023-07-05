@@ -16,12 +16,17 @@ waitForKeyElements('.select-wrapper', (element) => {
     select(tocoin)
     fill_in_and_exchange()
 });
-waitForKeyElements('#toast-container', (element) => {
+waitForKeyElements('#user_exchange b', (element) => {
+    let addpar=document.querySelector(".addedtoast")
     let WithButton = document.getElementById('all_submit')
-    let addButton = document.createElement("p")
-    addButton.setAttribute('class', 'title')
-    addButton.innerText = element.innerText
-    WithButton.parentNode.insertBefore(addButton, WithButton.nextSibling);
+    if(addpar){
+        console.log('replace addedtoast')
+    }else{
+        addpar = document.createElement("p");
+        addpar.setAttribute('class', 'addedtoast');
+    }
+    addpar.innerText = element.innerText.trim()
+    WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
 }, false)
 
 function selectFromDropDown(elem,choose=null){
