@@ -403,12 +403,12 @@
             .trim();
             const urlSplice = url.split("/").splice(2, 2);
             DEBUG && console.log(urlSplice)
-            const shortnerName = GM_getValue("shortner_name",'null')
+            const shortnerName = GM_getValue("shortner_name","null")
             .replace(/\s/g, "")
             .toLowerCase();
             const previousShortnerName = GM_getValue(
                 "previous_shortner_name",
-                'null'
+                "null"
             ).toLowerCase();
             let ref, exLink, hostname;
             try {
@@ -555,10 +555,10 @@
 
     function title(link = window.location.href) {
         // Get shortlink names from storage
-        const shortnerName = GM_getValue("shortner_name",'null');
-        const previousShortnerName = GM_getValue("previous_shortner_name",'null');
+        const shortnerName = GM_getValue("shortner_name","null");
+        const previousShortnerName = GM_getValue("previous_shortner_name","null");
         const sessionShortnerName =
-              sessionStorage.getItem("shortner_name") || "";
+              sessionStorage.getItem("shortner_name") || "null";
 
         // Check if page is reloaded
         if (
@@ -854,7 +854,7 @@
     // If 24 hours have passed or the "after24h" value has not been set yet, reset the "Bypass" and "already_sent" values
     if (
         (GM_getValue("after24h") !== new Date().toLocaleString() &&
-         !to_greaterthan_pre)||GM_getValue("Bypass",'null')=='null'
+         !to_greaterthan_pre)||GM_getValue("Bypass","null")=="null"
     ) {
         GM_setValue("after24h", "");
         GM_setValue("Bypass", true);
