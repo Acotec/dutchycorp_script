@@ -1,7 +1,7 @@
 (function () {
     const CLOSEWIN = true;
-    const DEBUG = true;
     const RELOADWIN = true;
+    const DEBUG = false;    
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     } //to prevent resubmit on refresh and back button
