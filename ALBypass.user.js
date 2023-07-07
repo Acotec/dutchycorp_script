@@ -1,7 +1,7 @@
 (function () {
     const CLOSEWIN = true;
     const RELOADWIN = true;
-    const DEBUG = false;    
+    const DEBUG = false;
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     } //to prevent resubmit on refresh and back button
@@ -403,11 +403,12 @@
             .trim();
             const urlSplice = url.split("/").splice(2, 2);
             DEBUG && console.log(urlSplice)
-            const shortnerName = GM_getValue("shortner_name")
+            const shortnerName = GM_getValue("shortner_name",'null')
             .replace(/\s/g, "")
             .toLowerCase();
             const previousShortnerName = GM_getValue(
-                "previous_shortner_name"
+                "previous_shortner_name",
+                'null'
             ).toLowerCase();
             let ref, exLink, hostname;
             try {
@@ -554,8 +555,8 @@
 
     function title(link = window.location.href) {
         // Get shortlink names from storage
-        const shortnerName = GM_getValue("shortner_name");
-        const previousShortnerName = GM_getValue("previous_shortner_name");
+        const shortnerName = GM_getValue("shortner_name",'null');
+        const previousShortnerName = GM_getValue("previous_shortner_name",'null');
         const sessionShortnerName =
               sessionStorage.getItem("shortner_name") || "";
 
@@ -852,8 +853,8 @@
 
     // If 24 hours have passed or the "after24h" value has not been set yet, reset the "Bypass" and "already_sent" values
     if (
-        GM_getValue("after24h") !== new Date().toLocaleString() &&
-        !to_greaterthan_pre
+        (GM_getValue("after24h") !== new Date().toLocaleString() &&
+         !to_greaterthan_pre)||GM_getValue("Bypass",'null')=='null'
     ) {
         GM_setValue("after24h", "");
         GM_setValue("Bypass", true);
