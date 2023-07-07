@@ -1,7 +1,7 @@
 (function () {
-    const CLOSEWIN =true;
-    const DEBUG =true;
-    const RELOADWIN =true;
+    const CLOSEWIN = true;
+    const DEBUG = true;
+    const RELOADWIN = true;
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     } //to prevent resubmit on refresh and back button
@@ -549,7 +549,7 @@
         }
     }
     if (GM_getValue("accesskey", false) == false) {
-        update_Accesskey();
+        updateAccesskey();
     }
 
     function title(link = window.location.href) {
@@ -644,10 +644,10 @@
                         let toname = "Harfho";
                         let temp_id = "api_issue";
                         let msg = `${message}==Get New API key,previous api key(${key}) as expired`;
-                        update_Accesskey();
+                        updateAccesskey();
                         sendEmail(toname, temp_id, msg);
                     } else {
-                        update_Accesskey();
+                        updateAccesskey();
                         setTimeout(() => {
                             CLOSEWIN && window.close();
                         }, 5000);
