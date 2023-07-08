@@ -3,7 +3,7 @@
     const RELOADWIN = true;
     const DEBUG = false;
     if (window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.href);
+        window.history.replaceState(null, null, decodeURIComponent(window.location.href));
     } //to prevent resubmit on refresh and back button
     //---------------------------------------------------------//
     GM_addValueChangeListener(
@@ -60,7 +60,7 @@
             //alert(error)
             //DEBUG && console.error(error);
             DEBUG && console.log("can't get Icons because of ", error);
-            window.location = window.location.href;
+            window.location = decodeURIComponent(window.location.href);
         });
     }
     (0 != green_icon && 0 != green_icon1 && 0 != grey_icon && 0 != red_icon) ||
@@ -99,14 +99,14 @@
         0 == GM_getValue("OnPhone", !1) ?
             GM_setValue("OnPhone", !0) :
         GM_setValue("OnPhone", !1);
-        window.location = window.location.href;
+        window.location = decodeURIComponent(window.location.href);
     }
 
     function AllowToSendEmail() {
         0 == GM_getValue("AllowToSendEmail", !1) ?
             GM_setValue("AllowToSendEmail", !0) :
         GM_setValue("AllowToSendEmail", !1);
-        window.location = window.location.href;
+        window.location =decodeURIComponent(window.location.href);
     }
 
     function Bypass() {
@@ -114,7 +114,7 @@
             GM_setValue("Bypass", !0) :
         GM_setValue("Bypass", !1);
         GM_setValue("already_sent", !1);
-        window.location = window.location.href;
+        window.location =decodeURIComponent(window.location.href);
     }
 
     function getSimilarWord(inputWord, knownWords, similarityThreshold = 0.3) {
@@ -329,6 +329,7 @@
                     );
                     const msg = `
                     Cant Bypass URL ${linkCantBypass}
+                    or ${decodeURIComponent(window.location.href)}
                     SNAME- ${linkName}
                     Because api return with
                     --------------------------------------
@@ -395,13 +396,14 @@
             .filter(Boolean)
             .map((s) => s.toLowerCase())
             .sort();
-            const url = window.location.href.toLowerCase().replace(/.*bypass=|\/==.*/, '');
+            const url = decodeURIComponent(window.location.href).toLowerCase().replace(/.*bypass=|\/==.*/, '');
             const pattern = /.+(\.|\|)|\(page.*|\s/gi
             const pageTitle = document.title
             .toLowerCase()
             .replace(pattern,'')
             .trim();
             const urlSplice = url.split("/").splice(2, 2);
+            urlSplice.push(url.split('.')[1])
             DEBUG && console.log(urlSplice)
             const shortnerName = GM_getValue("shortner_name","null")
             .replace(/\s/g, "")
@@ -432,6 +434,7 @@
                     pageTitle,
                     urlSplice[0],
                     urlSplice[1],
+                    urlSplice[2],
                     hostname,
                     shortnerName,
                     getSimilarWord(urlSplice[0], shortlinksName),
@@ -444,6 +447,7 @@
                     shortnerName,
                     pageTitle,
                     urlSplice[0],
+                    urlSplice[2],
                     hostname,
                     shortnerName,
                     getSimilarWord(urlSplice[0], shortlinksName),
@@ -553,12 +557,12 @@
         updateAccesskey();
     }
 
-    function title(link = window.location.href) {
+    function title(link = decodeURIComponent(window.location.href)) {
         // Get shortlink names from storage
         const shortnerName = GM_getValue("shortner_name","null");
-        const previousShortnerName = GM_getValue("previous_shortner_name","null");
+        const previousShortnerName = GM_getValue("previous_shortner_name",shortnerName);
         const sessionShortnerName =
-              sessionStorage.getItem("shortner_name") || "null";
+              sessionStorage.getItem("shortner_name") || shortnerName;
 
         // Check if page is reloaded
         if (
@@ -598,6 +602,7 @@
         link = link.replace(/.+:/, "https:"); //replaces the protocol of the provided link with 'https:'
         favicon(green_icon);
         let urlhost = new URL(link).host;
+        DEBUG && console.log(link,urlhost)
         title(link);
         GM_setValue("previousHost", urlhost);
         const key = atob(
@@ -608,6 +613,7 @@
         const baseUrl = "https://api.yuumari.com/alpha-bypass/";
         const u = key;
         const l = link;
+        DEBUG && console.log(u,l)
         try {
             const response = await fetch(baseUrl, {
                 method: "POST",
@@ -697,7 +703,7 @@
                     let msg = message + "The limit on the number of requests has exceeded 2 queries per 1sec.";
                     DEBUG && console.log(msg);
                     setTimeout(() => {
-                        RELOADWIN&&window.location.reload(true);
+                        window.location.href=link;
                     }, 3000);
                 } else {
                     let urlhost = new URL(l).host;
@@ -805,7 +811,7 @@
         "Bypass"
     );
     //autofaucet.dutcycorp.space
-    if (/.+shortlinks-wall.php(?:\?r=s)?$/gi.test(window.location.href)) {
+    if (/.+shortlinks-wall.php(?:\?r=s)?$/gi.test(decodeURIComponent(window.location.href))) {
         // GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
         //     GM_setValue('shortner_name', new_value)
         //     GM_setValue('previous_shortner_name', old_value)
@@ -853,8 +859,9 @@
 
     // If 24 hours have passed or the "after24h" value has not been set yet, reset the "Bypass" and "already_sent" values
     if (
-        (GM_getValue("after24h") !== new Date().toLocaleString() &&
-         !to_greaterthan_pre)||GM_getValue("Bypass","null")=="null"
+        (!GM_getValue("Bypass",false)&&GM_getValue("after24h") !== new Date().toLocaleString() &&
+         !to_greaterthan_pre)||
+        GM_getValue("Bypass","null")=="null"
     ) {
         GM_setValue("after24h", "");
         GM_setValue("Bypass", true);
@@ -863,7 +870,7 @@
 
     // If the "Bypass" value is false, display an error message and stop executing the rest of the code
     if (!GM_getValue("Bypass", true)) {
-        title(window.location.href);
+        title(decodeURIComponent(window.location.href));
         throw new Error(
             "!! Stop JS, You have used more than 2 IPs to access Yuumari.com !!"
         );
@@ -871,35 +878,35 @@
     // This function runs when the page is loaded
     window.onload = () => {
         // Check if the current page is in the list of accepted domains
+        var patt = 'muskfoundation.org'
+        var decodeUrl=decodeURIComponent(window.location.href)
+        var decodeHost = new URL(window.location.href).host
         if (!listOfAcceptDomains) {
             updateAcceptDomain();
             return
         } else if (
-            listOfAcceptDomains.includes(window.location.host) &&
-            !/\/===$/.test(window.location.href)
+            (listOfAcceptDomains.includes(decodeHost)||
+             new RegExp(patt,'ig').test(decodeHost))&&
+            !/\/===$/ig.test(decodeUrl)
         ) {
             // If the current page is in the list of accepted domains and is not a "quick bypass" link, run the bypass function
-            let link = window.location.href;
+            let link = decodeUrl;
             bypass(link);
-        } else if (/\/===$/.test(window.location.href)) {
+        } else if (/\/===$/.test(decodeUrl)) {
             // If the current page is a "quick bypass" link, extract the link and run the appropriate bypass function
-            if (/megaurl.in\/delay=/.test(window.location.href)) {
-                let link = window.location.pathname.replace(
-                    /.*delay=|\/===/gi,
-                    ""
-                );
+            if (new RegExp(patt+'delay=','ig').test(decodeUrl)) {
+                let pattern = "delay="
+                let link=decodeUrl.replace(new RegExp('.+'+pattern+'|/=.*','ig'),'')
                 quick_bypass(link);
-            } else if (/megaurl.in\/bypass=/.test(window.location.href)) {
-                let link = window.location.pathname.replace(
-                    /.*bypass=|\/===/gi,
-                    ""
-                );
+            } else if (new RegExp(patt+'bypass=','ig').test(decodeUrl)) {
+                let pattern = "bypass="
+                let link=decodeUrl.replace(new RegExp('.+'+pattern+'|/=.*','ig'),'')
                 bypass(link);
             } else {
-                let link = window.location.href.replace(/\/===/gi, "");
+                let link = decodeUrl.replace(/\/===/gi, "");
                 bypass(link);
             }
-        } else if (new RegExp(dutchy, "ig").test(window.location.href)) {
+        } else if (new RegExp(dutchy, "ig").test(decodeUrl)) {
             // If the current page is a DutchyCorp shortlink page, check for specific error messages and reload the page if necessary
             if (
                 /Attention Required|A timeout occurred/gi.test(document.title)
@@ -934,9 +941,10 @@
             }
         } else {
             // If the current page is not in the list of accepted domains, display an error message and stop executing the rest of the code
+            DEBUG && console.log('current page is not in the list')
             invalid = true;
             favicon(grey_icon);
-            let link = window.location.href;
+            let link = decodeUrl;
             let shortname = title(link)
             messageError =`${shortname} not yet added to accepted domains to bypass on yuumari or there is issue with it`
             getDomainOrPathNameAndUpdate(shortname, "unsupported url");
