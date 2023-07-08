@@ -42,7 +42,7 @@
 
         function generatepass(df_ps) {
             let ps = df_ps.toLowerCase()
-            let key = window.location.host
+            let key = window.location.host //autofaucet.dutchycorp.space
             let crypt_ps = crypt(key, ps)
             let decrypt_ps = decrypt(key, crypt_ps)
             let gen = capitalizeFirstLetter(crypt_ps)
