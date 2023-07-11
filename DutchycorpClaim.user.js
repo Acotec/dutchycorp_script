@@ -1,6 +1,21 @@
 const DEBUG = false;
 $('#DUTCHY-price-informations,#coupon').remove();
-document.querySelector("#mobile-demo").innerHTML = document.querySelector("#mobile-demo p b").innerText;
+window.addEventListener('keydown', function check(event) {
+    function copy(text) {
+        var input = document.createElement('textarea');
+        input.innerHTML = text;
+        document.body.appendChild(input);
+        input.select();
+        var result = document.execCommand('copy');
+        document.body.removeChild(input);
+        return result;
+    }
+    if (event.key.toLowerCase() === 'c') {
+        copy(document.querySelector(".user_avatar+b").innerText)
+        //this.removeEventListener('keydown',check,false);
+    }
+});
+document.querySelector("#mobile-demo").innerHTML = document.querySelector(".user_avatar+b").innerText
 var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     shortlinks_name = GM_getResourceText("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     _open_link_fast = [].map(e => e.toLowerCase()),
