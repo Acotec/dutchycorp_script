@@ -1,5 +1,5 @@
 (function(){
-'use strict';
+    'use strict';
     function waitForKeyElements(t, o, e, i, n) {
         void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
         var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -14,13 +14,25 @@
     let coin_code = 'USDT'
     var i=0
     var limit=10
+    // waitForKeyElements("#toast-container > div", (element) => {
+    //     let addButton = document.createElement("p")
+    //     let WithButton=document.getElementById('withdraw-btn2-'+coin_code)
+    //     addButton.setAttribute('class', 'title')
+    //     addButton.innerText =element.innerText
+    //     WithButton.parentNode.insertBefore(addButton, WithButton.nextSibling);
+    // },false);
     waitForKeyElements("#toast-container > div", (element) => {
+        let addpar=document.querySelector(".addedtoast")
         let WithButton=document.getElementById('withdraw-btn2-'+coin_code)
-        let addButton = document.createElement("p")
-        addButton.setAttribute('class', 'title')
-        addButton.innerText =element.innerText
-        WithButton.parentNode.insertBefore(addButton, WithButton.nextSibling);
-    },false);
+        if(addpar){
+            console.log('replace addedtoast')
+        }else{
+            addpar = document.createElement("p");
+            addpar.setAttribute('class', 'addedtoast');
+        }
+        addpar.innerText = element.innerText.trim()
+        WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
+    }, false)
     var check = setInterval(()=>{
         i++
         var element
