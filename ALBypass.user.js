@@ -1,6 +1,6 @@
 (function () {
     const CLOSEWIN = true;
-    const RELOADWIN = true;
+    const RELOADWIN =true;
     const DEBUG = false;
     if (window.history.replaceState) {
         window.history.replaceState(null, null, decodeURIComponent(window.location.href));
@@ -447,6 +447,7 @@
                     shortnerName,
                     pageTitle,
                     urlSplice[0],
+                    urlSplice[1],
                     urlSplice[2],
                     hostname,
                     shortnerName,
@@ -484,7 +485,7 @@
                 check.push(similarity);
                 DEBUG && console.log(item, "similar to", similarity);
             }
-            //check = [...new Set(check)];
+
             check = [...new Set(check)];
             DEBUG && console.log("check", check);
             if (check.length > 1) {
@@ -726,7 +727,7 @@
                         messageError = message;
                         linkCantBypass = link;
                         DEBUG && console.log(messageError);
-                        getDomainOrPathNameAndUpdate(link, 'dontopen', message) //getDomain Or PathName And Update _DontoOpen with it
+                        //getDomainOrPathNameAndUpdate(link, 'dontopen', message) //getDomain Or PathName And Update _DontoOpen with it
                         CLOSEWIN && window.close()
                     } else {
                         sessionStorage.removeItem('tryagain');
