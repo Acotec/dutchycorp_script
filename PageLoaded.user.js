@@ -1,3 +1,4 @@
+if(/.*dutchycorp.space\/defi.*|anchoreth/ig.test(window.location.href)){window.close()}
 //Press P on the keybboard to remove the added title
 let addedtitle=" (Page Loaded)"
 const title = ()=>{
@@ -16,7 +17,6 @@ let remove=()=>{
         }
     });
 };
-if(/.*dutchycorp.space\/defi.*/ig.test(window.location.href)){window.close()}
 //window.addEventListener('load', show, false);
 var checkPageLoadInterval;
 function checkPageLoad() {
