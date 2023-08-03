@@ -19,7 +19,7 @@
         //var location = window.location
         listOfAcceptDomains = GM_getValue("domains", ""),
         retry1 = 3,
-        retry2 = 5,
+        retry2 = 7,
         green_icon = GM_getValue("green_icon", ""),
         green_icon1 = GM_getValue("green_icon1", ""),
         grey_icon = GM_getValue("grey_icon", ""),
@@ -282,10 +282,10 @@
             .filter((e) => e)
             .map((item) => item.replace(/'/gi, '"').toLowerCase());
 
-            DEBUG && console.log(dontOpenList, linkName);
+            DEBUG && console.log(dontOpenList, linkName);            
 
             // If linkName is not already in _DontOpen list, update it
-            if (linkName && !new RegExp(linkName, "ig").test(dontOpenList)) {
+            if (!(dontOpenList.indexOf(linkName.toLowerCase())>=0)&& linkName){
                 const updatedDontOpenList = [...dontOpenList, linkName.toLowerCase()]; // Use spread syntax to create new array with added linkName
                 const raw = JSON.stringify({
                     files: {
@@ -328,9 +328,9 @@
                         " "
                     );
                     const msg = `
+                    SNAME- ${linkName}
                     Cant Bypass URL ${linkCantBypass}
                     or ${decodeURIComponent(window.location.href)}
-                    SNAME- ${linkName}
                     Because api return with
                     --------------------------------------
                     Error= ${messageError}\n
@@ -348,11 +348,12 @@
                     DEBUG && console.log("error", error);
                     CLOSEWIN && window.close();
                 });
-            } else {
+            }
+            else {
                 // If linkName is already in _DontOpen list, notify user and update accept domain list
-                const msg = `SNAME-${linkName}\n URL-${linkCantBypass}\n is Already added to _DontOpen`;
+                const msg = `SNAME-${linkName} is Already added to _DontOpen\nReason-${message}\nURL-${linkCantBypass}`;
                 GM_notification({
-                    title: `!Bypass-- ${linkCantBypass}`,
+                    title: `Can't Bypass-- ${linkCantBypass}`,
                     text: msg,
                     timeout: 10000,
                     ondone: () => {
@@ -447,7 +448,6 @@
                     shortnerName,
                     pageTitle,
                     urlSplice[0],
-                    urlSplice[1],
                     urlSplice[2],
                     hostname,
                     shortnerName,
@@ -485,7 +485,7 @@
                 check.push(similarity);
                 DEBUG && console.log(item, "similar to", similarity);
             }
-
+            //check = [...new Set(check)];
             check = [...new Set(check)];
             DEBUG && console.log("check", check);
             if (check.length > 1) {
