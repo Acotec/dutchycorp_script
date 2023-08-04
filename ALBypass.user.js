@@ -19,7 +19,7 @@
         //var location = window.location
         listOfAcceptDomains = GM_getValue("domains", ""),
         retry1 = 3,
-        retry2 = 7,
+        retry2 = 10,
         green_icon = GM_getValue("green_icon", ""),
         green_icon1 = GM_getValue("green_icon1", ""),
         grey_icon = GM_getValue("grey_icon", ""),
@@ -188,14 +188,17 @@
             // Save the domains as a string in GM storage
             GM_setValue("domains", JSON.stringify(elements));
             // Close the window after 2 seconds
-            setTimeout(() => {
-                CLOSEWIN && window.close();
-            }, 2000);
-        } catch (error) {
+            CLOSEWIN && window.close();
+            return
+        }
+        catch (error) {
             // Log the error if in debug mode
             DEBUG && console.log("can't updateAcceptDomain because of ", error);
+            console.log("can't updateAcceptDomain because of ", error);
             // Reload the page if there was an error
-            RELOADWIN&&window.location.reload(true);
+            await updateAcceptDomain();
+            return
+            //RELOADWIN&&window.location.reload(true);
         }
     }
 
@@ -241,11 +244,10 @@
             if (invalid) {
                 updateAcceptDomain();
             } else {
-                setTimeout(() => {
-                    CLOSEWIN && window.close()
-                }, 1000);
+                CLOSEWIN && window.close()
             }
-        } catch (error) {
+        }
+        catch (error) {
             DEBUG && console.log("error", error);
         }
     }
@@ -282,7 +284,7 @@
             .filter((e) => e)
             .map((item) => item.replace(/'/gi, '"').toLowerCase());
 
-            DEBUG && console.log(dontOpenList, linkName);            
+            DEBUG && console.log(dontOpenList, linkName);
 
             // If linkName is not already in _DontOpen list, update it
             if (!(dontOpenList.indexOf(linkName.toLowerCase())>=0)&& linkName){
@@ -367,14 +369,14 @@
         }
     }
 
-    function getDomainOrPathNameAndUpdate(
+    async function getDomainOrPathNameAndUpdate(
     link = sessionStorage.getItem("shortner_name"),
      toupdate = "unsupported url",
      message = messageError
     ) {
         const GIST_URL = `https://gist.github.com/Harfho/${gist_id}/raw/shortlinks_name.txt?timestamp=${+new Date()}`;
 
-        GM_xmlhttpRequest({
+        await GM_xmlhttpRequest({
             method: "GET",
             url: "https://gist.github.com/Harfho/" +
             gist_id +
@@ -384,10 +386,16 @@
             nocache: true,
             onload: getShortlinksName,
             onerror: (r) => {
+                getDomainOrPathNameAndUpdate(link,toupdate,message);
+                return
                 RELOADWIN && window.location.reload(true)
                 //messageError = `${messageError}-(${toupdate}) or shortlink url was changed;`;
                 //updateDontOpen(link, [], message);
             },
+            onabort: (r) => {
+                getDomainOrPathNameAndUpdate(link,toupdate,message);
+                return
+            }
         });
 
         function getShortlinksName(response) {
@@ -592,7 +600,6 @@
               sessionShortnerName || shortnerName :
         closestShortlink;
         document.title = useShortlink;
-
         DEBUG && console.log("title use", useShortlink);
         return useShortlink;
     }
@@ -638,6 +645,7 @@
                 const originalurl = new URL(data.result);
                 DEBUG && console.log(originalurl);
                 window.location.href = originalurl;
+                return
             } else {
                 DEBUG && console.log(`Issue of ${message} happen when bypassing`)
                 let tryagain = sessionStorage.getItem('tryagain');
@@ -686,7 +694,8 @@
                                 },
                             });
                         }
-                    } else {
+                    }
+                    else {
                         GM_setValue('already_sent', false);
                         let msgs = message + `You have use more than 2 IPs to access Yuumari.com,Wait for 24Hour ${after24h } for API key to continue working`;
                         DEBUG && console.log(msgs);
@@ -703,6 +712,8 @@
                 } else if (/exceeded/ig.test(message)) {
                     let msg = message + "The limit on the number of requests has exceeded 2 queries per 1sec.";
                     DEBUG && console.log(msg);
+                    await bypass(link)
+                    return
                     setTimeout(() => {
                         window.location.href=link;
                     }, 3000);
@@ -716,6 +727,8 @@
 
                     if (parseInt(tryagain) <= retry1) {
                         sessionStorage.setItem('tryagain', parseInt(tryagain) + 1);
+                        await bypass(link)
+                        return
                         setTimeout(() => {
                             RELOADWIN&&window.location.reload(true);
                         }, 3000);
@@ -741,15 +754,16 @@
                             text: msg,
                             timeout: 10 * 1000,
                             ondone: () => {
-                                CLOSEWIN && window.close();
+                                //CLOSEWIN && window.close();
                             },
                         });
                         DEBUG && console.log(message);
-                        CLOSEWIN && window.close();
+                        getDomainOrPathNameAndUpdate(link, 'dontopen', message) //getDomain Or PathName And Update _DontoOpen with it
                     }
                 }
             }
-        } catch (error) {
+        }
+        catch (error) {
             favicon(red_icon);
             if (/Failed to fetch/ig.test(error)) {
                 DEBUG && console.error(error);
@@ -764,6 +778,8 @@
 
                 if (parseInt(recheck) <= retry2) {
                     sessionStorage.setItem('recheck', parseInt(recheck) + 1);
+                    await bypass(link)
+                    return
                     setTimeout(() => {
                         RELOADWIN&&window.location.reload(true);
                     }, 5000);
@@ -774,7 +790,8 @@
                         window.close(true);
                     }, 5000);
                 }
-            } else {
+            }
+            else {
                 DEBUG && console.log(error);
             }
         }
@@ -913,6 +930,7 @@
                 /Attention Required|A timeout occurred/gi.test(document.title)
             ) {
                 RELOADWIN&&window.location.reload(true);
+                return
             } else if (
                 new RegExp(
                     ".*shortlinks-wall.php\\?antibot_failed.*",
