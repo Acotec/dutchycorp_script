@@ -1,25 +1,25 @@
 (function () {
     const CLOSEWIN = true;
     const RELOADWIN =true;
-    const DEBUG = false;
+    const DEBUG =false;
     if (window.history.replaceState) {
         window.history.replaceState(null, null, decodeURIComponent(window.location.href));
     } //to prevent resubmit on refresh and back button
     //---------------------------------------------------------//
-    GM_addValueChangeListener(
-        "shortner_name",
-        function (name, old_value, new_value, remote) {
-            GM_setValue("shortner_name", new_value);
-            GM_setValue("previous_shortner_name", old_value);
-        }
-    );
+    //     GM_addValueChangeListener(
+    //         "shortner_name",
+    //         function (name, old_value, new_value, remote) {
+    //             GM_setValue("shortner_name", new_value);
+    //             GM_setValue("previous_shortner_name", old_value);
+    //         }
+    //     );
     var messageError,
         linkCantBypass,
         invalid,
         //var location = window.location
         listOfAcceptDomains = GM_getValue("domains", ""),
-        retry1 = 3,
-        retry2 = 10,
+        retry_bypass_if_fail = 3,
+        retry_fail_connect = 10,
         green_icon = GM_getValue("green_icon", ""),
         green_icon1 = GM_getValue("green_icon1", ""),
         grey_icon = GM_getValue("grey_icon", ""),
@@ -60,7 +60,7 @@
             //alert(error)
             //DEBUG && console.error(error);
             DEBUG && console.log("can't get Icons because of ", error);
-            window.location = decodeURIComponent(window.location.href);
+            window.location.reload(true);
         });
     }
     (0 != green_icon && 0 != green_icon1 && 0 != grey_icon && 0 != red_icon) ||
@@ -445,7 +445,6 @@
                     urlSplice[1],
                     urlSplice[2],
                     hostname,
-                    shortnerName,
                     getSimilarWord(urlSplice[0], shortlinksName),
                     previousShortnerName,
                     ref,
@@ -458,7 +457,6 @@
                     urlSplice[0],
                     urlSplice[2],
                     hostname,
-                    shortnerName,
                     getSimilarWord(urlSplice[0], shortlinksName),
                     previousShortnerName,
                 ];
@@ -499,8 +497,7 @@
             if (check.length > 1) {
                 pathOrDomain = check[0];
                 DEBUG && console.log("Final", pathOrDomain, check[0]);
-            }
-
+            };
             if (pathOrDomain) {
                 if (/(dontopen|down)/i.test(toupdate)) {
                     pathOrDomain = getSimilarWord(
@@ -582,7 +579,7 @@
             DEBUG && console.log(sessionShortnerName);
         } else {
             DEBUG && console.info("This page is not reloaded");
-            sessionStorage.setItem("shortner_name", shortnerName);
+            sessionStorage.setItem("shortner_name", sessionShortnerName);
         }
 
         // Get closest shortlink name to the current URL host
@@ -592,13 +589,14 @@
             shortnerName,
             previousShortnerName,
         ].map((s) => s.toLowerCase());
-        const closestShortlink = getSimilarWord(host, shortlinks, 0.3);
+        const closestShortlink = getSimilarWord(sessionShortnerName, shortlinks, 0.3);
 
         // Set document title to the closest shortlink name
         const useShortlink =
               host === closestShortlink ?
               sessionShortnerName || shortnerName :
         closestShortlink;
+        sessionStorage.setItem("shortner_name", useShortlink);
         document.title = useShortlink;
         DEBUG && console.log("title use", useShortlink);
         return useShortlink;
@@ -610,9 +608,9 @@
         link = link.replace(/.+:/, "https:"); //replaces the protocol of the provided link with 'https:'
         favicon(green_icon);
         let urlhost = new URL(link).host;
+        GM_setValue("previousHost", urlhost);
         DEBUG && console.log(link,urlhost)
         title(link);
-        GM_setValue("previousHost", urlhost);
         const key = atob(
             GM_getValue("accesskey")
             .match(/\w*/gi)
@@ -715,7 +713,7 @@
                     await bypass(link)
                     return
                     setTimeout(() => {
-                        window.location.href=link;
+                        window.location.reload(true);
                     }, 3000);
                 } else {
                     let urlhost = new URL(l).host;
@@ -725,7 +723,7 @@
                         tryagain = sessionStorage.getItem('tryagain');
                     }
 
-                    if (parseInt(tryagain) <= retry1) {
+                    if (parseInt(tryagain) <= retry_bypass_if_fail) {
                         sessionStorage.setItem('tryagain', parseInt(tryagain) + 1);
                         await bypass(link)
                         return
@@ -776,7 +774,7 @@
                     recheck = sessionStorage.getItem('recheck');
                 }
 
-                if (parseInt(recheck) <= retry2) {
+                if (parseInt(recheck) <= retry_fail_connect) {
                     sessionStorage.setItem('recheck', parseInt(recheck) + 1);
                     await bypass(link)
                     return
@@ -784,7 +782,6 @@
                         RELOADWIN&&window.location.reload(true);
                     }, 5000);
                 } else {
-                    favicon(red_icon);
                     sessionStorage.removeItem('recheck');
                     setTimeout(() => {
                         window.close(true);
@@ -830,10 +827,13 @@
     );
     //autofaucet.dutcycorp.space
     if (/.+shortlinks-wall.php(?:\?r=s)?$/gi.test(decodeURIComponent(window.location.href))) {
-        // GM_addValueChangeListener('shortner_name', function(name, old_value, new_value, remote) {
-        //     GM_setValue('shortner_name', new_value)
-        //     GM_setValue('previous_shortner_name', old_value)
-        // });
+        GM_addValueChangeListener(
+            "shortner_name",
+            function (name, old_value, new_value, remote) {
+                GM_setValue("shortner_name", new_value);
+                GM_setValue("previous_shortner_name", old_value);
+            }
+        );
         document.onclick = function (event) {
             if (event === undefined) event = window.event;
             var target = "target" in event ? event.target : event.srcElement;
