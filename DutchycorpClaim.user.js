@@ -1,4 +1,4 @@
-const DEBUG = false;
+const DEBUG =false;
 $('#DUTCHY-price-informations,#coupon').remove();
 window.addEventListener('keydown', function check(event) {
     function copy(text) {
@@ -303,18 +303,39 @@ function Runcode(response = null) {
         } else {
             return false
         }
-    }
+    };
+    const crypt = (salt, text) => {
+        const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
+        const byteHex = (n) => ("0" + Number(n).toString(16)).substr(-2);
+        const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
 
+        return text
+            .split("")
+            .map(textToChars)
+            .map(applySaltToChar)
+            .map(byteHex)
+            .join("");
+    };
+    const decrypt = (salt, encoded) => {
+        const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
+        const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
+        return encoded
+            .match(/.{1,2}/g)
+            .map((hex) => parseInt(hex, 16))
+            .map(applySaltToChar)
+            .map((charCode) => String.fromCharCode(charCode))
+            .join("");
+    };
     function update_DontOpen(linkName) {
         _DontOpen.push(linkName.toLowerCase())
         shortlinks_name.push(linkName)
-        var access_token = atob('Z2hwXzFVMGhPMTFodTZ6eWxaZ0hMWW5qWFdMTjE1d3V5NjBZN0l6Rw=='), //get access_token and de_encrpt it btoa to atob
+        var token = decrypt('g','000f1738575309000a36282632043f3d3155165f551d2e08240c1d092e330501523f550406335606'), //get token and de_encrpt it
             discription = window.location.host + " added " + linkName + " to _DontOpen and shortlinks_name"
-        access_token = "Bearer " + access_token
-        DEBUG&&console.log(access_token)
+        token = "Bearer " + token
+        DEBUG&&console.log(token)
         const myHeaders = new Headers({
             "accept": "application/vnd.github.v3+json",
-            'Authorization': access_token,
+            'Authorization': token,
             "Content-Type": "application/json"
         })
         var raw = JSON.stringify({
