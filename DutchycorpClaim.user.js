@@ -475,6 +475,15 @@ function Runcode(response = null) {
     _views_ToVisit.forEach((c) => {
         LinkToVisitOnPage.push(c.getElementsByTagName("a")[1])
     })
+    function waitFor(conditionFunction) {
+
+        const poll = resolve => {
+            if(conditionFunction()) resolve();
+            else setTimeout(_ => poll(resolve), 400);
+        }
+
+        return new Promise(poll);
+    }
 
     function appear() { //define a function
         let limit = LinkToVisitOnPage.length
@@ -513,9 +522,25 @@ function Runcode(response = null) {
                                 if (exFirstNum >= 0) {
                                     clearInterval(interval)
                                     DEBUG&&console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i, "\nTotalreward=" + totalReward1)
-                                    clickOnEle(open_link)
+                                    //clickOnEle(open_link)
+                                    DEBUG&&console.log(open_link.href);
+                                    open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
+                                    if(!/extend_claim_count/ig.test(open_link.href)){
+                                        GM_setValue("_alreadyRun", true);
+                                        checkButton()
+                                        return
+                                    }
+                                    open_link.click()
+                                    const tinfo = GM_openInTab(open_link.href,{active:true,
+                                                                               insert:false,
+                                                                               setParent:true,
+                                                                               incognito:false,
+                                                                               loadInbackground:true});
+                                    tinfo.name =linkName.toLowerCase();
+                                    window.name =linkName.toLowerCase();
                                     duration += addtoduration
-                                    timerId = setTimeout(call, duration);
+                                    //waitFor(_ => tinfo.closed == true).then(_ =>{DEBUG&&console.log('the wait is over!');window.name='';});
+                                    timerId = setTimeout(call, duration)
                                 } else {
                                     DEBUG&&console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
                                     clearInterval(interval)
@@ -575,9 +600,7 @@ function Runcode(response = null) {
     }
     body.appendChild(button);
     // Add event handler
-    button.addEventListener("click", function() {
-        checkButton()
-    });
+    button.addEventListener("click",checkButton);
     //////////////////
     pageR()
     reloadP()
