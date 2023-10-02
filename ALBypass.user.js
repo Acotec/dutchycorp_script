@@ -1,18 +1,11 @@
 (function () {
-    const CLOSEWIN = true;
+    const CLOSEWIN =true;
     const RELOADWIN =true;
     const DEBUG =false;
     if (window.history.replaceState) {
         window.history.replaceState(null, null, decodeURIComponent(window.location.href));
     } //to prevent resubmit on refresh and back button
     //---------------------------------------------------------//
-    //     GM_addValueChangeListener(
-    //         "shortner_name",
-    //         function (name, old_value, new_value, remote) {
-    //             GM_setValue("shortner_name", new_value);
-    //             GM_setValue("previous_shortner_name", old_value);
-    //         }
-    //     );
     var messageError,
         linkCantBypass,
         invalid,
@@ -273,7 +266,7 @@
             .map((charCode) => String.fromCharCode(charCode))
             .join("");
     };
-    function updateDontOpen(linkName, check = [], message = messageError) {
+    function updateDontOpen(linkName=window.name, check = [], message = messageError) {
         // Constants for gist URL and access token
         const GIST_URL = `https://gist.github.com/Harfho/${gist_id}/raw/_DontOpen.txt?timestamp=${+new Date()}`;
         const TOKEN = decrypt('g','000f1738575309000a36282632043f3d3155165f551d2e08240c1d092e330501523f550406335606')
@@ -356,8 +349,8 @@
                     Error= ${messageError}\n
                     message = ${message}
                     --------------------------------------
-                    Yummari pattern="${yuumari_pattern}
-                    Possible shortlink that cause it can be =${check}\n
+                    Yummari pattern="${yuumari_pattern}\n
+                    Possible shortlink that cause it can be =${check}OR${window.name}\n
                     DontOpenListIsNow=${updatedDontOpenList}`;
 
                     DEBUG && console.log(msg)
@@ -388,7 +381,7 @@
     }
 
     async function getDomainOrPathNameAndUpdate(
-    link = sessionStorage.getItem("shortner_name"),
+    link = window.name||sessionStorage.getItem("shortner_name"),
      toupdate = "unsupported url",
      message = messageError
     ) {
@@ -456,6 +449,7 @@
             ) {
                 ref = new URL(document.referrer).host;
                 exLink = [
+                    window.name,
                     sessionStorage.getItem("shortner_name"),
                     shortnerName,
                     pageTitle,
@@ -469,6 +463,7 @@
                 ];
             } else {
                 exLink = [
+                    window.name,
                     sessionStorage.getItem("shortner_name"),
                     shortnerName,
                     pageTitle,
@@ -586,7 +581,7 @@
         const shortnerName = GM_getValue("shortner_name","null");
         const previousShortnerName = GM_getValue("previous_shortner_name",shortnerName);
         const sessionShortnerName =
-              sessionStorage.getItem("shortner_name") || shortnerName;
+              sessionStorage.getItem("shortner_name") || (window.name||shortnerName);
 
         // Check if page is reloaded
         if (
@@ -603,11 +598,12 @@
         // Get closest shortlink name to the current URL host
         const host = new URL(link).host;
         const shortlinks = [
+            window.name,
             sessionShortnerName,
             shortnerName,
             previousShortnerName,
         ].map((s) => s.toLowerCase());
-        const closestShortlink = getSimilarWord(sessionShortnerName, shortlinks, 0.3);
+        const closestShortlink = getSimilarWord(window.name||sessionShortnerName, shortlinks, 0.3);
 
         // Set document title to the closest shortlink name
         const useShortlink =
@@ -853,14 +849,17 @@
             }
         );
         document.onclick = function (event) {
+            window.name=''
             if (event === undefined) event = window.event;
             var target = "target" in event ? event.target : event.srcElement;
             if (/claim/gi.test(target.textContent)) {
                 let linkName = target.parentElement.parentElement.innerText
                 .replace(/\n.*/g, "")
                 .trim();
-                GM_setValue("shortner_name", linkName);
+                GM_setValue("shortner_name", window.name||linkName);
                 DEBUG && console.log(linkName);
+            }else{
+                //GM_setValue("shortner_name", window.name);
             }
             //if (GM_getValue('OnPhone', false)){//CLOSEWIN && window.close()}
         }; //get shortlink name when click
@@ -965,11 +964,11 @@
                 messageError = "Shortner Down";
                 sessionStorage.setItem(
                     "shortner_name",
-                    GM_getValue("shortner_name")
+                    window.name||GM_getValue("shortner_name")
                 );
                 let message = 'The shortlink is down for now'
                 getDomainOrPathNameAndUpdate(
-                    sessionStorage.getItem("shortner_name"),
+                    window.name||sessionStorage.getItem("shortner_name"),
                     "shortenerdown",
                     message
                 );
@@ -983,8 +982,8 @@
             favicon(grey_icon);
             let link = decodeUrl;
             let shortname = title(link)
-            messageError =`${shortname} not yet added to accepted domains to bypass on yuumari or there is issue with it`
-            getDomainOrPathNameAndUpdate(shortname, "unsupported url");
+            messageError =`${window.name||shortname} not yet added to accepted domains to bypass on yuumari or\nThere is issue with it`
+            getDomainOrPathNameAndUpdate(window.name||shortname, "unsupported url");
         }
     };
 })();
