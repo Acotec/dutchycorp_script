@@ -189,6 +189,7 @@ AutoUpdateDontOpen() //run
 if (GM_getValue("_alreadyRun") != true) {
     GM_setValue("_alreadyRun", true);
     if (GM_getValue("AutoUpdate")) {
+        DEBUG&&console.log('AUTOUPDATE IS ON')
         GM_xmlhttpRequest({
             method: 'GET',
             url: 'https://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
@@ -201,7 +202,6 @@ if (GM_getValue("_alreadyRun") != true) {
         function get_Shortlinks_and_DontOpen(response) {
             let get_shortlinks_name = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
             shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());
-            DEBUG&&console.log(shortlinks_name)
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: 'https://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
@@ -211,7 +211,9 @@ if (GM_getValue("_alreadyRun") != true) {
                 onerror: window.location.reload
             });
         }
-    } else {
+    }
+    else {
+        DEBUG&&console.log('AUTOUPDATE IS OFF')
         Runcode()
     }
 } else {
@@ -247,16 +249,13 @@ function Runcode(response = null) {
     } else {
         _totalLink = linknames.length;
     }
-
-    DEBUG&&console.log(_DontOpen)
-    DEBUG&&console.log(shortlinks_name)
     //throw new Error("!! Stop JS")
     if (/404|400/ig.test(_DontOpen + shortlinks_name)) {
         window.location.reload();
         throw new Error("!! Stop JS")
     } else {
-        DEBUG&&console.log(_DontOpen)
-        DEBUG&&console.log(shortlinks_name)
+        DEBUG&&console.log('_DontOpen lists',_DontOpen);
+        DEBUG&&console.log('shortlinks_name',shortlinks_name)
     }
     //function to check when the page is reloaded
     function pageR() {
@@ -403,7 +402,7 @@ function Runcode(response = null) {
     //                     if (select == icselect) {
     //                         DEBUG&&console.log("Antibot to select is - ", select)
     //                         let sec = 1000
-    //                         //waitForKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
+    //                         //waitUntilKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
     //                         DEBUG&&console.log(img.getElementsByTagName('input')[0], "clicked");
     //                         setTimeout(() => {
     //                             clickOnEle(img.getElementsByTagName('input')[0])
@@ -436,6 +435,7 @@ function Runcode(response = null) {
 
     function getduration(i,phone=false) {
         if (GM_getValue("static", null)) {
+            DEBUG&&console.log('STATIC IS ON')
             var ds = GM_getValue('speed')
             var time = new Date();
             time = time.toLocaleString('en-US', {
@@ -459,6 +459,7 @@ function Runcode(response = null) {
             }
         }
         else {
+            DEBUG&&console.log('STATIC IS OFF')
             if(phone){
                 duration = i * 1000}
             else if (GM_getValue('speed')) {
@@ -470,20 +471,29 @@ function Runcode(response = null) {
         var speedclass = document.querySelector("p.speed")
         speedclass.innerText=`${speedclass.innerText.replace(/\(duration.*/,'')} (duration=${duration/1000} seconds)`
         return duration
-    }
+    };
+
+
     var LinkToVisitOnPage = []
     _views_ToVisit.forEach((c) => {
         LinkToVisitOnPage.push(c.getElementsByTagName("a")[1])
     })
-    function waitFor(conditionFunction) {
 
-        const poll = resolve => {
-            if(conditionFunction()) resolve();
-            else setTimeout(_ => poll(resolve), 400);
-        }
-
-        return new Promise(poll);
-    }
+    const waitUntil = (condition,waitFor=600000) => {
+        return new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+                if (!condition()) {
+                    return;
+                }
+                clearInterval(interval);
+                resolve();
+            }, 500);
+            setTimeout(() => {
+                clearInterval(interval);
+                reject(`Waited for,${(waitFor/1000/60)} minutes and ${condition}(${condition()}) is not met`);
+            },waitFor);
+        });
+    };
 
     function appear() { //define a function
         let limit = LinkToVisitOnPage.length
@@ -495,7 +505,7 @@ function Runcode(response = null) {
                 DEBUG&&console.log(linkName,_available_link)
                 if (_available_link <= 1000) {
                     if (DontOpen_LinkByName(linkName)) {
-                        duration = 1
+                        duration = 0
                         //limit++
                         DEBUG&&console.log('wont open', linkName, limit, i)
                     } else {
@@ -515,6 +525,7 @@ function Runcode(response = null) {
                             } else {
                                 addtoduration = 0
                             }
+                            var count = 0
                             timerId = setTimeout(function call() {
                                 var speedclass = document.querySelector("p.speed");
                                 speedclass.innerText=`${speedclass.innerText.replace(/\(duration.*/,'')} (duration=${duration/1000} seconds)`
@@ -526,11 +537,14 @@ function Runcode(response = null) {
                                     DEBUG&&console.log(open_link.href);
                                     open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
                                     if(!/extend_claim_count/ig.test(open_link.href)){
+                                        DEBUG&&console.log('INVALID LINK,RETYING in ',duration/1000,'seconds');
                                         GM_setValue("_alreadyRun", true);
-                                        checkButton()
+                                        setTimeout(checkButton,duration)
                                         return
                                     }
+                                    DEBUG&&console.log('open tab count is now ',count+1);
                                     open_link.click()
+                                    count++
                                     const tinfo = GM_openInTab(open_link.href,{active:true,
                                                                                insert:false,
                                                                                setParent:true,
@@ -538,17 +552,32 @@ function Runcode(response = null) {
                                                                                loadInbackground:true});
                                     tinfo.name =linkName.toLowerCase();
                                     window.name =linkName.toLowerCase();
-                                    duration += addtoduration
-                                    //waitFor(_ => tinfo.closed == true).then(_ =>{DEBUG&&console.log('the wait is over!');window.name='';});
+                                    duration = count*addtoduration
                                     timerId = setTimeout(call, duration)
+                                    waitUntil(_=>tinfo.closed == true)
+                                        .then(_=>{window.name='';
+                                                  DEBUG&&console.log('open tab remain ',count-1);
+                                                  count--;
+                                                 })
+                                        .catch(_=>{count=0;
+                                                   DEBUG&&console.log(_);
+                                                   DEBUG&&console.log('open tab reset');})
                                 } else {
                                     DEBUG&&console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
                                     clearInterval(interval)
                                     clearTimeout(timerId)
-                                    duration = getduration(i)
-                                    appear()
+                                    duration =getduration(i)
+                                    let wait=(count+1)*5000
+                                    DEBUG&&console.log('waiting',wait/1000,'seconds');
+                                    waitUntil(_=>count<=0,wait)
+                                        .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
+                                                  window.name='';
+                                                  appear()
+                                                 })
+                                        .catch(_=>{DEBUG&&console.log(_);
+                                                   window.name='';
+                                                   appear()})
                                 }
-
                             }, duration);
                         } else {
                             DEBUG&&console.log(linkName.toLowerCase(), 'Is not among shortlinks to open', limit)
@@ -597,6 +626,7 @@ function Runcode(response = null) {
     function main() {
         GM_setValue("_alreadyRun", true);
         appear();
+
     }
     body.appendChild(button);
     // Add event handler
