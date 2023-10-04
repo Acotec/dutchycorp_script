@@ -194,9 +194,10 @@
             //RELOADWIN&&window.location.reload(true);
         }
     }
-
     async function sendEmail(toname, temp_id, msg) {
-        if(GM_getValue("email_sent")){
+        if(GM_getValue("email_sent")&&
+           (window.name||GM_getValue('shortner_name').toLowerCase()==GM_getValue('shortner_name').toLowerCase())
+          ){
             if (invalid) {
                 updateAcceptDomain();
             } else {
@@ -809,7 +810,7 @@
                 } else {
                     sessionStorage.removeItem('recheck');
                     setTimeout(() => {
-                        window.close(true);
+                        CLOSEWIN && window.close(true);
                     }, 5000);
                 }
             }
