@@ -24,7 +24,7 @@ var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').sp
     _available_link = parseInt(document.getElementsByClassName("accent-text")[0].textContent.replace(/.*\(/ig, '').replace(/[\W].*/, '')),
     button = document.createElement("button"),
     body = document.getElementsByClassName('col s12 m12 l4 center-align')[0], // card col s8 m4
-    gist_id = "493dc66ecebd58a75b730a77ef676632"
+    gist_id = "493dc66ecebd58a75b730a77ef676632";
 var linknames = [],
     totalReward = 0,
     totalReward1 = 0;
@@ -235,6 +235,7 @@ function Runcode(response = null) {
         interval, //for setInterval
         timerId,
         duration; //for setInterval duration
+
     if (GM_getValue('AutoUpdate')) {
         let getDontOpen = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
@@ -461,7 +462,7 @@ function Runcode(response = null) {
         else {
             DEBUG&&console.log('STATIC IS OFF')
             if(phone){
-                duration = i * 1000}
+                duration = i * 1500}
             else if (GM_getValue('speed')) {
                 duration = GM_getValue('speed') * 1000
             } else {
@@ -479,7 +480,7 @@ function Runcode(response = null) {
         LinkToVisitOnPage.push(c.getElementsByTagName("a")[1])
     })
 
-    const waitUntil = (condition,waitFor=600000) => {
+    const waitUntil = (condition,waitFor=300000) => {
         return new Promise((resolve, reject) => {
             const interval = setInterval(() => {
                 if (!condition()) {
@@ -487,7 +488,7 @@ function Runcode(response = null) {
                 }
                 clearInterval(interval);
                 resolve();
-            }, 500);
+            }, 1000);
             setTimeout(() => {
                 clearInterval(interval);
                 reject(`Waited for,${(waitFor/1000/60)} minutes and ${condition}(${condition()}) is not met`);
@@ -496,6 +497,7 @@ function Runcode(response = null) {
     };
 
     function appear() { //define a function
+        var tabs=[];
         let limit = LinkToVisitOnPage.length
         interval = setInterval(() => {
             try {
@@ -534,40 +536,47 @@ function Runcode(response = null) {
                                     clearInterval(interval)
                                     DEBUG&&console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i, "\nTotalreward=" + totalReward1)
                                     //clickOnEle(open_link)
-                                    DEBUG&&console.log(open_link.href);
                                     open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
-                                    if(!/extend_claim_count/ig.test(open_link.href)){
-                                        DEBUG&&console.log('INVALID LINK,RETYING in ',duration/1000,'seconds');
-                                        GM_setValue("_alreadyRun", true);
-                                        setTimeout(checkButton,duration)
-                                        return
-                                    }
                                     DEBUG&&console.log('open tab count is now ',count+1);
                                     open_link.click()
-                                    count++
-                                    const tinfo = GM_openInTab(open_link.href,{active:true,
-                                                                               insert:false,
-                                                                               setParent:true,
-                                                                               incognito:false,
-                                                                               loadInbackground:true});
+                                    count++;
+                                    let url;
+                                    if(!/extend_claim_count/ig.test(open_link.href)){
+                                        DEBUG&&console.log('HREF NOT AVAILABLE,GENERATING THE HREF');
+                                        url = `https://autofaucet.dutchycorp.space${open_link.getAttribute('onmousedown').split(',')[1].replace(/\s|\(|\)|;|'/ig,'')}`;
+                                        DEBUG&&console.log(url);
+                                    }else{
+                                        DEBUG&&console.log(open_link.href);
+                                        url = open_link.href;
+                                    }
+                                    const tinfo = GM_openInTab(url,{active:true,
+                                                                    insert:false,
+                                                                    setParent:true,
+                                                                    incognito:false,
+                                                                    loadInbackground:true});
                                     tinfo.name =linkName.toLowerCase();
                                     window.name =linkName.toLowerCase();
+                                    tabs.push(tinfo)
                                     duration = count*addtoduration
                                     timerId = setTimeout(call, duration)
                                     waitUntil(_=>tinfo.closed == true)
                                         .then(_=>{window.name='';
                                                   DEBUG&&console.log('open tab remain ',count-1);
                                                   count--;
+                                                  tabs.shift()
                                                  })
-                                        .catch(_=>{count=0;
-                                                   DEBUG&&console.log(_);
-                                                   DEBUG&&console.log('open tab reset');})
+                                        .catch(_=>{DEBUG&&console.log(_);
+                                                   DEBUG&&console.log('open tab reset');
+                                                   count=0;
+                                                   tabs.forEach((e)=>{e.close()});
+                                                   tabs=[]
+                                                  })
                                 } else {
                                     DEBUG&&console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
                                     clearInterval(interval)
                                     clearTimeout(timerId)
                                     duration =getduration(i)
-                                    let wait=(count+1)*5000
+                                    let wait=(count+1)*20000
                                     DEBUG&&console.log('waiting',wait/1000,'seconds');
                                     waitUntil(_=>count<=0,wait)
                                         .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
@@ -575,8 +584,11 @@ function Runcode(response = null) {
                                                   appear()
                                                  })
                                         .catch(_=>{DEBUG&&console.log(_);
+                                                   DEBUG&&console.log(tabs)
+                                                   tabs.forEach((e)=>{e.close()});
                                                    window.name='';
-                                                   appear()})
+                                                   appear()
+                                                  })
                                 }
                             }, duration);
                         } else {
@@ -614,7 +626,6 @@ function Runcode(response = null) {
                 console.log( caldutchbal(totalReward1))
                 button.innerHTML = "Done opening-Click to Run Again=[" + caldutchbal(totalReward1) + '] out of ' + caldutchbal(totalReward)
                 clearInterval(interval)
-                //clearInterval(inter)
                 //Re_run()
                 //window.close();//window.close()
             }
