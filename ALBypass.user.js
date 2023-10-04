@@ -196,52 +196,63 @@
     }
 
     async function sendEmail(toname, temp_id, msg) {
-        const username = "Harfho";
-        const from_name = "Harfho";
-        const to_name = toname;
-        const message = msg;
-        const accessToken = atob(
-            "NDFjYWY3YmU4MWMwMmRiODIwOWQwNGE2Njg4YWVhZWE="
-        );
-        const myHeaders = new Headers({
-            "Content-Type": "application/json",
-        });
-        const body = JSON.stringify({
-            user_id: "user_oF6Z1O2ypLkxsb5eCKwxN",
-            service_id: "gmail",
-            accessToken,
-            template_id: temp_id,
-            template_params: {
-                username,
-                from_name,
-                to_name,
-                message,
-            },
-        });
-        const requestOptions = {
-            method: "POST",
-            headers: myHeaders,
-            body,
-            redirect: "follow",
-        };
-        try {
-            const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", requestOptions);
-            const result = await response.text();
-            DEBUG && console.log(result);
-            GM_notification({
-                title: "!Bypass---- " + linkCantBypass,
-                text: msg,
-                timeout: 10000,
-                ondone: () => {},
-            });
+        if(GM_getValue("email_sent")){
             if (invalid) {
                 updateAcceptDomain();
             } else {
+                DEBUG&&console.log('ALREADY SENT EMAIL REGARDING THE SHORTLINK')
                 CLOSEWIN && window.close()
             }
-        }
-        catch (error) {
-            DEBUG && console.log("error", error);
+            return
+        }else{
+            const username = "Harfho";
+            const from_name = "Harfho";
+            const to_name = toname;
+            const message = msg;
+            const accessToken = atob(
+                "NDFjYWY3YmU4MWMwMmRiODIwOWQwNGE2Njg4YWVhZWE="
+            );
+            const myHeaders = new Headers({
+                "Content-Type": "application/json",
+            });
+            const body = JSON.stringify({
+                user_id: "user_oF6Z1O2ypLkxsb5eCKwxN",
+                service_id: "gmail",
+                accessToken,
+                template_id: temp_id,
+                template_params: {
+                    username,
+                    from_name,
+                    to_name,
+                    message,
+                },
+            });
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body,
+                redirect: "follow",
+            };
+            try {
+                const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", requestOptions);
+                const result = await response.text();
+                GM_setValue("email_sent",true)
+                DEBUG && console.log(result);
+                GM_notification({
+                    title: "!Bypass---- " + linkCantBypass,
+                    text: msg,
+                    timeout: 10000,
+                    ondone: () => {},
+                });
+                if (invalid) {
+                    updateAcceptDomain();
+                } else {
+                    CLOSEWIN && window.close()
+                }
+            }
+            catch (error) {
+                DEBUG && console.log("error", error);
+            }
         }
     }
     const crypt = (salt, text) => {
@@ -332,7 +343,7 @@
                     // Set variables for email message
                     const toname = "Yuumari.com";
                     const temp_id = "shortlinks_vicissitude";
-                    const pattern = linkCantBypass.replace(
+                    const pattern = linkCantBypass&&linkCantBypass.replace(
                         /http.*:\/\/|\./gi,
                         " "
                     );
@@ -350,7 +361,7 @@
                     message = ${message}
                     --------------------------------------
                     Yummari pattern="${yuumari_pattern}\n
-                    Possible shortlink that cause it can be =${check}OR${window.name}\n
+                    Possible shortlink that cause it can be =${check} OR ${window.name}\n
                     DontOpenListIsNow=${updatedDontOpenList}`;
 
                     DEBUG && console.log(msg)
@@ -846,6 +857,7 @@
             function (name, old_value, new_value, remote) {
                 GM_setValue("shortner_name", new_value);
                 GM_setValue("previous_shortner_name", old_value);
+                GM_deleteValue('email_sent')
             }
         );
         document.onclick = function (event) {
@@ -857,12 +869,9 @@
                 .replace(/\n.*/g, "")
                 .trim();
                 GM_setValue("shortner_name", window.name||linkName);
-                DEBUG && console.log(linkName);
-            }else{
-                //GM_setValue("shortner_name", window.name);
-            }
-            //if (GM_getValue('OnPhone', false)){//CLOSEWIN && window.close()}
-        }; //get shortlink name when click
+                DEBUG && console.log('N-',linkName);
+            }}; //get shortlink name when click
+        if (GM_getValue('OnPhone', false)){CLOSEWIN && window.close()}
         return
     }
     // Get the current time as a number to compare with the last time the "after24h" value was set
