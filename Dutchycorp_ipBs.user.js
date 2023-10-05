@@ -6,8 +6,17 @@ const adBlockDetected_2=()=>{};
 const video_display=()=>{}
 </script>`;
 const scriptTagappend = document.createRange().createContextualFragment(scriptTag);
-document.querySelector("html").append(scriptTagappend);
-document.querySelector("html").prepend(scriptTagappend);
+var loop=0
+var repeat = 300
+var check = setInterval(()=>{
+    loop++
+    document.querySelector("html").append(scriptTagappend);
+    document.querySelector("html").prepend(scriptTagappend);
+    //console.log(loop)
+    if(loop>=repeat){
+        clearInterval(check)
+    }
+},0)
 window.onload = function(){
     let text = `.*what can i do to prevent this in the future.*|
     .*Sorry, you have been blocked.*|
