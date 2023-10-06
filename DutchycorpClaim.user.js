@@ -462,7 +462,8 @@ function Runcode(response = null) {
         else {
             DEBUG&&console.log('STATIC IS OFF')
             if(phone){
-                duration = i * 1500}
+                duration =GM_getValue('speed')<=1 ? i*1000 : (GM_getValue('speed')*1000)-500;
+            }
             else if (GM_getValue('speed')) {
                 duration = GM_getValue('speed') * 1000
             } else {
@@ -488,7 +489,7 @@ function Runcode(response = null) {
                 }
                 clearInterval(interval);
                 resolve();
-            }, 1000);
+            }, 500);
             setTimeout(() => {
                 clearInterval(interval);
                 reject(`Waited for,${(waitFor/1000/60)} minutes and ${condition}(${condition()}) is not met`);
@@ -523,7 +524,7 @@ function Runcode(response = null) {
                             duration = getduration(i)
                             var addtoduration;
                             if (GM_getValue('OnPhone', false)) {
-                                addtoduration = 0 < GM_getValue("speed") ? getduration(1,GM_getValue('OnPhone',true)) : 0;
+                                addtoduration = GM_getValue("speed")>=0? getduration(1,GM_getValue('OnPhone',true)) : 0;
                             } else {
                                 addtoduration = 0
                             }
@@ -534,7 +535,7 @@ function Runcode(response = null) {
                                 exFirstNum--
                                 if (exFirstNum >= 0) {
                                     clearInterval(interval)
-                                    DEBUG&&console.log('linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\ni=" + i, "\nTotalreward=" + totalReward1)
+                                    DEBUG&&console.log("\ni=" + i,'linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\nTotalreward=" + totalReward1)
                                     //clickOnEle(open_link)
                                     open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
                                     DEBUG&&console.log('open tab count is now ',count+1);
@@ -576,7 +577,7 @@ function Runcode(response = null) {
                                     clearInterval(interval)
                                     clearTimeout(timerId)
                                     duration =getduration(i)
-                                    let wait=(count+1)*20000
+                                    let wait=(count+1)*10000
                                     DEBUG&&console.log('waiting',wait/1000,'seconds');
                                     waitUntil(_=>count<=0,wait)
                                         .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
