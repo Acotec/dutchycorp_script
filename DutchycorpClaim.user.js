@@ -577,9 +577,9 @@ function Runcode(response = null) {
                                     clearInterval(interval)
                                     clearTimeout(timerId)
                                     duration =getduration(i)
-                                    let wait=(count+1)*10000
+                                    let wait=(count+2)*10000
                                     DEBUG&&console.log('waiting',wait/1000,'seconds');
-                                    waitUntil(_=>count<=0,wait)
+                                    waitUntil(_=>count<=1,wait)
                                         .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
                                                   window.name='';
                                                   appear()
