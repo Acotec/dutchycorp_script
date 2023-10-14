@@ -80,15 +80,6 @@
 
     async function easyWithdrawal(coin, amount) {
         DEBUG&&console.log('@easyWithdrawal', coin, amount);
-        /* axios.post("https://autofaucet.dutchycorp.space/withdraw.php",{
-            coin: coin,
-            withdrawal_amount: amount, // coin amount, need to convert in sat in some cases
-            method: `faucetpay_w_${coin}`,
-            token: await recaptchaSolution()
-            // token: await hcaptchaSolution()
-        },)
-            .then(res => DEBUG&&console.log(res.data))
-            .catch(err => DEBUG&&console.log(err)) */
         axios.post('withdraw.php',{
             coin: coin,
             withdrawal_amount: amount, // coin amount, need to convert in sat in some cases
