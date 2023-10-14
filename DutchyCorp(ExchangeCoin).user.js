@@ -13,7 +13,7 @@ function waitForKeyElements(t, o, e, i, n) {
     }, i))
 }
 
-async function replace_par(element){
+function replace_par(element){
     let addpar=document.querySelector(".addedtoast")
     let WithButton = document.getElementById('all_submit')
     if(addpar){
