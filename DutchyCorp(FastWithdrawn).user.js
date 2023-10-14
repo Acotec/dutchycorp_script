@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    var DEBUG = false
+    var DEBUG =false
     function waitForKeyElements(t, o, e, i, n) {
         void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
         var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -24,7 +24,7 @@
             if(/exchange/ig.test(window.location.href)){
                 let p_withdraw = document.createElement("p")
                 container2.parentNode.appendChild(p_withdraw);
-                p_withdraw.innerHTML += '<a href="#s" id="fastWithdrawal2"> Withdraw</a>';
+                p_withdraw.innerHTML += '<a href="#fastWithdrawal2" id="fastWithdrawal2"> Withdraw</a>';
                 document.querySelector('#fastWithdrawal2').onclick = withdrawCoin;
             };
             return;
@@ -52,11 +52,12 @@
             DEBUG&&console.log('V3 response:'+token);
             return token;}
 
-        try{return await recaptchaSolutionv2()
-           }catch(err){
-               DEBUG&&console.log('reCAPTCHA_V2 Not exist',err)
-               return await recaptchaSolutionv3()
-           }
+        try{
+            return await recaptchaSolutionv2()
+        }catch(err){
+            DEBUG&&console.log('reCAPTCHA_V2 Not exist',err)
+            return await recaptchaSolutionv3()
+        }
     }
     // async function hcaptchaSolution() {
     //     let captcha = new HCaptchaWidget();
@@ -69,9 +70,11 @@
         DEBUG&&console.log('@withdrawCoin');
         function get_coin_amount(element){
             let r = document.querySelector(element)&&document.querySelector(element).innerText.split('\n')[1].split(' ');
+            let p=document.querySelector("#fastWithdrawal2")
             let coin=r[1]
             let amount =r[0]
             DEBUG&&console.log('coin '+coin,'amount '+amount)
+            p.innerText=`${p.innerText.replace(/-.*/,'')}-(Coin=[${coin}]- Amount=[${amount}])`
             easyWithdrawal(coin,amount);
         }
         //waitForKeyElements('#user_exchange b',get_coin_amount,true,500)
@@ -102,11 +105,11 @@
             if (response.data.send_status == 200){
                 // do something like update bal ect
                 //var nu_balance = response.data.nu_balance;
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML}`},true,500)
+                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${response.data.message}`},true,500)
                 DEBUG&&console.log('DONE')
             }else{
-                let i_msg=response.data.i_message||''
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML} ${i_msg}`},true,500)
+                let i_msg=response.data.i_message||response.data.message
+                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${i_msg}`},true,500)
                 DEBUG&&console.log('fail')
             }
             setTimeout(()=>{grecaptcha.reset();},1000)
