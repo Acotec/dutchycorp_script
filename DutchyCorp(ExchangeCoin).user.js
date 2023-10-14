@@ -1,6 +1,6 @@
 var exc, coin;
 var tocoin = "usdt"
-
+var DEBUG = false
 function waitForKeyElements(t, o, e, i, n) {
     void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
     var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -12,29 +12,34 @@ function waitForKeyElements(t, o, e, i, n) {
         waitForKeyElements(t, o, e, i, n)
     }, i))
 }
-waitForKeyElements('.select-wrapper', (element) => {
-    select(tocoin)
-    fill_in_and_exchange()
-});
-waitForKeyElements('#user_exchange b', (element) => {
+
+async function replace_par(element){
     let addpar=document.querySelector(".addedtoast")
     let WithButton = document.getElementById('all_submit')
     if(addpar){
-        console.log('replace addedtoast')
+        DEBUG&&console.log('replace addedtoast')
     }else{
         addpar = document.createElement("p");
         addpar.setAttribute('class', 'addedtoast');
     }
     addpar.innerText = element.innerText.trim()
     WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
-}, false)
+}
+
+waitForKeyElements('.select-wrapper', (element) => {
+    select(tocoin)
+    fill_in_and_exchange()
+});
+
+waitForKeyElements('#user_exchange b',replace_par, false,500)
+waitForKeyElements("#toast-container",replace_par, false,500)
 
 function selectFromDropDown(elem,choose=null){
     if(choose&&elem){
         let SelectCoin = Array.from(elem.querySelector('.dropdown-content').querySelectorAll('li'))
         SelectCoin.filter((coin) => {
             if (new RegExp(choose, 'ig').test(coin.textContent)) {
-                console.log(`pick ${coin.textContent.toUpperCase()}`)
+                DEBUG&&console.log(`pick ${coin.textContent.toUpperCase()}`)
                 coin.click()
             };
             elem.dispatchEvent(new Event('change'));
@@ -42,26 +47,26 @@ function selectFromDropDown(elem,choose=null){
     }
     else{
         let say = `Element to choose from:${elem} and what to pick: ${choose}`
-        console.log(say)
+        DEBUG&&console.log(say)
     }
 }
 function select(coin = 'usdt', exc =null) {
     if (exc) {
-        //console.log("Exchanging", exc)
+        //DEBUG&&console.log("Exchanging", exc)
         exc = exc
         let elem= document.querySelectorAll(".select-wrapper")[0]
         selectFromDropDown(elem,exc)
     }
     if (coin) {
-        //console.log("To ", coin)
+        //DEBUG&&console.log("To ", coin)
         coin = coin
         let elem = document.querySelectorAll(".select-wrapper")[1]
         selectFromDropDown(elem,coin)
     } else {
-        console.log('No currency claim yet ')
+        DEBUG&&console.log('No currency claim yet ')
     }
     exc = exc || "DUTCHY"
-    console.log("Exchanging:", exc.toUpperCase(), "To:", coin.toUpperCase())
+    DEBUG&&console.log("Exchanging:", exc.toUpperCase(), "To:", coin.toUpperCase())
 }
 
 function fill_in_and_exchange() {
