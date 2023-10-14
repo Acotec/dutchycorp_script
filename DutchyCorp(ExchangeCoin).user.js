@@ -31,8 +31,8 @@ waitForKeyElements('.select-wrapper', (element) => {
     fill_in_and_exchange()
 });
 
-waitForKeyElements('#user_exchange b',replace_par, false,500)
-waitForKeyElements("#toast-container",replace_par, false,500)
+waitForKeyElements('#user_exchange b',replace_par, false,100)
+waitForKeyElements("#toast-container",replace_par, false,100)
 
 function selectFromDropDown(elem,choose=null){
     if(choose&&elem){
@@ -71,8 +71,9 @@ function select(coin = 'usdt', exc =null) {
 
 function fill_in_and_exchange() {
     let balance = document.querySelector("#balance_to_exchange").textContent.replace(/\D/ig, '')
-    document.querySelector("#amount_to_exchange").value = balance
-    document.querySelector("#amount_to_exchange").dispatchEvent(new Event('input', {
+    let amount_value = document.querySelector("#amount_to_exchange")
+    amount_value.value = balance
+    amount_value.dispatchEvent(new Event('input', {
         bubbles: true,
         cancelable: true
     }))
