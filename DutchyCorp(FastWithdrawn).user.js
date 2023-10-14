@@ -113,7 +113,8 @@
                 waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML}`},true,500)
                 DEBUG&&console.log('DONE')
             }else{
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML} ${response.data.i_message}`},true,500)
+                let i_msg=response.data.i_message||''
+                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML} ${i_msg}`},true,500)
                 DEBUG&&console.log('fail')
             }
             setTimeout(()=>{grecaptcha.reset();},1000)
