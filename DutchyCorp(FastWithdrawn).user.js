@@ -80,6 +80,7 @@
 
     async function easyWithdrawal(coin, amount) {
         DEBUG&&console.log('@easyWithdrawal', coin, amount);
+
         axios.post('withdraw.php',{
             coin: coin,
             withdrawal_amount: amount, // coin amount, need to convert in sat in some cases
