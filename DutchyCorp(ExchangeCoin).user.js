@@ -24,6 +24,7 @@ function replace_par(element){
     }
     addpar.innerText = element.innerText.trim()
     WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
+    document.querySelector("#toast-container").remove()
 }
 
 waitForKeyElements('.select-wrapper', (element) => {
