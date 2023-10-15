@@ -37,6 +37,7 @@ _views_ToVisit.forEach(e => {
     // n = n.replace(/\s|\d$/ig, "").toLowerCase()
     0 == linknames.includes(n) && linknames.push(n)
 });
+//
 try {
     document.querySelector("#properties p:nth-child(2) i").scrollIntoView()
 } catch (err) {
@@ -185,30 +186,57 @@ function SpeedCtr() {
 }
 
 AutoUpdateDontOpen() //run
+var random_num=()=>{return Math.floor(101*Math.random())}
 //function to get the shortlinks that should not be open
 if (GM_getValue("_alreadyRun") != true) {
     GM_setValue("_alreadyRun", true);
     if (GM_getValue("AutoUpdate")) {
         DEBUG&&console.log('AUTOUPDATE IS ON')
+        body.appendChild(button);
+        button.addEventListener("click",checkButton);
+        button.innerHTML ="Getting Shortlinks_and_DontOpen";
         GM_xmlhttpRequest({
             method: 'GET',
-            url: 'https://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
+            url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
             fetch: false,
             nocache: false,
+            timeout:10000,
             onload: get_Shortlinks_and_DontOpen,
-            onerror: window.location.reload
+            onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
+                           button.innerHTML ="Error Getting Shortlinks "+random_num();
+                           setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000)},
+            ontimeout:(e)=>{DEBUG&&console.log('Getting Shortlinks timed out',e);
+                            button.innerHTML ='Getting Shortlinks timed out '+random_num();
+                            setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000)},
+            onabort:(e)=>{DEBUG&&console.log('Getting Shortlinks request_abort');
+                          button.innerHTML ='Getting Shortlinks request_abort '+random_num();
+                          setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000)},
         })
 
-        function get_Shortlinks_and_DontOpen(response) {
-            let get_shortlinks_name = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-            shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());
+        function get_Shortlinks_and_DontOpen(response=null) {
+            if (response){
+                let get_shortlinks_name =response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());}
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: 'https://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
+                url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
                 fetch: false,
                 nocache: false,
+                timeout:10000,
                 onload: Runcode,
-                onerror: window.location.reload
+                onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
+                               button.innerHTML ="Error Getting Dont open "+random_num();
+                               setTimeout(()=>{get_Shortlinks_and_DontOpen(e)},1000)},
+                ontimeout:(e)=>{DEBUG&&console.log('Getting Dontopen timed out',e)
+                                button.innerHTML='Getting Dontopen timed out '+random_num();
+                                setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000);
+                                //Runcode(null)
+                               },
+                onabort:(e)=>{DEBUG&&console.log('Getting Dontopen equest_abort');
+                              button.innerHTML ='Getting Dontopen equest_abort '+random_num();
+                              setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000);
+                              //Runcode(null)
+                             },
             });
         }
     }
@@ -216,7 +244,8 @@ if (GM_getValue("_alreadyRun") != true) {
         DEBUG&&console.log('AUTOUPDATE IS OFF')
         Runcode()
     }
-} else {
+}
+else {
     SpeedCtr()
     var second_parag = document.createElement("p");
     second_parag.setAttribute('class', 'title')
@@ -230,13 +259,14 @@ if (GM_getValue("_alreadyRun") != true) {
 }
 
 function Runcode(response = null) {
+    response&&DEBUG&&console.log('Get_Shortlinks_and_DontOpen',response)
     /* variable for appearFunction */
     var i = 0, //index (for looping purpose)
         interval, //for setInterval
         timerId,
         duration; //for setInterval duration
 
-    if (GM_getValue('AutoUpdate')) {
+    if (GM_getValue('AutoUpdate')&&response) {
         let getDontOpen = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
     } else {
@@ -382,58 +412,6 @@ function Runcode(response = null) {
         simulateMouseEvent(theButton, "click", coordX, coordY);
     }
 
-    // var check = 0
-    // var antibot = setInterval(isantibotvisible, 1000)
-    // function isantibotvisible() {
-    //     try {
-    //         let visible = document.getElementsByClassName("modal open")[0].style.display == "block"
-    //         let antibotid = document.getElementsByClassName("modal open")[0].id
-    //         DEBUG&&console.log('antibotFrame is now visible')
-    //         if (visible) {
-    //             clearInterval(interval)
-    //             clearInterval(antibot)
-    //             clearTimeout(timerId)
-    //             //alert('anti')
-    //             setTimeout(() => {
-    //                 let icon = Array.from(document.querySelector("#" + antibotid).getElementsByClassName("gradient-btn btn btn-secondary"))
-    //                 icon.forEach(img => {
-    //                     let select = document.querySelector("#" + antibotid).innerText.replace(/[\W]/g, "").replace(/.*Select|Gosend/ig, '').trim();
-    //                     let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig, "").trim();
-    //                     DEBUG&&console.log(icselect, select)
-    //                     if (select == icselect) {
-    //                         DEBUG&&console.log("Antibot to select is - ", select)
-    //                         let sec = 1000
-    //                         //waitUntilKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
-    //                         DEBUG&&console.log(img.getElementsByTagName('input')[0], "clicked");
-    //                         setTimeout(() => {
-    //                             clickOnEle(img.getElementsByTagName('input')[0])
-    //                         }, )
-    //                         setTimeout(() => {
-    //                             clickOnEle(document.querySelector("#" + antibotid).querySelector('button'))
-    //                         }, 1 * sec)
-    //                         GM_setValue("_alreadyRun", false);
-    //                         setTimeout(() => {
-    //                             if (GM_getValue('OnPhone', false)) {
-    //                                 window.close()
-    //                             } else {
-    //                                 window.location.reload(false)
-    //                             }
-    //                         }, 2 * sec)
-    //                     }
-    //                 })
-    //             }, 2000)
-    //         };
-    //     } catch (e) {
-    //         if (check > 3 + GM_getValue('speed')) {
-    //             clearInterval(antibot)
-    //             DEBUG&&console.log('There is no antibotFrame')
-    //         } else {
-    //             DEBUG&&console.log('waiting for antibotFrame', check)
-    //             check++
-    //         }
-    //     }
-    // }
-
     function getduration(i,phone=false) {
         if (GM_getValue("static", null)) {
             DEBUG&&console.log('STATIC IS ON')
@@ -489,7 +467,7 @@ function Runcode(response = null) {
                 }
                 clearInterval(interval);
                 resolve();
-            }, 500);
+            }, 1000);
             setTimeout(() => {
                 clearInterval(interval);
                 reject(`Waited for,${(waitFor/1000/60)} minutes and ${condition}(${condition()}) is not met`);
@@ -522,13 +500,19 @@ function Runcode(response = null) {
                         if (shortlinks_name.includes(linkName.replace(/\s/ig, '').toLowerCase())) {
                             i++; //increment the index
                             duration = getduration(i)
-                            var addtoduration;
+                            var addtoduration,max_tab;
                             if (GM_getValue('OnPhone', false)) {
-                                addtoduration = GM_getValue("speed")>=0? getduration(1,GM_getValue('OnPhone',true)) : 0;
+                                addtoduration = GM_getValue("speed")>=0 ? getduration(1,GM_getValue('OnPhone',true)) : 0;
+                                max_tab=5
                             } else {
                                 addtoduration = 0
+                                max_tab=10
                             }
-                            var count = 0
+                            var Error,
+                                count = 0;
+                            var checkcount=(count=0)=>{if(count<0){
+                                count++
+                            }}
                             timerId = setTimeout(function call() {
                                 var speedclass = document.querySelector("p.speed");
                                 speedclass.innerText=`${speedclass.innerText.replace(/\(duration.*/,'')} (duration=${duration/1000} seconds)`
@@ -538,18 +522,15 @@ function Runcode(response = null) {
                                     DEBUG&&console.log("\ni=" + i,'linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\nTotalreward=" + totalReward1)
                                     //clickOnEle(open_link)
                                     open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
-                                    DEBUG&&console.log('open tab count is now ',count+1);
                                     open_link.click()
-                                    count++;
                                     let url;
                                     if(!/extend_claim_count/ig.test(open_link.href)){
                                         DEBUG&&console.log('HREF NOT AVAILABLE,GENERATING THE HREF');
-                                        url = `https://autofaucet.dutchycorp.space${open_link.getAttribute('onmousedown').split(',')[1].replace(/\s|\(|\)|;|'/ig,'')}`;
-                                        DEBUG&&console.log(url);
+                                        url =`https://autofaucet.dutchycorp.space${open_link.getAttribute('onmousedown').split(',')[1].replace(/\s|\(|\)|;|'/ig,'')}`;
                                     }else{
-                                        DEBUG&&console.log(open_link.href);
-                                        url = open_link.href;
-                                    }
+                                        url =open_link.href;
+                                    };
+                                    DEBUG&&console.log(url);
                                     const tinfo = GM_openInTab(url,{active:true,
                                                                     insert:false,
                                                                     setParent:true,
@@ -558,34 +539,49 @@ function Runcode(response = null) {
                                     tinfo.name =linkName.toLowerCase();
                                     window.name =linkName.toLowerCase();
                                     tabs.push(tinfo)
-                                    duration = count*addtoduration
-                                    timerId = setTimeout(call, duration)
-                                    waitUntil(_=>tinfo.closed == true)
-                                        .then(_=>{window.name='';
-                                                  DEBUG&&console.log('open tab remain ',count-1);
-                                                  count--;
-                                                  tabs.shift()
-                                                 })
+                                    checkcount(count)
+                                    count++;
+                                    //DEBUG&&console.log('open tab count is now ',count);
+                                    duration = addtoduration
+                                    waitUntil(_=>max_tab>count)
+                                        .then(_=>{
+                                        checkcount(count)
+                                        DEBUG&&console.log('opening tab is less than or equal to ',count);
+                                        timerId = setTimeout(call, duration);
+                                        waitUntil(_=>tinfo.closed)
+                                            .then(_=>{window.name='';
+                                                      DEBUG&&console.log('open tab remain ',count);
+                                                      checkcount(count)
+                                                      count--
+                                                      tabs.shift();
+                                                     })
+                                            .catch(_=>{DEBUG&&console.log(_);
+                                                       count=0;
+                                                       tabs.forEach((e)=>{e.close()});
+                                                       tabs=[];
+                                                       DEBUG&&console.log('open tab reset');
+                                                      })
+                                    })
                                         .catch(_=>{DEBUG&&console.log(_);
-                                                   DEBUG&&console.log('open tab reset');
-                                                   count=0;
-                                                   tabs.forEach((e)=>{e.close()});
-                                                   tabs=[]
+                                                   DEBUG&&console.log('open tab is more than 5');
                                                   })
+
                                 } else {
                                     DEBUG&&console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
                                     clearInterval(interval)
                                     clearTimeout(timerId)
-                                    duration =getduration(i)
-                                    let wait=(count+2)*10000
+                                    duration =1//getduration(i)
+                                    let wait=(count+1)*10000
                                     DEBUG&&console.log('waiting',wait/1000,'seconds');
                                     waitUntil(_=>count<=1,wait)
                                         .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
                                                   window.name='';
+                                                  checkcount(count)
                                                   appear()
                                                  })
                                         .catch(_=>{DEBUG&&console.log(_);
                                                    DEBUG&&console.log(tabs)
+                                                   count=0;
                                                    tabs.forEach((e)=>{e.close()});
                                                    window.name='';
                                                    appear()
@@ -641,7 +637,6 @@ function Runcode(response = null) {
 
     }
     body.appendChild(button);
-    // Add event handler
     button.addEventListener("click",checkButton);
     //////////////////
     pageR()
