@@ -22,9 +22,8 @@ function replace_par(element){
         addpar = document.createElement("p");
         addpar.setAttribute('class', 'addedtoast');
     }
-    addpar.innerText = element.innerText.trim()
-    WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
-    document.querySelector("#toast-container").remove()
+    addpar.innerHTML = element.innerText.trim()
+    WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);   
 }
 
 waitForKeyElements('.select-wrapper', (element) => {
@@ -32,8 +31,8 @@ waitForKeyElements('.select-wrapper', (element) => {
     fill_in_and_exchange()
 });
 
-waitForKeyElements('#user_exchange b',replace_par, false,100)
-waitForKeyElements("#toast-container",replace_par, false,100)
+waitForKeyElements('#user_exchange b',replace_par, false)
+waitForKeyElements("#toast-container",replace_par, false)
 
 function selectFromDropDown(elem,choose=null){
     if(choose&&elem){
