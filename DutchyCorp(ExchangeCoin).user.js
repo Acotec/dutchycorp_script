@@ -23,13 +23,10 @@ function replace_par(element){
         addpar.setAttribute('class', 'addedtoast');
     }
     addpar.innerHTML = element.innerText.trim()
-    WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);   
+    WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
 }
 
-waitForKeyElements('.select-wrapper', (element) => {
-    select(tocoin)
-    fill_in_and_exchange()
-});
+waitForKeyElements('.select-wrapper',fill_in_and_exchange,false,1000);
 
 waitForKeyElements('#user_exchange b',replace_par, false)
 waitForKeyElements("#toast-container",replace_par, false)
@@ -70,12 +67,23 @@ function select(coin = 'usdt', exc =null) {
 }
 
 function fill_in_and_exchange() {
+    select(tocoin)
+    //setTimeout(()=>{
     let balance = document.querySelector("#balance_to_exchange").textContent.replace(/\D/ig, '')
     let amount_value = document.querySelector("#amount_to_exchange")
-    amount_value.value = balance
-    amount_value.dispatchEvent(new Event('input', {
-        bubbles: true,
-        cancelable: true
-    }))
-    //document.querySelector("#all_submit").click()
+    amount_value.value = balance;
+    window.onload = ()=>{
+        let check=0
+        let interval = setInterval(()=>{
+            DEBUG&&console.log(check)
+            if(check<20){
+                amount_value.dispatchEvent(new Event('change', {
+                    bubbles: true,
+                    cancelable:true
+                }));}
+            else{
+                clearInterval(interval)}
+            check++
+        },500)
+        }
 }
