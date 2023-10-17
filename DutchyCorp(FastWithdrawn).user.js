@@ -105,11 +105,11 @@
             if (response.data.send_status == 200){
                 // do something like update bal ect
                 //var nu_balance = response.data.nu_balance;
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${response.data.message}`},true,500)
+                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${response.data.message}`},false,500)
                 DEBUG&&console.log('DONE')
             }else{
                 let i_msg=response.data.i_message||response.data.message
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${i_msg}`},true,500)
+                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${i_msg}`},false,500)
                 DEBUG&&console.log('fail')
             }
             setTimeout(()=>{grecaptcha.reset();},1000)
@@ -141,7 +141,7 @@
                 // Something happened in setting up the request that triggered an Error
                 DEBUG&&console.log('Error', error.message);
             }
-            waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML} The transaction process failed`},true,500)
+            waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML} The transaction process failed`},false,500)
             DEBUG&&console.log("The transaction process failed")
 
         });
