@@ -14,6 +14,28 @@
     }
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms || 3000));
 
+    function notify(msg,length=5000,color='green'){
+        M.toast({
+            html:msg,
+            displayLength :length,
+            classes: color
+        });
+    }
+
+    function replace_par(text){
+        let addpar=document.querySelector(".addedtoast")
+        let WithButton = document.getElementById('all_submit')
+        if(addpar){
+            DEBUG&&console.log('replace addedtoast')
+        }else{
+            addpar = document.createElement("p");
+            addpar.setAttribute('class', 'addedtoast');
+        }
+        addpar.innerHTML = text.trim()
+        WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
+        document.querySelector("#toast-container")&&document.querySelector("#toast-container").remove()
+        document.querySelector("#user_exchange")&&document.querySelector("#user_exchange").remove()
+    }
     async function addButton() {
         let container1,container2;
         container1 = document.querySelector('sup');
@@ -36,10 +58,12 @@
     async function recaptchaSolution() {
         async function recaptchaSolutionv2() {
             if (grecaptcha && grecaptcha.getResponse().length > 0) {
+                replace_par('Processing Withdraw')
                 return grecaptcha.getResponse();
             } else {
                 DEBUG&&console.log('waiting for captcha');
-                await wait(5000);
+                replace_par('waiting for captcha')
+                await wait(1000);
                 return recaptchaSolution();
             }
         };
@@ -77,74 +101,68 @@
             p.innerText=`${p.innerText.replace(/-.*/,'')}-(Coin=[${coin}]- Amount=[${amount}])`
             easyWithdrawal(coin,amount);
         }
-        //waitForKeyElements('#user_exchange b',get_coin_amount,true,500)
+        //waitForKeyElements('#balance_to_receive',get_coin_amount,true,500)
         get_coin_amount('#balance_to_receive')
     }
 
     async function easyWithdrawal(coin, amount) {
         DEBUG&&console.log('@easyWithdrawal', coin, amount);
 
-        axios.post('withdraw.php',{
-            coin: coin,
-            withdrawal_amount: amount, // coin amount, need to convert in sat in some cases
-            method: `faucetpay_w_${coin}`,
-            token: await recaptchaSolution()
-            // token: await hcaptchaSolution()
-        })
-            .then( function(response){
-            DEBUG&&console.log(response.status);
-            DEBUG&&console.log(response.data);
-            DEBUG&&console.log(response.data.message);
-            let noti = document.querySelector("#user_exchange b")
-            noti&&noti.remove()
-            M.toast({
-                html: response.data.message,
-                displayLength : response.data.displayLength,
-                classes: response.data.color
-            });
-            if (response.data.send_status == 200){
-                // do something like update bal ect
-                //var nu_balance = response.data.nu_balance;
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${response.data.message}`},false,500)
-                DEBUG&&console.log('DONE')
-            }else{
-                let i_msg=response.data.i_message||response.data.message
-                waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${i_msg}`},false,500)
-                DEBUG&&console.log('fail')
-            }
-            setTimeout(()=>{grecaptcha.reset();},1000)
+        try{
+            axios.post('withdraw.php',{
+                coin: coin,
+                withdrawal_amount: amount, // coin amount, need to convert in sat in some cases
+                method: `faucetpay_w_${coin}`,
+                token: await recaptchaSolution()
+                // token: await hcaptchaSolution()
+            })
+                .then( function(response){
+                DEBUG&&console.log(response.status);
+                DEBUG&&console.log(response.data);
+                DEBUG&&console.log(response.data.message);
+                replace_par(response.data.message)
+                //notify(response.data.message, response.data.displayLength,response.data.color);
+                if (response.data.send_status == 200){
+                    // do something like update bal ect
+                    //var nu_balance = response.data.nu_balance;
+                    replace_par(response.data.message)
+                    //notify(response.data.message)
+                    DEBUG&&console.log('DONE')
+                }else{
+                    let i_msg=response.data.i_message||response.data.message
+                    //notify(i_msg)
+                    replace_par(i_msg)
+                    DEBUG&&console.log('fail')
+                }
+                setTimeout(()=>{//replace_par('recaptcha reset');
+                    grecaptcha.reset();},2000)
 
-        }).catch(function (error) {
-            DEBUG&&console.log(error.message); // "failed with status code ..."
-            M.toast({
-                html: "<i class='fas fa-times'></i>&nbsp;&nbsp;"+error.message,
-                displayLength : 10000,
-                classes: "red darken-4"
-            });
-            let noti = document.querySelector("#user_exchange b")
-            noti&&noti.remove()
-            if (error.response) {
-                DEBUG&&console.log(error.response.status);
-                DEBUG&&console.log(error.response.data);
-                let response=error.response
-                M.toast({
-                    html: response.data.message,
-                    displayLength : response.data.displayLength,
-                    classes: response.data.color
-                });
-            }else if (error.request) {
-                // The request was made but no response was received
-                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-                // http.ClientRequest in node.js
-                DEBUG&&console.log(error.request);
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                DEBUG&&console.log('Error', error.message);
-            }
-            waitForKeyElements(".addedtoast",(e)=>{e.innerHTML=`${e.innerHTML} The transaction process failed`},false,500)
-            DEBUG&&console.log("The transaction process failed")
+            }).catch(function (error) {
+                DEBUG&&console.log(error.message); // "failed with status code ..."
+                let response=error.response||null
+                if (response) {
+                    DEBUG&&console.log(error.response.status);
+                    DEBUG&&console.log(error.response.data);
+                    //notify(response.data.message, response.data.displayLength,response.data.color)
+                    replace_par(response.data.message)
+                }else if (error.request) {
+                    // The request was made but no response was received
+                    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                    // http.ClientRequest in node.js
+                    DEBUG&&console.log(error.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    DEBUG&&console.log('Error', error.message);
+                }
+                replace_par(`The transaction process failed`)
+                //notify(`The transaction process failed`)
+                DEBUG&&console.log("The transaction process failed")
 
-        });
+            })
+        }catch(err){
+            replace_par(`Error with Axios`)
+            console.log('Error with Axios',err)
+        };
 
     }
 
