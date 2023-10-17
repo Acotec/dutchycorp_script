@@ -1,6 +1,6 @@
 var exc, coin;
 var tocoin = "usdt"
-var DEBUG = false
+var DEBUG = true
 function waitForKeyElements(t, o, e, i, n) {
     void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
     var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -24,6 +24,7 @@ function replace_par(element){
     }
     addpar.innerHTML = element.innerText.trim()
     WithButton.parentNode.insertBefore(addpar, WithButton.nextSibling);
+    document.querySelector("#toast-container")&&document.querySelector("#toast-container").remove()
 }
 
 waitForKeyElements('.select-wrapper',fill_in_and_exchange,false,1000);
@@ -70,20 +71,17 @@ function fill_in_and_exchange() {
     select(tocoin)
     //setTimeout(()=>{
     let balance = document.querySelector("#balance_to_exchange").textContent.replace(/\D/ig, '')
-    let amount_value = document.querySelector("#amount_to_exchange")
-    amount_value.value = balance;
-    window.onload = ()=>{
-        let check=0
-        let interval = setInterval(()=>{
-            DEBUG&&console.log(check)
-            if(check<20){
-                amount_value.dispatchEvent(new Event('change', {
-                    bubbles: true,
-                    cancelable:true
-                }));}
-            else{
-                clearInterval(interval)}
-            check++
-        },500)
-        }
-}
+    let amount_input = document.querySelector("#amount_to_exchange")
+    amount_input.value = balance;
+    let check=0
+    let interval = setInterval(()=>{
+        let msg = document.querySelector("#user_exchange")||''
+        if(msg.innerText==''){
+            amount_input.dispatchEvent(new Event('change', {
+                bubbles: true,
+                cancelable:true
+            }))
+        }else{
+            clearInterval(interval)}
+    },1)
+    }
