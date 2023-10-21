@@ -446,11 +446,10 @@
             ).toLowerCase();
             let ref, exLink, hostname;
             try {
-                hostname = new URL(link).host;
+                hostname = window.name||sessionStorage.getItem("shortner_name")||new URL(link).host;
             } catch (error) {
-                hostname = document.title
+                hostname = window.name|| sessionStorage.getItem("shortner_name")
                     .toLowerCase()
-
                     .replace(pattern,'')
                     .trim();
             }
@@ -644,7 +643,7 @@
         );
         const baseUrl = "https://api.yuumari.com/alpha-bypass/";
         const u = key;
-        const l = link;
+        const l = link.replace(/\/\/\/.*/ig,'');
         DEBUG && console.log(u,l)
         try {
             const response = await fetch(baseUrl, {
@@ -669,6 +668,8 @@
                 const originalurl = new URL(data.result);
                 DEBUG && console.log(originalurl);
                 window.location.href = originalurl;
+                //console.log(originalurl)
+                //alert(originalurl)
                 return
             } else {
                 DEBUG && console.log(`Issue of ${message} happen when bypassing`)
