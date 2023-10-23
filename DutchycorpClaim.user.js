@@ -187,63 +187,71 @@ function SpeedCtr() {
 
 AutoUpdateDontOpen() //run
 var random_num=()=>{return Math.floor(101*Math.random())}
-//function to get the shortlinks that should not be open
-if (GM_getValue("_alreadyRun") != true) {
-    GM_setValue("_alreadyRun", true);
-    if (GM_getValue("AutoUpdate")) {
-        DEBUG&&console.log('AUTOUPDATE IS ON')
-        body.appendChild(button);
-        button.addEventListener("click",checkButton);
-        button.innerHTML ="Getting Shortlinks_and_DontOpen";
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
-            fetch: false,
-            nocache: false,
-            timeout:10000,
-            onload: get_Shortlinks_and_DontOpen,
-            onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
-                           button.innerHTML ="Error Getting Shortlinks "+random_num();
-                           setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000)},
-            ontimeout:(e)=>{DEBUG&&console.log('Getting Shortlinks timed out',e);
-                            button.innerHTML ='Getting Shortlinks timed out '+random_num();
-                            setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000)},
-            onabort:(e)=>{DEBUG&&console.log('Getting Shortlinks request_abort');
-                          button.innerHTML ='Getting Shortlinks request_abort '+random_num();
-                          setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000)},
-        })
-
-        function get_Shortlinks_and_DontOpen(response=null) {
-            if (response){
-                let get_shortlinks_name =response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-                shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());}
+//function to get the shortlinks
+function get_Shortlinks(){
+    let time=2000
+    if (GM_getValue("_alreadyRun") != true) {
+        if (GM_getValue("AutoUpdate")) {
+            DEBUG&&console.log('AUTOUPDATE IS ON')
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
+                url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
                 fetch: false,
                 nocache: false,
                 timeout:10000,
-                onload: Runcode,
-                onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
-                               button.innerHTML ="Error Getting Dont open "+random_num();
-                               setTimeout(()=>{get_Shortlinks_and_DontOpen(e)},1000)},
-                ontimeout:(e)=>{DEBUG&&console.log('Getting Dontopen timed out',e)
-                                button.innerHTML='Getting Dontopen timed out '+random_num();
-                                setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000);
-                                //Runcode(null)
-                               },
-                onabort:(e)=>{DEBUG&&console.log('Getting Dontopen equest_abort');
-                              button.innerHTML ='Getting Dontopen equest_abort '+random_num();
-                              setTimeout(()=>{get_Shortlinks_and_DontOpen()},1000);
-                              //Runcode(null)
-                             },
-            });
+                onload:(e)=>{GM_setValue("_alreadyRun", true);get_DontOpen(e)},
+                onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
+                               button.innerHTML ="Error Getting Shortlinks "+random_num();
+                               setTimeout(()=>{get_Shortlinks()//get_DontOpen()
+                                              },time)},
+                ontimeout:(e)=>{DEBUG&&console.log('Getting Shortlinks timed out',e);
+                                button.innerHTML ='Getting Shortlinks timed out '+random_num();
+                                setTimeout(()=>{get_Shortlinks()//get_DontOpen()
+                                               },time)},
+                onabort:(e)=>{DEBUG&&console.log('Getting Shortlinks request_abort');
+                              button.innerHTML ='Getting Shortlinks request_abort '+random_num();
+                              setTimeout(()=>{get_Shortlinks()//get_DontOpen()
+                                             },time)},
+            })
+        }
+        else {
+            DEBUG&&console.log('AUTOUPDATE IS OFF')
+            Runcode()
         }
     }
-    else {
-        DEBUG&&console.log('AUTOUPDATE IS OFF')
-        Runcode()
-    }
+}
+function get_DontOpen(response=null) {
+    let time=2000
+    if (response){
+        let get_shortlinks_name =response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+        shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());}
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
+        fetch: false,
+        nocache: false,
+        timeout:10000,
+        onload: Runcode,
+        onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
+                       button.innerHTML ="Error Getting Dont open "+random_num();
+                       setTimeout(()=>{get_DontOpen(e)},time)},
+        ontimeout:(e)=>{DEBUG&&console.log('Getting Dontopen timed out',e)
+                        button.innerHTML='Getting Dontopen timed out '+random_num();
+                        setTimeout(()=>{get_DontOpen()},time);
+                        //Runcode(null)
+                       },
+        onabort:(e)=>{DEBUG&&console.log('Getting Dontopen equest_abort');
+                      button.innerHTML ='Getting Dontopen equest_abort '+random_num();
+                      setTimeout(()=>{get_DontOpen()},time);
+                      //Runcode(null)
+                     },
+    });
+}
+if (GM_getValue("_alreadyRun") != true){
+    body.appendChild(button);
+    button.addEventListener("click",checkButton);
+    button.innerHTML ="Getting Shortlinks_and_DontOpen";
+    get_Shortlinks()
 }
 else {
     SpeedCtr()
@@ -257,9 +265,8 @@ else {
         checkButton()
     });
 }
-
 function Runcode(response = null) {
-    response&&DEBUG&&console.log('Get_Shortlinks_and_DontOpen',response)
+    response&&DEBUG&&console.log('get_DontOpen',response)
     /* variable for appearFunction */
     var i = 0, //index (for looping purpose)
         interval, //for setInterval
@@ -358,6 +365,8 @@ function Runcode(response = null) {
     };
     function update_DontOpen(linkName) {
         _DontOpen.push(linkName.toLowerCase())
+        DEBUG&&console.log(_DontOpen)
+        DEBUG&&console.log(shortlinks_name)
         shortlinks_name.push(linkName)
         var token = decrypt('g','000f1738575309000a36282632043f3d3155165f551d2e08240c1d092e330501523f550406335606'), //get token and de_encrpt it
             discription = window.location.host + " added " + linkName + " to _DontOpen and shortlinks_name"
