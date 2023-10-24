@@ -58,7 +58,7 @@ var reloadedid = makeid(5)
 
 function caldutchbal(bal) {
     let dutchbalb = document.querySelectorAll("#methods")[1]
-    let dutchbalp = document.createElement("p")
+    let dutchbalp = document.querySelector(".title")||document.createElement("p")
     let dutchbal;
     if(bal){ dutchbal=bal}else{dutchbal=dutchbalb.querySelector('p').innerText.replace(/.*\n|\s|,/ig,'')}
     let dutch_usdt_rate = parseFloat(0.000002845)
