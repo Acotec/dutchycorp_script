@@ -86,7 +86,7 @@ function OnPhone() {
 GM_registerMenuCommand("OnPhone-" + GM_getValue('OnPhone', false), OnPhone, "OnPhone");
 
 function AutoUpdateDontOpen() {
-    GM_setValue("AutoUpdate", true)
+    GM_getValue("AutoUpdate",'notset')=='notset'&&GM_setValue("AutoUpdate", true)
     var AutoUpdateB = document.createElement("button"),
         AutoUpdate = document.getElementsByClassName('col s12 center-align')[1]
     AutoUpdate.appendChild(AutoUpdateB);
@@ -113,6 +113,35 @@ function AutoUpdateDontOpen() {
     } catch (err) {}
 }
 
+function TabLimit() {
+    GM_getValue("TabLimit",'notset')=='notset'&&GM_setValue("TabLimit", true)
+    var TabLimitB = document.createElement("button"),
+        TabLimit = document.getElementsByClassName('col s12 center-align')[1]
+    TabLimit.appendChild(TabLimitB);
+    try {
+        if (GM_getValue("TabLimit", true)) {
+            TabLimitB.innerHTML = 'TabLimit_ON';
+            TabLimitB.style = "background-color:Violet;color:white"
+        } else {
+            GM_setValue("TabLimit", false)
+            TabLimitB.innerHTML = 'TabLimit_OFF';
+            TabLimitB.style = "background-color:black;color:white"
+        }
+        TabLimitB.addEventListener('click', function(e) {
+            if (GM_getValue("TabLimit", true)) {
+                GM_setValue("TabLimit", false);
+                TabLimitB.innerHTML = 'TabLimit_OFF';
+                TabLimitB.style = "background-color:black;color:white"
+            } else {
+                GM_setValue("TabLimit", true);
+                TabLimitB.innerHTML = 'TabLimit_ON'
+                TabLimitB.style = "background-color:Violet;color:white"
+            }
+        });
+    } catch (err) {}
+}
+
+
 function checkButton() {
     if (GM_getValue("_alreadyRun") == true) {
         GM_setValue("_alreadyRun", false);
@@ -127,6 +156,7 @@ function checkButton() {
 }
 
 function static_speed() {
+    GM_getValue("static",'notset')=='notset'&&GM_setValue("static",false)
     let staticB = document.createElement("button"),
         static = document.getElementsByClassName('col s12 center-align')[1]
     static.appendChild(staticB);
@@ -185,6 +215,7 @@ function SpeedCtr() {
     static_speed()
 }
 
+TabLimit()
 AutoUpdateDontOpen() //run
 var random_num=()=>{return Math.floor(101*Math.random())}
 //function to get the shortlinks
@@ -529,72 +560,84 @@ function Runcode(response = null) {
                                 if (exFirstNum >= 0) {
                                     clearInterval(interval)
                                     DEBUG&&console.log("\ni=" + i,'linkName=' + linkName, "\nviews_left=" + exFirstNum + "/" + views_left, '\nduration using is', (duration / 1000) + ' seconds', "\nlimit=" + limit, "\nTotalreward=" + totalReward1)
-                                    //clickOnEle(open_link)
-                                    open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
-                                    open_link.click()
-                                    let url;
-                                    if(!/extend_claim_count/ig.test(open_link.href)){
-                                        DEBUG&&console.log('HREF NOT AVAILABLE,GENERATING THE HREF');
-                                        url =`https://autofaucet.dutchycorp.space${open_link.getAttribute('onmousedown').split(',')[1].replace(/\s|\(|\)|;|'/ig,'')}`;
-                                    }else{
-                                        url =open_link.href;
-                                    };
-                                    DEBUG&&console.log(url);
-                                    const tinfo = GM_openInTab(url,{active:true,
-                                                                    insert:false,
-                                                                    setParent:true,
-                                                                    incognito:false,
-                                                                    loadInbackground:true});
-                                    tinfo.name =linkName.toLowerCase();
-                                    window.name =linkName.toLowerCase();
-                                    tabs.push(tinfo)
-                                    checkcount(count)
-                                    count++;
-                                    //DEBUG&&console.log('open tab count is now ',count);
-                                    duration = addtoduration
-                                    waitUntil(_=>max_tab>count)
-                                        .then(_=>{
-                                        checkcount(count)
-                                        DEBUG&&console.log('opening tab is less than or equal to ',count);
+                                    if (GM_getValue("TabLimit",false)==false) {
+                                        clickOnEle(open_link)
+                                        clickOnEle(open_link)
+                                        duration += addtoduration
                                         timerId = setTimeout(call, duration);
-                                        waitUntil(_=>tinfo.closed)
-                                            .then(_=>{window.name='';
-                                                      DEBUG&&console.log('open tab remain ',count);
-                                                      checkcount(count)
-                                                      count--
-                                                      tabs.shift();
-                                                     })
+                                    }
+                                    else {
+                                        open_link.addEventListener("click", function(cancel){cancel.preventDefault()});
+                                        open_link.click()
+                                        let url;
+                                        if(!/extend_claim_count/ig.test(open_link.href)){
+                                            DEBUG&&console.log('HREF NOT AVAILABLE,GENERATING THE HREF');
+                                            url =`https://autofaucet.dutchycorp.space${open_link.getAttribute('onmousedown').split(',')[1].replace(/\s|\(|\)|;|'/ig,'')}`;
+                                        }else{
+                                            url =open_link.href;
+                                        };
+                                        DEBUG&&console.log(url);
+                                        const tinfo = GM_openInTab(url,{active:true,
+                                                                        insert:false,
+                                                                        setParent:true,
+                                                                        incognito:false,
+                                                                        loadInbackground:true});
+                                        tinfo.name =linkName.toLowerCase();
+                                        window.name =linkName.toLowerCase();
+                                        tabs.push(tinfo)
+                                        checkcount(count)
+                                        count++;
+                                        //DEBUG&&console.log('open tab count is now ',count);
+                                        duration = addtoduration
+                                        waitUntil(_=>max_tab>count)
+                                            .then(_=>{
+                                            checkcount(count)
+                                            DEBUG&&console.log('opening tab is less than or equal to ',count);
+                                            timerId = setTimeout(call, duration);
+                                            waitUntil(_=>tinfo.closed)
+                                                .then(_=>{window.name='';
+                                                          DEBUG&&console.log('open tab remain ',count);
+                                                          checkcount(count)
+                                                          count--
+                                                          tabs.shift();
+                                                         })
+                                                .catch(_=>{DEBUG&&console.log(_);
+                                                           count=0;
+                                                           tabs.forEach((e)=>{e.close()});
+                                                           tabs=[];
+                                                           DEBUG&&console.log('open tab reset');
+                                                          })
+                                        })
                                             .catch(_=>{DEBUG&&console.log(_);
-                                                       count=0;
-                                                       tabs.forEach((e)=>{e.close()});
-                                                       tabs=[];
-                                                       DEBUG&&console.log('open tab reset');
+                                                       DEBUG&&console.log('open tab is more than 5');
                                                       })
-                                    })
-                                        .catch(_=>{DEBUG&&console.log(_);
-                                                   DEBUG&&console.log('open tab is more than 5');
-                                                  })
+                                    }
 
                                 } else {
                                     DEBUG&&console.log('linkName=' + linkName, "no view left", '\nduration using is', (duration / 1000) + ' seconds')
                                     clearInterval(interval)
                                     clearTimeout(timerId)
-                                    duration =1//getduration(i)
-                                    let wait=(count+1)*10000
-                                    DEBUG&&console.log('waiting',wait/1000,'seconds');
-                                    waitUntil(_=>count<=1,wait)
-                                        .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
-                                                  window.name='';
-                                                  checkcount(count)
-                                                  appear()
-                                                 })
-                                        .catch(_=>{DEBUG&&console.log(_);
-                                                   DEBUG&&console.log(tabs)
-                                                   count=0;
-                                                   tabs.forEach((e)=>{e.close()});
-                                                   window.name='';
-                                                   appear()
-                                                  })
+                                    if (GM_getValue("TabLimit",false)==false) {
+                                        duration = getduration(i)
+                                        appear()
+                                    }else{
+                                        duration =1//getduration(i)
+                                        let wait=(count+1)*10000
+                                        DEBUG&&console.log('waiting',wait/1000,'seconds');
+                                        waitUntil(_=>count<=1,wait)
+                                            .then(_=>{DEBUG&&console.log('the wait is over opening new shortlinks ',count);
+                                                      window.name='';
+                                                      checkcount(count)
+                                                      appear()
+                                                     })
+                                            .catch(_=>{DEBUG&&console.log(_);
+                                                       DEBUG&&console.log(tabs)
+                                                       count=0;
+                                                       tabs.forEach((e)=>{e.close()});
+                                                       window.name='';
+                                                       appear()
+                                                      })
+                                    }
                                 }
                             }, duration);
                         } else {
