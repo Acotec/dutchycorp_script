@@ -663,7 +663,7 @@
             const data = await response.json();
             let message = data.message;
 
-            if (!message&&message!="") {
+             if (data.result&&!message) {
                 sessionStorage.removeItem('tryagain');
                 const originalurl = new URL(data.result);
                 DEBUG && console.log(originalurl);
