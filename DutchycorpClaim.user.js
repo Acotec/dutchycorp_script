@@ -230,7 +230,8 @@ function get_Shortlinks(){
                 fetch: false,
                 nocache: false,
                 timeout:10000,
-                onload:(e)=>{GM_setValue("_alreadyRun", true);get_DontOpen(e)},
+                onload:(e)=>{//GM_setValue("_alreadyRun", true);
+                    get_DontOpen(e)},
                 onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
                                button.innerHTML ="Error Getting Shortlinks "+random_num();
                                setTimeout(()=>{get_Shortlinks()//get_DontOpen()
@@ -278,6 +279,7 @@ function get_DontOpen(response=null) {
                      },
     });
 }
+
 if (GM_getValue("_alreadyRun") != true){
     body.appendChild(button);
     button.addEventListener("click",checkButton);
@@ -669,6 +671,7 @@ function Runcode(response = null) {
                 DEBUG&&console.log('recalling appear and duration using is', (duration / 1000))
                 appear(); //re-run
             } else {
+                GM_setValue("_alreadyRun", true);
                 clearInterval(interval);
                 i = 0; //reset
                 DEBUG&&console.log('Done opening')
