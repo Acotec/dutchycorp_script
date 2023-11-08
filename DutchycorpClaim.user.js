@@ -687,7 +687,7 @@ function Runcode(response = null) {
     SpeedCtr()
 
     function main() {
-        GM_setValue("_alreadyRun", true);
+        //GM_setValue("_alreadyRun", true);
         appear();
 
     }
