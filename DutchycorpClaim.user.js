@@ -226,7 +226,7 @@ function get_Shortlinks(){
             DEBUG&&console.log('AUTOUPDATE IS ON')
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
+                url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?' + (+new Date()),
                 fetch: true,
                 timeout:10000,
                 onload:(e)=>{//GM_setValue("_alreadyRun", true);
@@ -258,7 +258,7 @@ function get_DontOpen(response=null) {
         shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());}
     GM_xmlhttpRequest({
         method: 'GET',
-        url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
+        url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?' + (+new Date()),
         fetch: true,
         timeout:10000,
         onload: Runcode,
