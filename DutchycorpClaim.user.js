@@ -227,8 +227,7 @@ function get_Shortlinks(){
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?timestamp=' + (+new Date()),
-                fetch: false,
-                nocache: false,
+                fetch: true,
                 timeout:10000,
                 onload:(e)=>{//GM_setValue("_alreadyRun", true);
                     get_DontOpen(e)},
@@ -260,8 +259,7 @@ function get_DontOpen(response=null) {
     GM_xmlhttpRequest({
         method: 'GET',
         url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?timestamp=' + (+new Date()),
-        fetch: false,
-        nocache: false,
+        fetch: true,
         timeout:10000,
         onload: Runcode,
         onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
