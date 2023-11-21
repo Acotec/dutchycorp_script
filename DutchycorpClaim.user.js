@@ -218,6 +218,7 @@ function SpeedCtr() {
 TabLimit()
 AutoUpdateDontOpen() //run
 var random_num=()=>{return Math.floor(101*Math.random())}
+var retry_time=0
 //function to get the shortlinks
 function get_Shortlinks(){
     let time=2000
@@ -228,17 +229,35 @@ function get_Shortlinks(){
                 method: 'GET',
                 url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/shortlinks_name.txt?' + (+new Date()),
                 fetch: true,
-                timeout:10000,
+                timeout:5000,
                 onload:(e)=>{//GM_setValue("_alreadyRun", true);
-                    get_DontOpen(e)},
+                    GM_setValue("_DontOpen",e.responseText)
+                    let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                    get_DontOpen(res)},
                 onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
                                button.innerHTML ="Error Getting Shortlinks "+random_num();
-                               setTimeout(()=>{get_Shortlinks()//get_DontOpen()
-                                              },time)},
+                               if(retry_time>=3){
+                                   let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                                   button.innerHTML ="Using Cached Shortlinks";
+                                   get_DontOpen(res)
+                               }else{
+                                   retry_time+=1
+                                   setTimeout(()=>{get_Shortlinks()//get_DontOpen()
+                                                  },time)
+                               }
+                              },
                 ontimeout:(e)=>{DEBUG&&console.log('Getting Shortlinks timed out',e);
                                 button.innerHTML ='Getting Shortlinks timed out '+random_num();
-                                setTimeout(()=>{get_Shortlinks()//get_DontOpen()
-                                               },time)},
+                                if(retry_time>=3){
+                                    let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                                    button.innerHTML ="Using Cached Shortlinks";
+                                    get_DontOpen(res)
+                                }else{
+                                    retry_time+=1
+                                    setTimeout(()=>{get_Shortlinks()//get_DontOpen()
+                                                   },time)
+                                }
+                               },
                 onabort:(e)=>{DEBUG&&console.log('Getting Shortlinks request_abort');
                               button.innerHTML ='Getting Shortlinks request_abort '+random_num();
                               setTimeout(()=>{get_Shortlinks()//get_DontOpen()
@@ -254,24 +273,44 @@ function get_Shortlinks(){
 function get_DontOpen(response=null) {
     let time=2000
     if (response){
-        let get_shortlinks_name =response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+        let get_shortlinks_name =response//.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+        console.log(typeof(get_shortlinks_name),get_shortlinks_name)
         shortlinks_name = get_shortlinks_name.map(item => item.replace(/'/ig, '"').toLowerCase());}
     GM_xmlhttpRequest({
         method: 'GET',
         url: 'http://gist.github.com/Harfho/' + gist_id + '/raw/_DontOpen.txt?' + (+new Date()),
         fetch: true,
-        timeout:10000,
-        onload: Runcode,
+        timeout:5000,
+        onload:(e)=>{
+            GM_setValue("shortlinks_name",e.responseText);
+            let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+            Runcode(res)
+        },
         onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
                        button.innerHTML ="Error Getting Dont open "+random_num();
-                       setTimeout(()=>{get_DontOpen(e)},time)},
+                       if(retry_time>=6){
+                           let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                           button.innerHTML ="Using Cached DontOpen Shortlinks ";
+                           Runcode(res)
+                       }else{
+                           retry_time+=1
+                           setTimeout(()=>{get_DontOpen()},time);
+                       }
+                      },
         ontimeout:(e)=>{DEBUG&&console.log('Getting Dontopen timed out',e)
                         button.innerHTML='Getting Dontopen timed out '+random_num();
-                        setTimeout(()=>{get_DontOpen()},time);
+                        if(retry_time>=6){
+                            let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                            button.innerHTML ="Using Cached DontOpen Shortlinks ";
+                            Runcode(res)
+                        }else{
+                            retry_time+=1
+                            setTimeout(()=>{get_DontOpen()},time);
+                        }
                         //Runcode(null)
                        },
-        onabort:(e)=>{DEBUG&&console.log('Getting Dontopen equest_abort');
-                      button.innerHTML ='Getting Dontopen equest_abort '+random_num();
+        onabort:(e)=>{DEBUG&&console.log('Getting Dontopen request_abort');
+                      button.innerHTML ='Getting Dontopen request_abort '+random_num();
                       setTimeout(()=>{get_DontOpen()},time);
                       //Runcode(null)
                      },
@@ -305,7 +344,7 @@ function Runcode(response = null) {
         duration; //for setInterval duration
 
     if (GM_getValue('AutoUpdate')&&response) {
-        let getDontOpen = response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+        let getDontOpen = response//response.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         _DontOpen = getDontOpen.map(item => item.replace(/'/ig, '"').toLowerCase())
     } else {
         _DontOpen = _DontOpen.map(item => item.replace(/'/ig, '"').toLowerCase());
