@@ -222,6 +222,7 @@ var retry_time=0
 //function to get the shortlinks
 function get_Shortlinks(){
     let time=2000
+    let retry=2
     if (GM_getValue("_alreadyRun") != true) {
         if (GM_getValue("AutoUpdate")) {
             DEBUG&&console.log('AUTOUPDATE IS ON')
@@ -235,9 +236,9 @@ function get_Shortlinks(){
                     let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
                     get_DontOpen(res)},
                 onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
-                               if(retry_time>=3){
+                               if(retry_time>=retry){
                                    let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-                                   button.innerHTML ="Using Cached Shortlinks";
+                                   button.innerHTML ="(Error)Using Cached Shortlinks";
                                    get_DontOpen(res)
                                }else{
                                    retry_time+=1;
@@ -247,9 +248,9 @@ function get_Shortlinks(){
                                }
                               },
                 ontimeout:(e)=>{DEBUG&&console.log('Getting Shortlinks timed out',e);
-                                if(retry_time>=3){
+                                if(retry_time>=retry){
                                     let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-                                    button.innerHTML ="Using Cached Shortlinks";
+                                    button.innerHTML ="(Timedout)Using Cached Shortlinks";
                                     get_DontOpen(res)
                                 }else{
                                     retry_time+=1;
@@ -272,6 +273,7 @@ function get_Shortlinks(){
 }
 function get_DontOpen(response=null) {
     let time=2000
+    let retry=4
     if (response){
         let get_shortlinks_name =response//.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         console.log(typeof(get_shortlinks_name),get_shortlinks_name)
@@ -287,9 +289,9 @@ function get_DontOpen(response=null) {
             Runcode(res)
         },
         onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
-                       if(retry_time>=6){
+                       if(retry_time>=retry){
                            let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-                           button.innerHTML ="Using Cached DontOpen Shortlinks ";
+                           button.innerHTML ="(Error)Using Cached DontOpen Shortlinks ";
                            Runcode(res)
                        }else{
                            retry_time+=1;
@@ -298,9 +300,9 @@ function get_DontOpen(response=null) {
                        }
                       },
         ontimeout:(e)=>{DEBUG&&console.log('Getting Dontopen timed out',e)
-                        if(retry_time>=6){
+                        if(retry_time>=retry){
                             let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-                            button.innerHTML ="Using Cached DontOpen Shortlinks ";
+                            button.innerHTML ="(Timedout)Using Cached DontOpen Shortlinks ";
                             Runcode(res)
                         }else{
                             retry_time+=1;
@@ -716,7 +718,7 @@ function Runcode(response = null) {
                 button.innerHTML = "Done opening-Click to Run Again=[" + caldutchbal(totalReward1) + '] out of ' + caldutchbal(totalReward)
                 clearInterval(interval)
                 //Re_run()
-                //window.close();//window.close()
+                window.close();window.close()
             }
         }, duration);
     }
