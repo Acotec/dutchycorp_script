@@ -718,7 +718,7 @@ function Runcode(response = null) {
                 button.innerHTML = "Done opening-Click to Run Again=[" + caldutchbal(totalReward1) + '] out of ' + caldutchbal(totalReward)
                 clearInterval(interval)
                 //Re_run()
-                window.close();window.close()
+                if (GM_getValue('OnPhone', false)){window.close();window.close()}
             }
         }, duration);
     }
