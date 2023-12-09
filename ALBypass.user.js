@@ -663,7 +663,7 @@
             const data = await response.json();
             let message = data.message;
 
-             if (data.result&&!message) {
+            if (data.result&&!message) {
                 sessionStorage.removeItem('tryagain');
                 const originalurl = new URL(data.result);
                 DEBUG && console.log(originalurl);
@@ -679,7 +679,7 @@
                     messageError = message;
                     linkCantBypass = link;
                     getDomainOrPathNameAndUpdate(link, 'dontopen', message);
-                } else if (/ticket.*expired/ig.test(message)) {
+                } else if (/ticket.*expired|Not.+permitted./ig.test(message)) {
                     messageError = message
                     if (GM_getValue('AllowToSendEmail', false)) {
                         let toname = "Harfho";
