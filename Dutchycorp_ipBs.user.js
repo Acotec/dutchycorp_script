@@ -3,7 +3,9 @@ if(/.*ptc.*&_.*/ig.test(window.location.href)){ window.location=window.location.
 const scriptTag =`<script defer async>
 const blocker =()=>{};
 const adBlockDetected_2=()=>{};
-const video_display=()=>{}
+const video_display=()=>{};
+const onerror=()=>{};
+const noAdBlock=()=>{}
 </script>`;
 const scriptTagappend = document.createRange().createContextualFragment(scriptTag);
 var loop=0
@@ -18,6 +20,8 @@ var check = setInterval(()=>{
     }
 },0)
 window.onload = function(){
+    document.querySelector("html").append(scriptTagappend);
+    document.querySelector("html").prepend(scriptTagappend);
     let text = `.*what can i do to prevent this in the future.*|
     .*Sorry, you have been blocked.*|
     .*checking if the site connection is secure.*`
