@@ -60,7 +60,7 @@ function caldutchbal(bal) {
     let dutchbalb = document.querySelectorAll("#methods")[1]
     let dutchbalp = document.querySelector(".title")||document.createElement("p")
     let dutchbal;
-    if(bal){ dutchbal=bal}else{dutchbal=dutchbalb.querySelector('p').innerText.replace(/.*\n|\s|,/ig,'')}
+    if(bal){ dutchbal=bal}else{dutchbal=dutchbalb.querySelector('p').innerText.replace(/.*\n|\s|,|\+.+/ig,'')}
     let dutch_usdt_rate = parseFloat(0.000002845)
     let calusdt = dutch_usdt_rate * dutchbal
     let calperc = ((5 / 100) * calusdt).toFixed(8)
