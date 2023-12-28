@@ -33,6 +33,7 @@
         console.log(ps,crypt_ps,decrypt_ps,gen)
         return gen
     }
+    setTimeout(()=>{
     var can_continue=window.confirm(`HAVE YOU CHANGE YOUR IP?\nYES(OK)--NO(Cancel).\n\n(Don't click(OK) if you have not change your IP!).\nElse you will lose your refferer.`);
     if(can_continue){
         //if (confirm("ARE YOU SURE YOU HAVE CHANGE YOUR IP?\nYES(ok)     NO(Cancel)")){null}else{alert("CHANGE YOUR IP");throw Error};
@@ -67,4 +68,5 @@
         document.querySelector('input[name*="password"]').value=ps
         document.querySelector('input[name*="passwordConf"]').value=ps
     });
+},2000)
 })();
