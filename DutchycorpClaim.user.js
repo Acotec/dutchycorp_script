@@ -1,6 +1,7 @@
 const DEBUG =false;
 $('#DUTCHY-price-informations,#coupon').remove();
 document.querySelector("#mobile-demo").innerHTML = document.querySelector(".user_avatar+b").innerText
+
 var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     shortlinks_name = GM_getResourceText("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e),
     _open_link_fast = [].map(e => e.toLowerCase()),
@@ -125,7 +126,6 @@ function TabLimit() {
         });
     } catch (err) {}
 }
-
 
 function checkButton() {
     if (GM_getValue("_alreadyRun") == true) {
@@ -304,6 +304,11 @@ function get_DontOpen(response=null) {
     });
 }
 
+if(/key/ig.test(window.location.href)){
+    DEBUG&&console.log('Dont Run Script ON This Page')
+    throw new Error('Dont Run Script ON This Page')
+};
+
 if (GM_getValue("_alreadyRun") != true){
     body.appendChild(button);
     button.addEventListener("click",checkButton);
@@ -322,6 +327,7 @@ else {
         checkButton()
     });
 }
+
 function Runcode(response = null) {
     DEBUG&&console.log('get_DontOpen',response)
     /* variable for appearFunction */
