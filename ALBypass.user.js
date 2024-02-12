@@ -853,7 +853,7 @@
         "Bypass"
     );
     //autofaucet.dutcycorp.space
-    if (/.+shortlinks-wall.php(?:\?r=s)?$/gi.test(decodeURIComponent(window.location.href))) {
+    if (/.+shortlinks-wall.php(?:\?r=.+)?$/gi.test(decodeURIComponent(window.location.href))) {
         GM_addValueChangeListener(
             "shortner_name",
             function (name, old_value, new_value, remote) {
