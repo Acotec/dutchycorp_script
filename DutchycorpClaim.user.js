@@ -258,7 +258,7 @@ function get_Shortlinks(){
 }
 function get_DontOpen(response=null) {
     let time=2000
-    let retry=4
+    let retry=3
     if (response){
         let get_shortlinks_name =response//.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
         console.log(typeof(get_shortlinks_name),get_shortlinks_name)
