@@ -427,6 +427,10 @@ function Runcode(response = null) {
             .join("");
     };
     function update_DontOpen(linkName) {
+        if(/notauthenticated|proxyusernameandport/ig.test(linkname)){
+            DEBUG&&console.log('Wrong Shortlink_Name');
+            return
+        }
         _DontOpen.push(linkName.toLowerCase())
         DEBUG&&console.log(_DontOpen)
         DEBUG&&console.log(shortlinks_name)
