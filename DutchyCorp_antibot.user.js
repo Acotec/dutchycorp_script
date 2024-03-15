@@ -74,15 +74,20 @@
         let username = document.querySelector("ul li .user_avatar + b").innerText.trim()
         function checkLinks() {
             Array.from(shortlinkBtn).forEach((btn, i) => {
-                const onclick = btn.getAttribute('onclick');
-                const match = onclick.match(/ad_display\('square',\s*(\d+)\)/);
-                if (match) {
-                    const id = match[1];
-                    btn.setAttribute('target', '_blank');
-                    btn.setAttribute('href', `/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`);
-                    btn.removeAttribute('onclick');
-                    btn.removeAttribute('onmousedown');
-                    //console.log(btn);
+                try{
+                    const onclick = btn.getAttribute('onclick');
+                    const match = onclick.match(/ad_display\('square',\s*(\d+)\)/);
+                    if (match) {
+                        const id = match[1];
+                        btn.setAttribute('target', '_blank');
+                        btn.setAttribute('href', `/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`);
+                        btn.removeAttribute('onclick');
+                        btn.removeAttribute('onmousedown');
+                        //console.log(btn);
+                    }
+                }catch(err){
+                    console.error(err)
+                    console.info(err)
                 }
             });
         }
