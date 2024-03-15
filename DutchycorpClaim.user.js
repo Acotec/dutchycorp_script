@@ -9,7 +9,8 @@ var _DontOpen = GM_getResourceText("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').sp
     _views_ToVisit = Array.from(document.getElementsByClassName("col s12 m6 l4")),
     _available_link = parseInt(document.getElementsByClassName("accent-text")[0].textContent.replace(/.*\(/ig, '').replace(/[\W].*/, '')),
     button = document.createElement("button"),
-    body = document.getElementsByClassName('col s12 m12 l4 center-align')[0], // card col s8 m4
+    body = document.getElementsByClassName('col s12 center-align')[0],
+    body1 = document.getElementsByClassName('col s12 center-align')[0],
     gist_id = "493dc66ecebd58a75b730a77ef676632";
 var linknames = [],
     totalReward = 0,
@@ -171,8 +172,7 @@ function static_speed() {
 GM_getValue('speed', null) || GM_setValue('speed', 0)
 
 function SpeedCtr() {
-    var speed = GM_getValue('speed', null); //the duration speed
-    var body1 = document.getElementsByClassName('col s12 m12 l4 center-align')[0],
+    var speed = GM_getValue('speed', null); //the duration speed    
         dis = document.createElement("p"),
         speed_add = document.createElement("button"),
         speed_sub = document.createElement("button");
