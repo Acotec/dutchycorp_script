@@ -173,7 +173,7 @@ GM_getValue('speed', null) || GM_setValue('speed', 0)
 
 function SpeedCtr() {
     var speed = GM_getValue('speed', null); //the duration speed    
-        dis = document.createElement("p"),
+    dis = document.createElement("p"),
         speed_add = document.createElement("button"),
         speed_sub = document.createElement("button");
     dis.classList.add('speed');
@@ -217,6 +217,12 @@ function get_Shortlinks(){
                 fetch: true,
                 timeout:5000,
                 onload:(e)=>{//GM_setValue("_alreadyRun", true);
+                    if(/notauthenticated|proxyusernameandport/ig.test(e)){
+                        let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                        button.innerHTML ="(Error)Using Cached Shortlinks ";
+                        Runcode(res)
+                        return
+                    }
                     GM_setValue("shortlinks_name",e.responseText)
                     let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
                     get_DontOpen(res)},
@@ -269,6 +275,12 @@ function get_DontOpen(response=null) {
         fetch: true,
         timeout:5000,
         onload:(e)=>{
+            if(/notauthenticated|proxyusernameandport/ig.test(e)){
+                let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
+                button.innerHTML ="(Error)Using Cached DontOpen Shortlinks ";
+                Runcode(res)
+                return
+            }
             GM_setValue("_DontOpen",e.responseText);
             let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
             Runcode(res)
