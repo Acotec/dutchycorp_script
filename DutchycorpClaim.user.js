@@ -217,11 +217,10 @@ function get_Shortlinks(){
                 fetch: true,
                 timeout:5000,
                 onload:(e)=>{//GM_setValue("_alreadyRun", true);
-                    if(/notauthenticated|proxyusernameandport/ig.test(e)){
+                    if(/notauthenticated|proxyusernameandport/ig.test(e.responseText)){
                         let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
                         button.innerHTML ="(Error)Using Cached Shortlinks ";
                         Runcode(res)
-                        return
                     }
                     GM_setValue("shortlinks_name",e.responseText)
                     let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
@@ -275,11 +274,10 @@ function get_DontOpen(response=null) {
         fetch: true,
         timeout:5000,
         onload:(e)=>{
-            if(/notauthenticated|proxyusernameandport/ig.test(e)){
+            if(/notauthenticated|proxyusernameandport/ig.test(e.responseText)){
                 let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
                 button.innerHTML ="(Error)Using Cached DontOpen Shortlinks ";
                 Runcode(res)
-                return
             }
             GM_setValue("_DontOpen",e.responseText);
             let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
