@@ -221,10 +221,11 @@ function get_Shortlinks(){
                         let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
                         button.innerHTML ="(Error)Using Cached Shortlinks ";
                         Runcode(res)
-                    }
+                    }else{
                     GM_setValue("shortlinks_name",e.responseText)
                     let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-                    get_DontOpen(res)},
+                    get_DontOpen(res)}
+                            },
                 onerror: (e)=>{DEBUG&&console.log('Error getting Shortlinks',e);
                                if(retry_time>=retry){
                                    let res=GM_getValue("shortlinks_name").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
@@ -278,10 +279,11 @@ function get_DontOpen(response=null) {
                 let res=GM_getValue("_DontOpen").replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
                 button.innerHTML ="(Error)Using Cached DontOpen Shortlinks ";
                 Runcode(res)
-            }
+            }else{
             GM_setValue("_DontOpen",e.responseText);
             let res=e.responseText.replace(/'|"|\[|\]|\s/ig, '').split(',').filter(e => e);
-            Runcode(res)
+            Runcode(res) 
+            }
         },
         onerror: (e)=>{DEBUG&&console.log('error getting DontOpen',e);
                        if(retry_time>=retry){
