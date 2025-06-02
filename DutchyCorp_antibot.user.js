@@ -1,5 +1,5 @@
 (function() {
-    var solveantibot=false//
+    var solveantibot=true//
 
     if(solveantibot){
         var antibotid;
@@ -40,34 +40,64 @@
             simulateMouseEvent (theButton, "mouseup", coordX, coordY);
             simulateMouseEvent (theButton, "click", coordX, coordY);
         }
-        //var antibot= setInterval(isantibotvisible,2000)
-        function isantibotvisible(){
-            try{
-                let visible =document.getElementsByClassName("modal open")[0].style.display == "block"
-                let antibotid=document.getElementsByClassName("modal open")[0].id
-                console.log('waiting for antibotFrame')
-                if(visible){
-                    clearInterval(antibot)
-                    //alert('anti')
-                    setTimeout(()=>{
-                        let icon=Array.from(document.querySelector("#"+antibotid).getElementsByClassName("gradient-btn btn btn-secondary"))
-                        icon.forEach(img=>{
-                            let select =document.querySelector("#"+antibotid).innerText.replace(/[\W]/g,"").replace(/.*Select|Gosend/ig,'').trim();
-                            let icselect = img.getElementsByTagName('input')[0].value.replace(/[\W]/ig,"").trim();
-                            console.log(icselect,select)
-                            if(select == icselect){
-                                console.log("Antibot to select is - ",select)
-                                //waitForKeyElements(".waves-ripple", (element) =>{alert("OPEN")});
-                                console.log(img.getElementsByTagName('input')[0],"clicked");
-                                setTimeout(()=>{clickOnEle(img.getElementsByTagName('input')[0])},1000)
-                                setTimeout(()=>{clickOnEle(document.querySelector("#"+antibotid).querySelector('button'))},1000)
-                                setTimeout(()=>{window.location.reload()},2000)
-                            }
-                        })
-                    },1000)
-                };
-            }catch(e){}
+        var antibot= setInterval(isantibotvisible,2000)
+        async function isantibotvisible(){
+            try {
+                // Find visible modal by checking multiple indices
+                const modals = document.getElementsByClassName("modal open");
+                const modal = [0, 1, 2].reduce((found, index) => {
+                    if (found) return found;
+                    return modals[index]?.style?.display === "block" ? modals[index] : null;
+                }, null);
+
+                if (!modal) return;
+
+                const modalId = modal.id;
+                if (!modalId) return;
+
+                // Get all icon buttons
+                const icons = Array.from(
+                    document.querySelector("#" + modalId)
+                    .getElementsByClassName("gradient-btn btn btn-secondary")
+                );
+
+                // Get the text we need to match
+                const targetText = document
+                .querySelector("#" + modalId)
+                .innerText
+                .replace(/[\W]/g, "")
+                .replace(/.*Select|Gosend/ig, "")
+                .trim();
+
+                // Find and click matching icon
+                for (const icon of icons) {
+                    const input = icon.getElementsByTagName('input')[0];
+                    const iconText = input.value.replace(/[\W]/g, "").trim();
+
+                    if (targetText === iconText) {
+                        // Click the icon
+                        input.click();
+
+                        // Click confirm button after a short delay
+                        await setTimeout(() => {
+                            const confirmBtn = document
+                            .querySelector("#" + modalId)
+                            .querySelector('button');
+                            if (confirmBtn) confirmBtn.click();
+                        }, 1000);
+
+                        // Clean up modal
+                        modal.style.display = "none";
+                        const overlay = document.querySelector(".modal-overlay");
+                        if (overlay) overlay.click();
+                        break;
+                    }
+                }
+            } catch (error) {
+                console.error("Anti-bot handler error:", error);
+            }
         }
+
     }
     else{
         let shortlinkBtn = document.querySelectorAll("a.gradient-btn.btn");
@@ -75,14 +105,21 @@
         function checkLinks() {
             Array.from(shortlinkBtn).forEach((btn, i) => {
                 try{
+                    //btn.addEventListener("click", function(cancel){cancel.preventDefault()});
+                    //btn.click()
                     const onclick = btn.getAttribute('onclick');
                     const match = onclick.match(/ad_display\('square',\s*(\d+)\)/);
                     if (match) {
                         const id = match[1];
-                        btn.setAttribute('target', '_blank');
-                        btn.setAttribute('href', `/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`);
                         btn.removeAttribute('onclick');
                         btn.removeAttribute('onmousedown');
+                        btn.removeAttribute('href');
+                        //btn.setAttribute('target', '_blank');
+                        btn.setAttribute('href', `/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`);
+                        btn.setAttribute('data-tooltip',"Visit Shortlink")
+                        //btn.setAttribute('onmousedown',`$(this).attr('href', '/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`)
+                        //btn.setAttribute('onclick',`$(this).attr('href', '/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`)
+                        //btn.removeAttribute('onmousedown');
                         //console.log(btn);
                     }
                 }catch(err){
