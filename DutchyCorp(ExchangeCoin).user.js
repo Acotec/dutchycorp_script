@@ -1,5 +1,5 @@
 var exc, coin;
-var tocoin = "usdt"
+var tocoin = "ltc"
 var DEBUG = true
 function waitForKeyElements(t, o, e, i, n) {
     void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
