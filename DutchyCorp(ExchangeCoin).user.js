@@ -1,5 +1,6 @@
 var exc, coin;
 var tocoin = "ltc"
+var EXCHANGE_COIN = 'dutchy'
 var DEBUG = true
 function waitForKeyElements(t, o, e, i, n) {
     void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
@@ -48,25 +49,34 @@ function selectFromDropDown(elem,choose=null){
         DEBUG&&console.log(say)
     }
 }
-function select(coin = 'usdt', exc =null) {
+// Select exchange and target coins
+function select(coin = "USDT", exc = null) {
+    // Target the specific dropdowns using select element attributes
+    const targetCoinDropdown = document.querySelector('.select-wrapper select#coin_to_receive')?.closest('.select-wrapper');
+    const exchangeCoinDropdown = document.querySelector('.select-wrapper select:not(#coin_to_receive)')?.closest('.select-wrapper');
+
+    if (!targetCoinDropdown) {
+        DEBUG && console.error("Target coin dropdown (coin_to_receive) not found");
+        return;
+    }
+    if (exc && !exchangeCoinDropdown) {
+        DEBUG && console.error("Exchange coin dropdown not found");
+        return;
+    }
+
     if (exc) {
-        //DEBUG&&console.log("Exchanging", exc)
-        exc = exc
-        let elem= document.querySelectorAll(".select-wrapper")[0]
-        selectFromDropDown(elem,exc)
+        DEBUG && console.log("Selecting exchange coin:", exc);
+        selectFromDropDown(exchangeCoinDropdown, exc);
     }
     if (coin) {
-        //DEBUG&&console.log("To ", coin)
-        coin = coin
-        let elem = document.querySelectorAll(".select-wrapper")[1]
-        selectFromDropDown(elem,coin)
+        DEBUG && console.log("Selecting target coin:", coin);
+        selectFromDropDown(targetCoinDropdown, coin);
     } else {
-        DEBUG&&console.log('No currency claim yet ')
+        DEBUG && console.log("No target coin specified");
     }
-    exc = exc || "DUTCHY"
-    DEBUG&&console.log("Exchanging:", exc.toUpperCase(), "To:", coin.toUpperCase())
+    exc = exc || EXCHANGE_COIN;
+    DEBUG && console.log(`Exchanging: ${exc.toUpperCase()} To: ${coin.toUpperCase()}`);
 }
-
 function fill_in_and_exchange() {
     select(tocoin)
     //setTimeout(()=>{
