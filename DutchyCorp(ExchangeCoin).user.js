@@ -28,10 +28,6 @@ function replace_par(element){
     document.querySelector("#toast-container")&&document.querySelector("#toast-container").remove()
 }
 
-waitForKeyElements('.select-wrapper',fill_in_and_exchange,false,1000);
-
-waitForKeyElements('#user_exchange b',replace_par, false)
-waitForKeyElements("#toast-container",replace_par, false)
 
 function selectFromDropDown(elem,choose=null){
     if(choose&&elem){
@@ -95,3 +91,8 @@ function fill_in_and_exchange() {
             clearInterval(interval)}
     },1)
     }
+
+
+waitForKeyElements('.select-wrapper',fill_in_and_exchange,false,1000);
+waitForKeyElements('#user_exchange b',replace_par, false)
+waitForKeyElements("#toast-container",replace_par, false)
