@@ -1,6 +1,17 @@
 (function() {
     'use strict';
     var DEBUG =false
+
+    function isCloudflareVerificationPage() {
+        const h2Text = document.querySelector("h2")?.innerText.toLowerCase();
+        if (h2Text && h2Text.includes("verify")) {
+            console.log('Detected Cloudflare Turnstile verification page, stopping script execution');
+            return true;
+        }
+        return false;
+    }
+    if (isCloudflareVerificationPage()) return;s
+
     function waitForKeyElements(t, o, e, i, n) {
         void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
         var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -76,18 +87,22 @@
     }
 
     async function recaptchaSolution() {
+        if (isCloudflareVerificationPage()) return;
         async function recaptchaSolutionv2() {
+            if (isCloudflareVerificationPage()) return;
             if (grecaptcha && grecaptcha.getResponse().length > 0) {
                 replace_par('Processing Withdraw')
                 return grecaptcha.getResponse();
             } else {
                 DEBUG&&console.log('waiting for captcha');
                 replace_par('waiting for captcha')
+                if (isCloudflareVerificationPage()) return;
                 await wait(1000);
                 return recaptchaSolution();
             }
         };
         async function recaptchaSolutionv3() {
+            if (isCloudflareVerificationPage()) return;
             // V3 token
             var token = await grecaptcha.execute('6LctglAdAAAAAJmNg2xib4UQDYI1eDK5wIUFTXY9', {
                 action: 'submit'
@@ -104,6 +119,7 @@
         }
     }
     async function hcaptchaSolution() {
+        if (isCloudflareVerificationPage()) return;
         let captcha = new HCaptchaWidget();
         await captcha.isSolved();
         DEBUG&&console.log(captcha.element.getAttribute('data-hcaptcha-response'));
@@ -111,6 +127,7 @@
     }
 
     async function iconcaptchaSolution() {
+        if (isCloudflareVerificationPage()) return;
         var ic_id =document.getElementsByName('ic-hf-id')[0].value;
         var ic_se =document.getElementsByName('ic-hf-se')[0].value;
         if (ic_id.length > 0 || ic_se.length > 0) {
@@ -126,12 +143,14 @@
         } else {
             DEBUG&&console.log('waiting for icon_captcha');
             replace_par('waiting for icon_captcha')
+            if (isCloudflareVerificationPage()) return;
             await wait(1000);
             return iconcaptchaSolution();
         }
     };
 
     async function withdrawCoin(coin="",amount="",method="") {
+        if (isCloudflareVerificationPage()) return;
         DEBUG&&console.log('@withdrawCoin');
         function get_coin_amount(element){
             let r = document.querySelector(element)&&document.querySelector(element).innerText.split('\n')[1].split(' ');
@@ -149,6 +168,7 @@
 
     async function easyWithdrawal(coin, amount,method) {
         DEBUG&&console.log('@easyWithdrawal', coin, amount,method);
+        if (isCloudflareVerificationPage()) return;
         function detectCaptchaType() {
             // Check for reCAPTCHA
             if (document.querySelector('div[data-sitekey], iframe[src*="google.com/recaptcha/api.js"]')) {
@@ -169,6 +189,7 @@
             return 'reCAPTCHA';
         };
         async function getCaptchaSolution() {
+            if (isCloudflareVerificationPage()) return;
             const captchaType =await detectCaptchaType();
             console.log('Captcha type:', captchaType);
             switch (captchaType) {
@@ -242,6 +263,7 @@
     }
 
     setTimeout(() => {
+        if (isCloudflareVerificationPage()) return;
         addButton();
     }, 2000);
 })();
