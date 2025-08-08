@@ -2,6 +2,18 @@ var exc, coin;
 var tocoin = "ltc"
 var EXCHANGE_COIN = 'dutchy'
 var DEBUG = true
+
+function isCloudflareVerificationPage() {
+    const h2Text = document.querySelector("h2")?.innerText.toLowerCase();
+    if (h2Text && h2Text.includes("verify")) {
+        console.log('Detected Cloudflare Turnstile verification page, stopping script execution');
+        return true;
+    }
+    return false;
+}
+
+if (isCloudflareVerificationPage()) return;
+
 function waitForKeyElements(t, o, e, i, n) {
     void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
     var r = "function" == typeof t ? t() : document.querySelectorAll(t),
@@ -10,6 +22,7 @@ function waitForKeyElements(t, o, e, i, n) {
         var e = "data-userscript-alreadyFound";
         t.getAttribute(e) || !1 || (o(t) ? u = !1 : t.setAttribute(e, !0))
     }), 0 === n || u && e || (--n, setTimeout(function() {
+        if (isCloudflareVerificationPage()) return;
         waitForKeyElements(t, o, e, i, n)
     }, i))
 }
@@ -81,6 +94,7 @@ function fill_in_and_exchange() {
     amount_input.value = balance;
     let check=0
     let interval = setInterval(()=>{
+        if (isCloudflareVerificationPage()) return;
         let msg = document.querySelector("#user_exchange")||''
         if(msg.innerText==''){
             amount_input.dispatchEvent(new Event('change', {
