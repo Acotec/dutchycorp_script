@@ -10,7 +10,7 @@
         }
         return false;
     }
-    if (isCloudflareVerificationPage()) return;s
+    if (isCloudflareVerificationPage()) return;
 
     function waitForKeyElements(t, o, e, i, n) {
         void 0 === e && (e = !0), void 0 === i && (i = 300), void 0 === n && (n = -1);
@@ -20,6 +20,7 @@
             var e = "data-userscript-alreadyFound";
             t.getAttribute(e) || !1 || (o(t) ? u = !1 : t.setAttribute(e, !0))
         }), 0 === n || u && e || (--n, setTimeout(function() {
+             if (isCloudflareVerificationPage()) return;
             waitForKeyElements(t, o, e, i, n)
         }, i))
     }
