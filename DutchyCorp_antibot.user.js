@@ -1,6 +1,17 @@
 (function() {
     var solveantibot=true//
 
+    function isCloudflareVerificationPage() {
+        const h2Text = document.querySelector("h2")?.innerText.toLowerCase();
+        if (h2Text && h2Text.includes("verify")) {
+            console.log('Detected Cloudflare Turnstile verification page, stopping script execution');
+            return true;
+        }
+        return false;
+    }
+    if (isCloudflareVerificationPage()) return;
+
+
     if(solveantibot){
         var antibotid;
         function waitForKeyElements(t, o, e, i, n) {
@@ -11,6 +22,7 @@
                 var e = "data-userscript-alreadyFound";
                 t.getAttribute(e) || !1 || (o(t) ? u = !1 : t.setAttribute(e, !0))
             }), 0 === n || u && e || (--n, setTimeout(function () {
+                if (isCloudflareVerificationPage()) return;
                 waitForKeyElements(t, o, e, i, n)
             }, i))
         }
@@ -42,6 +54,7 @@
         }
         var antibot= setInterval(isantibotvisible,2000)
         async function isantibotvisible(){
+            if (isCloudflareVerificationPage()) return;
             try {
                 // Find visible modal by checking multiple indices
                 const modals = document.getElementsByClassName("modal open");
