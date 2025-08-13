@@ -4,12 +4,10 @@ var EXCHANGE_COIN = 'dutchy'
 var DEBUG = true
 
 function isCloudflareVerificationPage() {
-    const h2Text = document.querySelector("h2")?.innerText.toLowerCase();
-    if (h2Text && h2Text.includes("verify")) {
-        console.log('Detected Cloudflare Turnstile verification page, stopping script execution');
+    if(document.querySelector(".h2")?.innerText.toLowerCase().includes("verify") || document.querySelector("h2")?.innerText.toLowerCase().includes("verify")){
+        console.log("Turnstile Detected");
         return true;
     }
-    return false;
 }
 
 if (isCloudflareVerificationPage()) return;
@@ -106,7 +104,49 @@ function fill_in_and_exchange() {
     },1)
     }
 
+function waitForClickTargetCoin(timeout = 30000, interval = 1000) {
+    return new Promise((resolve, reject) => {
+        const start = Date.now();
+        const check = () => {
+            const item = localStorage.getItem('clickTargetCoin');
+            if (item) {
+                try {
+                    const parsed = JSON.parse(item);
+                    if (parsed.coin) {
+                        resolve(parsed.coin.toLowerCase());
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Invalid clickTargetCoin JSON:', e);
+                }
+            }
+            if (Date.now() - start > timeout) {
+                reject(new Error("Timeout: clickTargetCoin not found or invalid in localStorage"));
+            } else {
+                setTimeout(check, interval);
+            }
+        };
+        check();
+    });
+}
 
-waitForKeyElements('.select-wrapper',fill_in_and_exchange,false,1000);
-waitForKeyElements('#user_exchange b',replace_par, false)
-waitForKeyElements("#toast-container",replace_par, false)
+
+// Wrap rest of script logic inside the async keyword-loading block
+waitForClickTargetCoin()
+    .then((keyword) => {
+    tocoin = keyword;
+    DEBUG && console.log("✅ Loaded coin from localStorage:", tocoin);
+
+    waitForKeyElements('.select-wrapper', fill_in_and_exchange, false, 1000);
+    waitForKeyElements('#user_exchange b', replace_par, false);
+    waitForKeyElements("#toast-container", replace_par, false);
+})
+    .catch(err => {
+    console.warn(err.message);
+    DEBUG && console.log("⚠️ Using fallback coin:", tocoin);
+
+    waitForKeyElements('.select-wrapper', fill_in_and_exchange, false, 1000);
+    waitForKeyElements('#user_exchange b', replace_par, false);
+    waitForKeyElements("#toast-container", replace_par, false);
+});
+
