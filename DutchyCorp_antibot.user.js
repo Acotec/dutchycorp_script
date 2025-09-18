@@ -1,5 +1,5 @@
 (function() {
-    var solveantibot=true//
+    var solveantibot=false
 
     function isCloudflareVerificationPage() {
         const h2Text = document.querySelector("h2")?.innerText.toLowerCase();
@@ -116,31 +116,53 @@
         let shortlinkBtn = document.querySelectorAll("a.gradient-btn.btn");
         let username = document.querySelector("ul li .user_avatar + b").innerText.trim()
         function checkLinks() {
-            Array.from(shortlinkBtn).forEach((btn, i) => {
-                try{
-                    //btn.addEventListener("click", function(cancel){cancel.preventDefault()});
-                    //btn.click()
-                    const onclick = btn.getAttribute('onclick');
+            // capture username once and make it URL-safe
+            const user = encodeURIComponent(String(username || '').trim());
+
+            Array.from(shortlinkBtn || []).forEach((btn) => {
+                try {
+                    const onclick = btn.getAttribute('onclick') || '';
                     const match = onclick.match(/ad_display\('square',\s*(\d+)\)/);
-                    if (match) {
-                        const id = match[1];
-                        btn.removeAttribute('onclick');
-                        btn.removeAttribute('onmousedown');
-                        btn.removeAttribute('href');
-                        //btn.setAttribute('target', '_blank');
-                        btn.setAttribute('href', `/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`);
-                        btn.setAttribute('data-tooltip',"Visit Shortlink")
-                        //btn.setAttribute('onmousedown',`$(this).attr('href', '/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`)
-                        //btn.setAttribute('onclick',`$(this).attr('href', '/extend_claim_count_wall_nu_link_per_click_version.php?username=${username}&id=${id}`)
-                        //btn.removeAttribute('onmousedown');
-                        //console.log(btn);
+                    if (!match) return;
+
+                    const id = match[1];
+
+                    // Clean old inline handlers
+                    btn.removeAttribute('onclick');
+                    btn.removeAttribute('onmousedown');
+
+                    // Show a sane URL on hover (root-relative prevents duplicates)
+                    btn.setAttribute('href', `/shortlinks-wall/extend_claim_count.php?username=${user.toLowerCase()}&id=${parseInt(id)}`);
+                    btn.setAttribute('target', '_blank');
+                    btn.setAttribute('data-tooltip', 'Visit Shortlink');
+
+                    // Keep the id with the element so the handler always sees the right one
+                    btn.dataset.shortlinkId = id;
+
+                    // If we already attached a handler before, remove it to avoid duplicates
+                    if (btn._shortlinkHandler) {
+                        btn.removeEventListener('click', btn._shortlinkHandler);
                     }
-                }catch(err){
-                    console.error(err)
-                    console.info(err)
+
+                    // Attach a clean click handler
+                    const handler = function (e) {
+                        // compute the final URL at click-time using the element's own id
+                        const finalId = this.dataset.shortlinkId;
+                        const finalUrl = `/shortlinks-wall/extend_claim_count.php?username=${user.toLowerCase()}&id=${parseInt(finalId)}`;
+
+                        // update href and let the default navigation occur (opens in new tab due to target)
+                        this.href = finalUrl;
+                    };
+
+                    btn.addEventListener('click', handler);
+                    btn._shortlinkHandler = handler; // remember so we can remove/replace later if needed
+                } catch (err) {
+                    console.error('checkLinks error:', err);
                 }
             });
         }
+
+
         checkLinks();
     }
 
