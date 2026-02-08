@@ -61,7 +61,7 @@
                 let method = this.getAttribute('data-method');
                 withdrawCoin(coin, amount, method);
             };;
-            if(/exchange/ig.test(window.location.href)){
+            if(/convert/ig.test(window.location.href)){
                 let p_withdraw = document.createElement("p")
                 let p1_withdraw = document.createElement("p")
                 container2.parentNode.appendChild(p_withdraw);
