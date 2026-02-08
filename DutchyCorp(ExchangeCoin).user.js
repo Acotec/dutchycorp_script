@@ -57,7 +57,7 @@ function selectFromDropDown(elem,choose=null){
     }
 }
 // Select exchange and target coins
-function select(coin = "USDT", exc = null) {
+function select(coin = "USDT", exc = EXCHANGE_COIN) {
     // Target the specific dropdowns using select element attributes
     const targetCoinDropdown = document.querySelector('.select-wrapper select#coin_to_receive')?.closest('.select-wrapper');
     const exchangeCoinDropdown = document.querySelector('.select-wrapper select:not(#coin_to_receive)')?.closest('.select-wrapper');
@@ -84,8 +84,40 @@ function select(coin = "USDT", exc = null) {
     exc = exc || EXCHANGE_COIN;
     DEBUG && console.log(`Exchanging: ${exc.toUpperCase()} To: ${coin.toUpperCase()}`);
 }
+
+function selectCoinOption(parsed) {
+    const coin = parsed?.coin?.trim();
+    const useAllCoins = Math.random() < 0.5;
+
+    if (useAllCoins || !coin) {
+        console.log(`[Selection] Selected: All your Coins`);
+        return 'All your Coins';
+    } else {
+        console.log(`[Selection] Selected: ${coin}`);
+        return coin;
+    }
+}
+
 function fill_in_and_exchange() {
-    select(tocoin)
+    if(localStorage.getItem('swapCoin')){
+        //exc=localStorage.getItem('swapCoin')
+        const item = localStorage.getItem('swapCoin')
+        if (item) {
+            try {
+                const parsed = JSON.parse(item);
+                if (parsed.coin) {
+                    EXCHANGE_COIN=selectCoinOption(parsed);
+                    localStorage.removeItem('swapCoin')
+                }
+            } catch (e) {
+                console.warn('Invalid swapCoin JSON:', e);
+            }
+        }
+        //localStorage.removeItem('faucetPayValidBalances')
+    }
+
+    select(tocoin,EXCHANGE_COIN)
+    //select(tocoin)
     //setTimeout(()=>{
     let balance = document.querySelector("#balance_to_exchange").textContent.replace(/\D/ig, '')
     let amount_input = document.querySelector("#amount_to_exchange")
