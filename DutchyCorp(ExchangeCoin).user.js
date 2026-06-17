@@ -156,6 +156,10 @@ setTimeout(async () => {
 
     // ── Read clickTargetCoin from SS (namespaced — same key FaucetAutoWithdraw writes)
     async function waitForClickTargetCoin(timeout = 30000, interval = 1000) {
+        // --- ADDED: Let FaucetAutoWithdraw finish cleanup and state assignment ---
+        console.log("[DutchyExchange] Pausing 1000ms to allow main script state to stabilize...");
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
         const start = Date.now();
         return new Promise((resolve, reject) => {
             const check = async () => {
