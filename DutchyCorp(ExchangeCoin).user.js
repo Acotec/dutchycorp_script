@@ -37,7 +37,7 @@ function makeKeys(username) {
 const CLICK_TARGET_CACHE_EXPIRY = 60 * 60 * 1000; // 1 hour — matches FaucetAutoWithdraw
 
 setTimeout(async () => {
-    let tocoin        = "usdt";
+    let tocoin        = "aave";
     let EXCHANGE_COIN = 'dutchy';
     const DEBUG       = true;
 
@@ -52,7 +52,6 @@ setTimeout(async () => {
     if (isCloudflareVerificationPage()) return;
 
     // ── Resolve USERNAME first (same logic as FaucetAutoWithdraw) ────────────
-    // ── Resolve USERNAME from container bridge only — no localStorage ────────
     const profile = await getContainerProfile();
     const USERNAME = profile?.username ?? null;
     const EMAIL    = profile?.email    ?? null;
@@ -138,6 +137,17 @@ setTimeout(async () => {
 
         select(tocoin, EXCHANGE_COIN);
 
+        const existing = document.getElementById('dutchy-dropdown-set');
+        if (existing) existing.remove();
+
+        const marker = document.createElement('div');
+        marker.id = 'dutchy-dropdown-set';
+        marker.style.display = 'none';
+        document.body.appendChild(marker);
+        window.dutchyDropdownSet = true; // optional debug
+
+        console.log('[DutchyExchange] Dropdown set marker added.');
+
         const balance      = document.querySelector("#balance_to_exchange")?.textContent.replace(/\D/ig, '') || '';
         const amount_input = document.querySelector("#amount_to_exchange");
         if (amount_input) {
@@ -156,9 +166,7 @@ setTimeout(async () => {
 
     // ── Read clickTargetCoin from SS (namespaced — same key FaucetAutoWithdraw writes)
     async function waitForClickTargetCoin(timeout = 30000, interval = 1000) {
-        // --- ADDED: Let FaucetAutoWithdraw finish cleanup and state assignment ---
-        console.log("[DutchyExchange] Pausing 1000ms to allow main script state to stabilize...");
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        // --- ADDED: Let FaucetAutoWithdraw finish cleanup and state assignment ---;
 
         const start = Date.now();
         return new Promise((resolve, reject) => {
